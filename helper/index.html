@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Neon Button Design with Links and Search Button</title>
+  <style>
+    /* Basic Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d0f12;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      flex-direction: column;
+    }
+
+    /* Heading Style */
+    h1 {
+      font-size: 2.5em;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 30px;
+      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff;
+    }
+
+    /* Frame for Buttons */
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+      border-radius: 15px;
+      background-color: rgba(0, 0, 0, 0.7);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    .button-container:hover {
+      box-shadow: 0 0 60px rgba(255, 255, 255, 0.7);
+    }
+
+    /* Button Style */
+    .button {
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #000000;
+      text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s, box-shadow 0.3s, background-color 0.5s;
+      margin: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none; /* Remove underline from the link */
+    }
+
+    /* Hover Effect */
+    .button:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 0 80px rgba(255, 255, 255, 0.5);
+      background-color: #ffffff;
+      color: #000;
+    }
+
+    /* Neon Colors */
+    .button.orange { background: #ff4500; box-shadow: 0 0 15px #ff4500, 0 0 30px #ff4500; }
+    .button.yellow { background: #ffd700; box-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700; }
+    .button.light-yellow { background: #f9e79f; color: #333; box-shadow: 0 0 15px #f9e79f, 0 0 30px #f9e79f; }
+    .button.brown { background: #5d4037; box-shadow: 0 0 15px #5d4037, 0 0 30px #5d4037; }
+    .button.purple { background: #9c27b0; box-shadow: 0 0 15px #9c27b0, 0 0 30px #9c27b0; }
+    .button.cyan { background: #00bcd4; box-shadow: 0 0 15px #00bcd4, 0 0 30px #00bcd4; }
+    .button.green { background: #32cd32; box-shadow: 0 0 15px #32cd32, 0 0 30px #32cd32; }
+    .button.blue { background: #1e90ff; box-shadow: 0 0 15px #1e90ff, 0 0 30px #1e90ff; }
+    .button.pink { background: #ff1493; box-shadow: 0 0 15px #ff1493, 0 0 30px #ff1493; }
+    .button.red { background: #dc143c; box-shadow: 0 0 15px #dc143c, 0 0 30px #dc143c; }
+
+    /* Icon Style */
+    .checkmark::before {
+      content: "✔️";
+      margin-left: 10px;
+    }
+
+    /* Back Button Style */
+    .back-button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #32cd32;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.3);
+      transition: transform 0.3s, box-shadow 0.3s, background-color 0.5s;
+    }
+
+    .back-button:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 0 80px rgba(255, 255, 255, 0.5);
+      background-color: #ffffff;
+      color: #000;
+    }
+
+    /* Search Button Style */
+    .search-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #1e90ff;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.3);
+      transition: transform 0.3s, box-shadow 0.3s, background-color 0.5s;
+    }
+
+    .search-button:hover {
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 0 80px rgba(255, 255, 255, 0.5);
+      background-color: #ffffff;
+      color: #000;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      .button {
+        width: 100%;
+      }
+      .back-button, .search-button {
+        width: 100%;
+        text-align: center;
+      }
+    }
+    h3{
+      text-align: center;
+      font-weight: lighter;
+      color:rgb(11, 255, 32);
+      font-size: larger;
+      font-weight: 900;
+    }
+    .scrool h3{
+      color: #ededed;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Heading -->
+   <div class="scrool">
+  <h3>Just scrool and choose which one </h3>
+</div>
+  <h3>लोकसेवा खरिदार, नायक सुब, र आधिकारिक को लागि GK and IQ</h3>
+  <div class="button-container">
+
+    
+    <a href="nepal history and culture.html" class="button red">
+      नेपालको इतिहास र संस्कृतिक
+      <span class="checkmark"></span>
+    </a>
+   
+    <a href="loksewa ecomanics.html" class="button yellow">
+      अर्थशास्त्र
+      <span class="checkmark"></span>
+    </a>
+    <a href="rajniti and sabidahn.html" class="button blue">
+      राजनीति र संविधान
+      <span class="checkmark"></span>
+    </a>
+    <a href="loksewa science and technology.html" class="button green">
+      विज्ञान र प्रविधि
+      <span class="checkmark"></span>
+    </a>
+   
+    <a href="loksewa social.html" class="button purple">
+      सामाजिक अध्ययन
+      <span class="checkmark"></span>
+    </a> <a href="samasayik ghatnana .html" class="button pink">
+      समसामयिक घटनाक्रम
+      <span class="checkmark"></span>
+    </a> <a href="bhasa and sahitya.html" class="button white">
+      भाषा र साहित्य:
+      <span class="checkmark"></span>
+    </a> <a href="janasakti and jiban sili.html" class="button yellow">
+      जनस्वास्थ्य र जीवनशैली
+      <span class="checkmark"></span>
+    </a>
+    <!-- More buttons... -->
+  </div>
+ 
+
+  </div>
+  <h3>  Engineering Loksewa Preperation(5th level)</h3>
+  <div class="button-container">
+   
+    <a href="loksewa civil.html" class="button purple">
+Civil Engineering
+      <span class="checkmark"></span>
+    </a>
+    <a href="diploma computer enginering.html" class="button yellow">
+      Computer Engineering
+      <span class="checkmark"></span>
+    </a>
+    <a href="diploma electrical engineering.html" class="button pink">
+      Electrical  Engineering
+      <span class="checkmark"></span>
+    </a>
+    <a href="diploma mechnaical engineering.html" class="button blue">
+      Mechanical Engineering
+      <span class="checkmark"></span>
+    </a>
+
+   
+  </div>
+  <h3>+2 Science ,CTEVT Entrance preperation</h3>
+  <div class="button-container">
+   
+    <a href="math preperation class 10.html" class="button orange">
+      Mathematics
+      <span class="checkmark"></span>
+    </a>
+    <a href="science preperation class 10.html" class="button red">
+      Science
+      <span class="checkmark"></span>
+    </a>
+    <a href="english preperation class 10.html" class="button light-yellow">
+      English
+      <span class="checkmark"></span>
+    </a>
+    <a href="all class 10 mix.html" class="button green">
+      All in one(+2 Science,CTEVT Test MCQ)
+      <span class="checkmark"></span>
+    </a>
+
+    <!-- More buttons... -->
+  </div>
+
+  <h3>  CMAT Entrance Preprartion Preperation(5th level)</h3>
+  
+  <div class="button-container">
+    
+    <a href="https://www.example.com/civil-engineering" class="button orange">
+Civil Engineering
+      <span class="checkmark"></span>
+    </a>
+    <a href="https://www.example.com/electrical-engineering" class="button yellow">
+      Computer Engineering
+      <span class="checkmark"></span>
+    </a>
+    <a href="https://www.example.com/electrical-engineering" class="button brown">
+      Electrical  Engineering
+      <span class="checkmark"></span>
+    </a>
+    <a href="https://www.example.com/electrical-engineering" class="button blue">
+      Mechanical Engineering
+      <span class="checkmark"></span>
+    </a>
+
+    <!-- More buttons... -->
+  </div>
+  <h3>IOE Entrance Preperation (TU,KU,PU,MWU,FWU,POU) helps for CEE also </h3>
+  <div class="button-container">
+    
+    <a href="ioe physics.html" class="button red">
+Physics
+      <span class="checkmark"></span>
+    </a>
+    <a href="ioe chemistry.html" class="button yellow">
+      Chemistry
+      <span class="checkmark"></span>
+    </a>
+   
+  </div>
+  <h3>Comman Entrance Preperation(CEE)Medical Exam  </h3>
+    <div class="button-container">
+      
+      <a href="zoology.html" class="button red">
+  Zoology
+        <span class="checkmark"></span>
+      </a>
+      <a href="CEE botany.html" class="button yellow">
+        Botony
+        <span class="checkmark"></span>
+      </a>
+  </div>
+ 
+ 
+
+    <!-- More buttons... -->
+  
+    
+
+    <!-- More buttons... -->
+
+  <!-- Search Button -->
+ 
+
+  <!-- Back Button -->
+  <a href="hmro main page.html" class="back-button">Back</a>
+</body>
+</html>

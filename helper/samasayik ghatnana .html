@@ -1,0 +1,1046 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    const questions = [
+    {
+        question: "हालै नेपालका प्रधानमन्त्री को हुन्?",
+        answers: ["शेरबहादुर देउवा", "केपी शर्मा ओली", "प्रचण्ड", "बाबुराम भट्टराई"],
+        correct: 2
+    },
+    {
+        question: "नेपालमा २०७९ सालमा सम्पन्न स्थानीय निर्वाचनको प्रमुख मिति कुन हो?",
+        answers: ["बैशाख ३०", "जेठ १", "चैत्र १५", "आषाढ २०"],
+        correct: 0
+    },
+    {
+        question: "नेपालको वर्तमान राष्ट्रिय योजना कुन नम्बरको छ?",
+        answers: ["१२औं योजना", "१४औं योजना", "१५औं योजना", "१६औं योजना"],
+        correct: 2
+    },
+    {
+        question: "हालै नेपाली राष्ट्रिय क्रिकेट टिमका कप्तान को हुन्?",
+        answers: ["दीपेन्द्र सिंह ऐरी", "सन्दीप लामिछाने", "रोहित पौडेल", "गुलशन झा"],
+        correct: 2
+    },
+    {
+        question: "नेपालले हालै कुन अन्तर्राष्ट्रिय खेलकुद प्रतियोगितामा स्वर्ण पदक जितेको हो?",
+        answers: ["ओलम्पिक", "एसियाली खेलकुद", "साग खेलकुद", "सार्क खेलकुद"],
+        correct: 1
+    },
+    {
+        question: "हालै नेपालले कुन देशसँग द्विपक्षीय व्यापार सम्झौता गरेको छ?",
+        answers: ["भारत", "चीन", "बंगलादेश", "जापान"],
+        correct: 0
+    },
+    {
+        question: "हालै स्थापना भएको 'नेपाल भिजन २०४०' को मुख्य उद्देश्य के हो?",
+        answers: ["आर्थिक समृद्धि", "शिक्षा सुधार", "जलविद्युत् विकास", "पर्यटन प्रवर्द्धन"],
+        correct: 0
+    },
+    {
+        question: "नेपालका हालका राष्ट्रपतिको नाम के हो?",
+        answers: ["विद्या भण्डारी", "रामचन्द्र पौडेल", "गणेश तिमल्सिना", "नन्दकिशोर पुन"],
+        correct: 1
+    },
+    {
+        question: "नेपालले २०७९ सालमा कुन देशबाट अत्यधिक प्रत्यक्ष वैदेशिक लगानी प्राप्त गरेको छ?",
+        answers: ["भारत", "चीन", "अमेरिका", "युरोपियन युनियन"],
+        correct: 1
+    },
+    {
+        question: "हालै नेपालले कुन नदीमा जलविद्युत् आयोजनाको लागि भारतसँग सहकार्य गरेको छ?",
+        answers: ["कोशी", "गण्डकी", "माहाकाली", "कर्णाली"],
+        correct: 2
+    },
+    {
+        question: "हालै सम्पन्न नेपाल-चीनबीचको सीमाना वार्ता कुन शहरमा सम्पन्न भएको हो?",
+        answers: ["काठमाडौं", "बेइजिङ", "ल्हासा", "पोक्हरा"],
+        correct: 1
+    },
+    {
+        question: "हालै नेपालमा कुन वर्षलाई 'भ्रमण वर्ष' घोषणा गरिएको छ?",
+        answers: ["२०२२", "२०२५", "२०२३", "२०२४"],
+        correct: 3
+    },
+    {
+        question: "हालै काठमाडौँ उपत्यकाको वायु प्रदूषण मापनको लागि प्रयोग हुने प्रणाली के हो?",
+        answers: ["AQI प्रणाली", "ISO प्रणाली", "PM प्रणाली", "IQ प्रणाली"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन अन्तर्राष्ट्रिय संगठनको अध्यक्षता ग्रहण गरेको छ?",
+        answers: ["सार्क", "बिमस्टेक", "गुट-निरपेक्ष आन्दोलन", "एशियाली विकास बैंक"],
+        correct: 1
+    },
+    {
+        question: "हालै नेपालको विद्युत् व्यापार कुन देशसँग बढी भएको छ?",
+        answers: ["भारत", "चीन", "भूटान", "बंगलादेश"],
+        correct: 0
+    },
+    {
+        question: "हालै 'गरिबी निवारण कोष' अन्तर्गत कुन कार्यक्रम चर्चित भएको छ?",
+        answers: ["समृद्धि गाउँ कार्यक्रम", "ग्रामीण विकास योजना", "समाज सुधार अभियान", "उद्योग प्रवर्द्धन कार्यक्रम"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन प्राकृतिक क्षेत्रलाई विश्व सम्पदा सूचीमा समावेश गरेको छ?",
+        answers: ["लुम्बिनी", "माछापुच्छ्रे बेस क्याम्प", "चितवन राष्ट्रिय निकुञ्ज", "हिमालय क्षेत्र"],
+        correct: 2
+    },
+    {
+        question: "नेपालले हालै कुन देशबाट नयाँ राजदूत नियुक्त गरेको छ?",
+        answers: ["भारत", "चीन", "अमेरिका", "बंगलादेश"],
+        correct: 3
+    },
+    {
+        question: "हालै नेपालको 'हुलाकी मार्ग' निर्माणको प्रमुख वित्तीय स्रोत कुन हो?",
+        answers: ["भारत सरकार", "विश्व बैंक", "एशियाली विकास बैंक", "चीन सरकार"],
+        correct: 0
+    },
+    {
+        question: "नेपालमा हालै कुन प्रदेशले 'डिजिटल ग्रामिण बैंक' स्थापना गरेको छ?",
+        answers: ["प्रदेश १", "गण्डकी प्रदेश", "प्रदेश २", "लुम्बिनी प्रदेश"],
+        correct: 3
+    }, {
+        question: "नेपालले हालै कुन देशसँग २५ मेगावाट विद्युत् निर्यात गरेको छ?",
+        answers: ["भारत", "चीन", "बंगलादेश", "भूटान"],
+        correct: 2
+    },
+    {
+        question: "हालै सम्पन्न 'नेपाल आइटी फेयर २०२४' कुन सहरमा आयोजित भएको थियो?",
+        answers: ["काठमाडौं", "पोखरा", "बिराटनगर", "भैरहवा"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन क्षेत्रमा 'ग्रीन इकोनोमी' लागू गर्ने घोषणा गरेको छ?",
+        answers: ["जलविद्युत्", "कृषि", "पर्यटन", "शिक्षा"],
+        correct: 1
+    },
+    {
+        question: "नेपालको ७७ औं जिल्ला कुन हो?",
+        answers: ["रौतहट", "नवलपरासी", "गुल्मी", "रुकुम पूर्व"],
+        correct: 3
+    },
+    {
+        question: "नेपालको पहिलो स्याटेलाइट 'नेपाल स्याट-१' कहिले अन्तरिक्षमा पठाइएको थियो?",
+        answers: ["२०७५", "२०७६", "२०७७", "२०७८"],
+        correct: 0
+    },
+    {
+        question: "नेपालमा हालै स्थापना भएको 'हिमालयन क्लाइमेट रिसर्च सेन्टर' कुन शहरमा रहेको छ?",
+        answers: ["ललितपुर", "काठमाडौं", "पोखरा", "भक्तपुर"],
+        correct: 1
+    },
+    {
+        question: "हालै सम्पन्न नेपाल-भारत बिजनेस समिट कुन ठाउँमा सम्पन्न भयो?",
+        answers: ["दिल्ली", "काठमाडौं", "पोखरा", "लखनऊ"],
+        correct: 0
+    },
+    {
+        question: "नेपालमा हालै कुन बैंकले 'डिजिटल रुपैँया' अभियान शुरू गरेको छ?",
+        answers: ["नेपाल राष्ट्र बैंक", "एनआइसी एशिया बैंक", "सिद्धार्थ बैंक", "प्रभु बैंक"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन नदीमा जलमार्ग परियोजना सुरु गरेको छ?",
+        answers: ["गण्डकी", "कोशी", "कर्णाली", "माहाकाली"],
+        correct: 1
+    },
+    {
+        question: "नेपालमा २०८० सालमा कुन मेला पहिलो पटक अन्तर्राष्ट्रिय स्तरमा आयोजना गरियो?",
+        answers: ["लुम्बिनी फेयर", "काठमाडौं फेस्टिवल", "पोखरा करिअर फेयर", "चितवन पर्यटन मेला"],
+        correct: 3
+    },
+    {
+        question: "नेपालमा हालै कुन विश्वविद्यालयलाई 'रिसर्च युनिभर्सिटी' का रूपमा घोषित गरिएको छ?",
+        answers: ["त्रिभुवन विश्वविद्यालय", "काठमाण्डौं विश्वविद्यालय", "पोखरा विश्वविद्यालय", "पूर्वाञ्चल विश्वविद्यालय"],
+        correct: 1
+    },
+    {
+        question: "हालै सम्पन्न 'नेपाल पर्यटन वर्ष २०२४' अभियानको प्रमुख नारा के थियो?",
+        answers: ["नेपालको भ्रमण गरौं", "सुन्दर नेपाल, समृद्ध नेपाल", "नेपालमा स्वागत छ", "एडवेंचर नेपाल"],
+        correct: 1
+    },
+    {
+        question: "नेपालले हालै कुन क्षेत्रलाई UNESCO विश्व सम्पदा सूचीमा सिफारिस गरेको छ?",
+        answers: ["रारा ताल", "मुकुट हिमाल", "लुम्बिनी क्षेत्र", "कर्णाली क्षेत्र"],
+        correct: 0
+    },
+    {
+        question: "हालै नेपालले कुन देशसँग स्वास्थ्य सहकार्य सम्झौता गरेको छ?",
+        answers: ["चीन", "जर्मनी", "अमेरिका", "भारत"],
+        correct: 3
+    },
+    {
+        question: "नेपालको पहिलो पूर्ण डिजिटल नगरपालिका कुन हो?",
+        answers: ["धनगढी", "वीरगंज", "हेटौंडा", "भक्तपुर"],
+        correct: 2
+    },
+    {
+        question: "नेपालको हालैको जनगणनामा कुल जनसंख्या कति छ?",
+        answers: ["२ करोड ८० लाख", "३ करोड २० लाख", "२ करोड ९५ लाख", "३ करोड १० लाख"],
+        correct: 1
+    },
+    {
+        question: "नेपालले हालै कुन क्षेत्रलाई 'बायोस्फीयर रिजर्भ' घोषणा गरेको छ?",
+        answers: ["अन्नपूर्ण क्षेत्र", "लाङटाङ क्षेत्र", "रारा क्षेत्र", "मुकुट हिमाल"],
+        correct: 0
+    },
+    {
+        question: "हालै नेपालमा पहिलो पटक कुन सरकारी निकायले 'ई-गभर्नेन्स' लागू गरेको छ?",
+        answers: ["शिक्षा मन्त्रालय", "गृह मन्त्रालय", "पर्यटन मन्त्रालय", "परराष्ट्र मन्त्रालय"],
+        correct: 1
+    },
+    {
+        question: "नेपालको सबैभन्दा नयाँ जलविद्युत् परियोजना कुन हो?",
+        answers: ["मध्यभोटेकोशी", "तामाकोशी-५", "अरुण-३", "कालीगण्डकी"],
+        correct: 2
+    },
+    {
+        question: "नेपालमा हालै सार्वजनिक भएको 'क्लाइमेट चेंज पॉलिसी २०८०' को मुख्य उद्देश्य के हो?",
+        answers: ["वातावरण संरक्षण", "जलविद्युत् प्रवर्द्धन", "पर्यटन विकास", "समाज सुधार"],
+        correct: 0
+    },
+    {
+        question: "नेपालमा पहिलो पटक स्थापित 'रोबोटिक्स पार्क' कुन ठाउँमा छ?",
+        answers: ["काठमाडौं", "पोखरा", "चितवन", "ललितपुर"],
+        correct: 1
+    },
+    {
+        question: "हालै नेपालले 'डीजल-ग्यास' को आयातलाई घटाउन कुन योजना सुरु गरेको छ?",
+        answers: ["सोलार इनर्जी प्रोजेक्ट", "ग्रीन इकोनोमी अभियान", "विद्युत् चार्जिङ स्टेशन", "हाइड्रोजन फ्युल सिस्टम"],
+        correct: 2
+    },
+    {
+        question: "नेपालको पहिलो 'स्मार्ट सिटी' कुन हो?",
+        answers: ["काठमाडौं", "हेटौंडा", "धरान", "धनगढी"],
+        correct: 1
+    },
+    {
+        question: "नेपालको हालैको राष्ट्रिय बजेटमा कृषिमा छुट्याइएको रकम कति थियो?",
+        answers: ["२० अर्ब", "१५ अर्ब", "२५ अर्ब", "३० अर्ब"],
+        correct: 2
+    },
+    {
+        question: "नेपालमा २०८० सालमा कुन क्षेत्रमा सर्वाधिक प्राकृतिक विपत्ति भएको थियो?",
+        answers: ["ताप्लेजुङ", "डोल्पा", "दार्चुला", "स्याङ्जा"],
+        correct: 3
+    },
+    {
+        question: "हालै नेपालमा 'सोलार पावर ग्रिड' परियोजना कुन जिल्लामा सुरु भएको छ?",
+        answers: ["मकवानपुर", "सर्लाही", "चितवन", "भक्तपुर"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन देशसँग सीधा रेल सेवा सुरु गरेको छ?",
+        answers: ["भारत", "चीन", "भूटान", "बंगलादेश"],
+        correct: 0
+    },
+    {
+        question: "नेपालको पहिलो अन्तर्राष्ट्रिय स्पोर्ट्स स्टेडियम कुन ठाउँमा निर्माण भइरहेको छ?",
+        answers: ["चितवन", "पोखरा", "बिराटनगर", "दाङ"],
+        correct: 0
+    },
+    {
+        question: "नेपालमा पहिलो पटक स्थापना गरिएको 'हाइड्रो-जियोपार्क' कुन क्षेत्रमा छ?",
+        answers: ["गण्डकी प्रदेश", "कर्णाली प्रदेश", "बागमती प्रदेश", "सुदूरपश्चिम प्रदेश"],
+        correct: 1
+    },{
+        question: "नेपालले हालै 'महासागर गढा' नामक योजना कुन देशसँग सुरु गरेको छ?",
+        answers: ["भारत", "चीन", "जापान", "अमेरिका"],
+        correct: 1
+    },
+    {
+        question: "नेपालको पहिलो 'सौर्य पावर प्लांट' कुन स्थानमा स्थापित गरिएको छ?",
+        answers: ["काठमाण्डौं", "पोखरा", "चितवन", "सुनसरी"],
+        correct: 2
+    },
+    {
+        question: "नेपालले आफ्नो ५५ औं राष्ट्रिय जलवायु परिवर्तन सम्मेलन कहिले आयोजना गर्यो?",
+        answers: ["२०७८", "२०७७", "२०७६", "२०७५"],
+        correct: 1
+    },
+    {
+        question: "नेपालको दोस्रो सबैभन्दा ठूलो मेला कुन हो?",
+        answers: ["सार्वजनिक मेला", "लुम्बिनी मेला", "बुद्ध जयन्ती", "गणेश चतुर्थी"],
+        correct: 0
+    },
+    {
+        question: "नेपालको नयाँ राष्ट्रिय पर्व 'दृष्टि दिवस' कहिले मनाइन्छ?",
+        answers: ["१ माघ", "२५ माघ", "१५ माघ", "२७ माघ"],
+        correct: 3
+    },
+    {
+        question: "नेपालले आफ्नो २१ औं संविधान संशोधन कहिले गरेको थियो?",
+        answers: ["२०७५", "२०७४", "२०७६", "२०७७"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै आफ्नो पहिलो डिजिटल बैंकको लाइसेन्स किसलाई दिएको छ?",
+        answers: ["एनआईसी एशिया बैंक", "प्रभु बैंक", "सेभन बैंक", "धनाढ्य बैंक"],
+        correct: 1
+    },
+    {
+        question: "नेपालमा 'वैश्विक COVID-१९ महामारी'को प्रभाव कति समयसम्म रह्यो?",
+        answers: ["१ वर्ष", "२ वर्ष", "३ वर्ष", "४ वर्ष"],
+        correct: 1
+    },
+    {
+        question: "नेपालले हालै कुन प्रदेशको पर्वतीय क्षेत्रलाई 'नेचुरल हेरिटेज' सूचीमा राख्ने घोषणा गरेको छ?",
+        answers: ["सुदूरपश्चिम", "बागमती", "गण्डकी", "कर्णाली"],
+        correct: 3
+    },
+    {
+        question: "नेपालको संविधानको ७ वर्षे वार्षिक समीक्षा कुन मितिमा सम्पन्न गरियो?",
+        answers: ["२०७८ माघ", "२०७८ कात्तिक", "२०७७ माघ", "२०७९ माघ"],
+        correct: 2
+    },
+    {
+        question: "नेपालमा चलिरहेको जलवायु परिवर्तनको असर कुन क्षेत्रलाई सबैभन्दा बढी परेको छ?",
+        answers: ["कृषि", "पर्यटन", "स्वास्थ्य", "शिक्षा"],
+        correct: 0
+    },
+    {
+        question: "नेपालको राष्ट्रीय ध्वजालाई नयाँ शैलीमा प्रस्तुत गरिएको महोत्सव कुन वर्ष आयोजित गरियो?",
+        answers: ["२०७८", "२०७७", "२०७६", "२०७५"],
+        correct: 3
+    },
+    {
+        question: "नेपालको पहिलो अन्तर्राष्ट्रिय फुटबल प्रतियोगिता कुन वर्ष शुरू भयो?",
+        answers: ["२०२४", "२०२२", "२०२३", "२०२५"],
+        correct: 0
+    },
+    {
+        question: "नेपालको पहिलो अन्तर्राष्ट्रिय शान्ति सम्मेलन कुन वर्ष आयोजना गरियो?",
+        answers: ["२०२०", "२०१८", "२०१९", "२०१७"],
+        correct: 2
+    },
+    {
+        question: "नेपालले हालै कुन मुलुकसँग 'व्यापारिक सहकार्य' सम्झौता गरेको छ?",
+        answers: ["अमेरिका", "भारत", "चीन", "जर्मनी"],
+        correct: 0
+    },
+    {
+        question: "नेपालको नेपाल भ्रमण वर्ष २०२४ को आयोजनामा प्रमुख आकर्षण के हो?",
+        answers: ["लुम्बिनी क्षेत्र", "हिमालयन ट्रेकिङ", "सार्वजनिक मेला", "साहित्य महोत्सव"],
+        correct: 1
+    },
+    {
+        question: "नेपालको कुल निर्यात मूल्यमा सगरमाथा कस्तो उत्पादनको योगदान बढी रहेको छ?",
+        answers: ["फलफूल", "तरकारी", "सूती कपडा", "पानी"],
+        correct: 2
+    },
+    {
+        question: "नेपालका लागि 'कर्पोरेट सोशल रेस्पन्सिबिलिटी' कार्यक्रमको मुख्य उद्देश्य के हो?",
+        answers: ["विकास", "सामाजिक दायित्व", "आर्थिक सहकार्य", "पारदर्शिता"],
+        correct: 1
+    },
+    {
+        question: "नेपालको एकमात्र भौगोलिक 'विशाल पार्क' कुन हो?",
+        answers: ["लुम्बिनी पार्क", "शिवपुरी पार्क", "सप्टरी ताल पार्क", "बागमती पार्क"],
+        correct: 1
+    },
+    {
+        question: "नेपालको सबैभन्दा लामो टनेल कुन सडकमा स्थित छ?",
+        answers: ["प्रभु चोक टनेल", "नारायणघाट टनेल", "पुस्पलाल राजमार्ग", "नवलपुर टनेल"],
+        correct: 3
+    },
+    {
+        question: "नेपालले हालै मुलुकको राष्ट्रध्वजाको डिजाइन कति वर्ष पुरानो बनाएको छ?",
+        answers: ["१०० वर्ष", "१५० वर्ष", "२०० वर्ष", "२१० वर्ष"],
+        correct: 1
+    },
+    {
+        question: "नेपालको प्रसिद्ध 'चन्द्रागिरी टावर' कुन क्षेत्रमा स्थित छ?",
+        answers: ["काठमाण्डौं", "ललितपुर", "पोखरा", "सुनसरी"],
+        correct: 0
+    },
+    {
+        question: "नेपालको पहिलो जिओलॉजिकल पार्क कुन स्थानमा स्थित छ?",
+        answers: ["मकवानपुर", "सार्वजनिक पार्क", "भैरहवा", "हेटौंडा"],
+        correct: 3
+    },
+    {
+        question: "नेपालले बर्ड फ्लूको महामारीको समयमा कुन उपाय अपनायो?",
+        answers: ["अर्थशास्त्र सुधार", "भ्रमण वर्ष रोक्नु", "सवारी रोक्नु", "स्वास्थ्य जाँच प्रणाली"],
+        correct: 3
+    },
+    {
+        question: "नेपालको पहिलो ग्रीन हाउस ग्यास पोल्युशन नियन्त्रण कार्यक्रम कुन वर्ष शुरू गरिएको थियो?",
+        answers: ["२०२२", "२०२३", "२०२१", "२०२४"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख राष्ट्रिय वनहरू मध्ये कुन क्षेत्र 'बायो डाइवर्सिटी'को लागि प्रसिद्ध छ?",
+        answers: ["कसकी", "पर्बत", "कञ्चनजङ्घा", "अन्नपूर्ण"],
+        correct: 3
+    }, {
+        question: "नेपालले हालै २०२४ का लागि औपचारिक ‘ब्याज दर’ घोषणा गरेको छ?",
+        answers: ["८%", "७%", "६%", "५%"],
+        correct: 2
+    },
+    {
+        question: "नेपालको पहिलो डिजीटल बजेट कहिले पेश गरियो?",
+        answers: ["२०७६", "२०७५", "२०७८", "२०७७"],
+        correct: 0
+    },
+    {
+        question: "नेपालको पर्यटनको बढावा दिने अभियान 'Visit Nepal Year' कुन वर्ष सञ्चालन भएको हो?",
+        answers: ["२०२०", "२०२१", "२०२२", "२०२४"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन अन्तर्राष्ट्रिय सम्मेलनमा भाग लिएको थियो?",
+        answers: ["सार्क सम्मेलन", "संयुक्त राष्ट्र संघ", "एशियाई खेल", "चीन-नेपाल सम्मेलन"],
+        correct: 1
+    },
+    {
+        question: "नेपालले हालै व्यापार क्षेत्रमा कुन ठुलो सुधार गरेको छ?",
+        answers: ["विदेशी लगानी", "मुलुकभित्रको व्यापार नीति", "नमूना गाह्रो कर्जा नीति", "वैकल्पिक ऊर्जा नीति"],
+        correct: 0
+    },
+    {
+        question: "नेपालको एउटा प्रमुख जलविद्युत आयोजनाको नाम के हो?",
+        answers: ["सगरमाथा जलविद्युत", "अरुण जलविद्युत", "माथि कुसु जलविद्युत", "काली गण्डकी जलविद्युत"],
+        correct: 1
+    },
+    {
+        question: "नेपालका लागि हालैको ‘स्मार्ट सिटी’ कार्यक्रम कुन क्षेत्रको लागि अघि बढाइएको हो?",
+        answers: ["काठमाण्डौं", "पोखरा", "ललितपुर", "धरान"],
+        correct: 0
+    },
+    {
+        question: "नेपालको एशियाई खेल २०२२ मा कुन खेलमा स्वर्ण पदक प्राप्त भएको हो?",
+        answers: ["फुटबल", "क्रिकेट", "कुश्ती", "हॉकी"],
+        correct: 2
+    },
+    {
+        question: "नेपालको संविधानको अस्थायी व्यवस्था कहिले लागू गरिएको थियो?",
+        answers: ["२०७२", "२०७४", "२०७५", "२०७७"],
+        correct: 0
+    },
+    {
+        question: "नेपालले हालै कुन राष्ट्रिय सस्तो उर्जा उत्पादन परियोजना सुरु गरेको छ?",
+        answers: ["सौर्य पावर", "हाइड्रो पावर", "बायोमास", "ग्याँस आधारित"],
+        correct: 0
+    },
+    {
+        question: "नेपालको कस्ता उत्पादनका लागि सबैभन्दा बढी निर्यात हुँदैछ?",
+        answers: ["चिया", "फलफूल", "साँसारिक वस्तु", "कृषि उत्पादन"],
+        correct: 1
+    },
+    {
+        question: "नेपालको सबैभन्दा ठूलो सार्वजनिक स्वास्थ्य कार्यक्रम कुन हो?",
+        answers: ["स्वास्थ्य बिमा", "टीकाकरण अभियान", "स्मार्ट हेल्थ", "राष्ट्रीय स्वास्थ्य योजना"],
+        correct: 1
+    },
+    {
+        question: "नेपालले हालै कुन मुलुकसँग व्यापार सम्झौतामा हस्ताक्षर गरेको छ?",
+        answers: ["भारत", "चीन", "नेपाल-नेपाल", "पाकिस्तान"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख पर्यटन गन्तव्यहरू मध्ये कुन स्थानलाई 'विश्व धरोहर स्थल'का रूपमा चिन्नु भएको छ?",
+        answers: ["साल्ट ट्राउट", "काठमाण्डौं दरबार स्क्वायर", "जनकपुर", "सञ्चार पहाड"],
+        correct: 1
+    },
+    {
+        question: "नेपालको सर्वाधिक जनसंख्या कुन प्रदेशमा स्थित छ?",
+        answers: ["प्रदेश १", "प्रदेश २", "प्रदेश ३", "प्रदेश ४"],
+        correct: 1
+    },
+    {
+        question: "नेपालको राष्ट्रिय प्राथमिकता क्षेत्र कुन हो?",
+        answers: ["कृषि", "निर्माण", "पर्यटन", "विज्ञान र प्रविधि"],
+        correct: 0
+    },
+    {
+        question: "नेपालले आफ्नो मुख्य रक्षात्मक नीति कुनसँग संबद्ध गरिएको छ?",
+        answers: ["सार्क", "नेपाल-भारत साझेदारी", "द्विपक्षीय सहयोग", "शान्ति सम्झौताहरू"],
+        correct: 0
+    },
+    {
+        question: "नेपालको सबैभन्दा ठूलो रासायनिक उद्योग कुन हो?",
+        answers: ["विस्थापित शैक्षिक", "रासायनिक उद्योग", "सामान्य उद्योग", "पशुपालन उद्योग"],
+        correct: 1
+    },
+    {
+        question: "नेपालले हालै कुन योजना अन्तर्गत टेलिकम सेवा उपलब्ध गराएको छ?",
+        answers: ["स्मार्ट नेपाल", "नेपाल इन्टरनेट योजना", "नेपाल टेलिकम सुधार", "नेपाल डिजिटल योजना"],
+        correct: 3
+    },
+    {
+        question: "नेपालको सबैभन्दा ठूलो व्यावसायिक संस्थान कुन हो?",
+        answers: ["एनसीसी बैंक", "नेपाल रेशम उद्योग", "अन्नपूर्ण होटल", "नेपाल पर्यटन बोर्ड"],
+        correct: 2
+    },
+    {
+        question: "नेपालको सबैभन्दा ठूलो बजेट भएका मन्त्रालय कुन हो?",
+        answers: ["शिक्षा मन्त्रालय", "स्वास्थ्य मन्त्रालय", "वित्त मन्त्रालय", "रक्षा मन्त्रालय"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख राष्ट्रिय जल स्रोतहरूको संरक्षणको लागि कुन संस्थाले पहल गरेको छ?",
+        answers: ["नेपाल जल प्राधिकरण", "जल निगम", "विज्ञान प्राधिकरण", "नेपाल जल निगम"],
+        correct: 0
+    },
+    {
+        question: "नेपालको नयाँ राष्ट्रिय भाषा नीति कुन वर्ष लागू गरिएको हो?",
+        answers: ["२०७५", "२०७६", "२०७४", "२०७३"],
+        correct: 1
+    },
+    {
+        question: "नेपालले विदेशी फडको मापदण्डमा परिवर्तनको योजना कुन वर्ष कार्यान्वयन गरेको थियो?",
+        answers: ["२०२३", "२०२२", "२०२०", "२०२४"],
+        correct: 0
+    },{
+        question: "नेपालले आफ्नो पहिलो स्वदेशी सवारी निर्माण कारखाना कहिले खोलेको थियो?",
+        answers: ["२०२१", "२०२२", "२०२३", "२०२४"],
+        correct: 1
+    },
+    {
+        question: "नेपालको प्रमुख कृषि उत्पादन कुन हो?",
+        answers: ["चिया", "गेहूँ", "चामल", "दाल"],
+        correct: 2
+    },
+    {
+        question: "नेपालको सबैभन्दा ठूलो हवाई अड्डा कुन हो?",
+        answers: ["तृतीय अन्तर्राष्ट्रिय विमानस्थल", "सिद्धार्थ हवाई अड्डा", "पोखरा अन्तर्राष्ट्रिय हवाई अड्डा", "नेपालगञ्ज हवाई अड्डा"],
+        correct: 0
+    },
+    {
+        question: "नेपालको पहिलो राष्ट्रिय निर्वाचन कहिले सम्पन्न भएको थियो?",
+        answers: ["१९५१", "१९५९", "१९६१", "१९६५"],
+        correct: 1
+    },
+    {
+        question: "नेपालको पहिलो महिला राष्ट्रपति को हुन्?",
+        answers: ["सुरिता देवी", "बिद्या देवी भण्डारी", "माया देवी", "यशोदा शाह"],
+        correct: 1
+    },
+    {
+        question: "नेपालको औपचारिक राष्ट्रिय गीतको नाम के हो?",
+        answers: ["सयौं थुँगा फूलका हामी", "नेपाल भइया", "माछा माछा", "पृथ्वी जनक"],
+        correct: 0
+    },
+    {
+        question: "नेपालको प्रमुख निर्यात उत्पादको रुपमा कुन वस्तु रहेको छ?",
+        answers: ["चिया", "फलफूल", "नमकीन", "कपास"],
+        correct: 0
+    },
+    {
+        question: "नेपालले संयुक्त राष्ट्र संघको सदस्यता कुन वर्ष प्राप्त गर्यो?",
+        answers: ["१९५५", "१९५७", "१९६०", "१९६५"],
+        correct: 0
+    },
+    {
+        question: "नेपालमा पर्यटन मन्त्रालयको स्थापना कहिले गरिएको हो?",
+        answers: ["१९५१", "१९५७", "१९८७", "२००१"],
+        correct: 2
+    },
+    {
+        question: "नेपालको पहिलो अन्तर्राष्ट्रिय क्रिकेट मैदान कहिले निर्माण भएको थियो?",
+        answers: ["२००५", "२००६", "२०१०", "२०१२"],
+        correct: 1
+    },
+    {
+        question: "नेपालले कोरोना भाइरसको महामारीसँग जुध्न कुन वर्षको प्रारम्भमा लकडाउन घोषणा गरेको थियो?",
+        answers: ["२०२० मार्च", "२०२१ मार्च", "२०२० अप्रिल", "२०२१ अप्रिल"],
+        correct: 0
+    },
+    {
+        question: "नेपालले भारतसँगको सीमा विवाद कुन क्षेत्रमा समाधान गरेको हो?",
+        answers: ["लिपुलेख", "झापा", "कञ्चनपुर", "सुनसरी"],
+        correct: 0
+    },
+    {
+        question: "नेपालको प्रमुख शहरी योजना कुन वर्ष सार्वजनिक गरिएको हो?",
+        answers: ["२०२०", "२०१५", "२०२२", "२०२१"],
+        correct: 2
+    },
+    {
+        question: "नेपालले हालै ‘इलेक्ट्रोनिक ट्राफिक सिग्नल’ प्रणाली कहिले लागू गरेको हो?",
+        answers: ["२०२१", "२०२२", "२०२३", "२०२४"],
+        correct: 2
+    },
+    {
+        question: "नेपालको राजधानी काठमाण्डौंमा कति वटै उपनगरहरू छन्?",
+        answers: ["७", "१०", "११", "५"],
+        correct: 0
+    },
+    {
+        question: "नेपालका सबैभन्दा पुराना जलविद्युत आयोजना कुन हो?",
+        answers: ["पोखरा जलविद्युत", "मेलम्ची जलविद्युत", "भोटेकोशी जलविद्युत", "इन्द्रसरोवर जलविद्युत"],
+        correct: 2
+    },
+    {
+        question: "नेपालको प्रमुख राष्ट्रिय भौगोलिक संरचना कुन हो?",
+        answers: ["हिमालय", "तराई", "मधेश", "काठमाडौँ उपत्यका"],
+        correct: 0
+    },
+    {
+        question: "नेपालले पहिलो डिजिटल कल्याणकारी सेवा शुरू गर्ने योजना कुन वर्ष घोषणा गरेको हो?",
+        answers: ["२०२३", "२०२१", "२०२२", "२०२४"],
+        correct: 1
+    },
+    {
+        question: "नेपालको प्रमुख शहरी अवसंरचनामा हालैको प्रमुख योजना कुन हो?",
+        answers: ["काठमाण्डौं टुकुका", "सडक विस्तार", "स्मार्ट सिटी विकास", "रेलवे निर्माण"],
+        correct: 2
+    },
+    {
+        question: "नेपालको उद्योगको योगदान राष्ट्रिय जीडीपीमा कति प्रतिशत छ?",
+        answers: ["१०%", "१५%", "१८%", "२०%"],
+        correct: 2
+    },
+    {
+        question: "नेपालले हालैको जुन २०२३ को सूचीमा पहिलो नैतिकता आयोग सदस्यता प्राप्त गर्यो?",
+        answers: ["संविधान आयोग", "न्याय आयोग", "राष्ट्रिय मानवाधिकार आयोग", "न्यायिक सुरक्षा आयोग"],
+        correct: 2
+    },
+    {
+        question: "नेपालको सबैभन्दा ठूलो राष्ट्रिय चाड कुन हो?",
+        answers: ["दशैं", "तिहार", "लोसार", "तीज"],
+        correct: 0
+    },
+    {
+        question: "नेपालको शेर चिउडोको प्रसिद्ध रंग कस्तो हुन्छ?",
+        answers: ["सुन्तला रंग", "सारेरो रंग", "हरा रंग", "सेतो रंग"],
+        correct: 0
+    },
+    {
+        question: "नेपालको पहिलो प्रमुख श्रमिक आन्दोलन कहिले भएको थियो?",
+        answers: ["१९५१", "१९५५", "१९७२", "१९८०"],
+        correct: 0
+    }
+  
+];
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

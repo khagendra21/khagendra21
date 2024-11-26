@@ -1,0 +1,3003 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    
+    const questions = [
+    {
+        question: "What is the primary function of a dam in water resources management?",
+        answers: ["To store water", "To provide electricity", "To prevent flooding", "To treat water"],
+        correct: 0
+    },
+    {
+        question: "Which soil type has the highest permeability?",
+        answers: ["Clay", "Silt", "Gravel", "Sand"],
+        correct: 2
+    },
+    {
+        question: "In road construction, what is the main purpose of sub-base material?",
+        answers: ["To support the pavement structure", "To provide drainage", "To improve aesthetic value", "To reduce cost"],
+        correct: 0
+    },
+    {
+        question: "What is the maximum allowable bending stress in reinforced concrete design according to IS codes?",
+        answers: ["5 MPa", "15 MPa", "20 MPa", "25 MPa"],
+        correct: 1
+    },
+    {
+        question: "What is the main use of Total Station in surveying?",
+        answers: ["Measuring vertical distances", "Measuring horizontal distances", "Measuring angles and distances", "For mapping floodplains"],
+        correct: 2
+    }, {
+        question: "What is the unit of strain in solid mechanics?",
+        answers: ["Newton", "Meter", "No Unit", "Kilogram"],
+        correct: 2
+    },
+    {
+        question: "Which material is primarily used for the construction of the foundation of buildings?",
+        answers: ["Concrete", "Bricks", "Steel", "Wood"],
+        correct: 0
+    },
+    {
+        question: "The modulus of elasticity of concrete typically ranges between?",
+        answers: ["10 to 20 GPa", "20 to 40 GPa", "50 to 70 GPa", "80 to 100 GPa"],
+        correct: 1
+    },
+    {
+        question: "Which type of cement is used for underwater construction?",
+        answers: ["Ordinary Portland Cement", "Rapid Hardening Cement", "Hydraulic Cement", "Sulfate Resistant Cement"],
+        correct: 2
+    },
+    {
+    question: "What is the main use of Total Station in surveying?",
+    answers: ["Measuring vertical distances", "Measuring horizontal distances", "Measuring angles and distances", "For mapping floodplains"],
+    correct: 2
+  },
+  {
+    question: "What is the primary purpose of a slab in construction?",
+    answers: ["To support vertical loads", "To provide shelter", "To resist lateral forces", "To provide a flat surface"],
+    correct: 3
+  },
+  {
+    question: "What does the term 'formwork' refer to in construction?",
+    answers: ["A temporary mold used to shape concrete", "A structural component of a building", "A method of insulating walls", "A type of concrete mix"],
+    correct: 0
+  },
+  {
+    question: "What is the primary cause of corrosion in reinforced concrete?",
+    answers: ["Water ingress", "High temperatures", "Insufficient curing", "High load"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a common cause of soil settlement?",
+    answers: ["Excessive load", "High water content", "Compaction", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the role of a geotechnical engineer in construction?",
+    answers: ["To assess soil stability", "To design the foundation system", "To evaluate site conditions", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which of the following materials is known for its high strength-to-weight ratio?",
+    answers: ["Steel", "Concrete", "Wood", "Brick"],
+    correct: 0
+  },
+  {
+    question: "What is the primary purpose of a foundation?",
+    answers: ["To transfer loads from the structure to the soil", "To provide a flat surface", "To reduce vibrations", "To improve aesthetic appeal"],
+    correct: 0
+  },
+  {
+    question: "Which type of concrete is known for its ability to flow without mechanical vibration?",
+    answers: ["Self-compacting concrete", "High-strength concrete", "Lightweight concrete", "Air-entrained concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the primary component of Portland cement?",
+    answers: ["Calcium silicate", "Silica", "Aluminum oxide", "Magnesium oxide"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of excessive water in a concrete mix?",
+    answers: ["It reduces strength", "It increases workability", "It increases durability", "It speeds up curing time"],
+    correct: 0
+  },
+  {
+    question: "What type of foundation is used for tall buildings and skyscrapers?",
+    answers: ["Pile foundation", "Raft foundation", "Shallow foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main reason for using reinforcement in concrete?",
+    answers: ["To resist tensile forces", "To improve workability", "To increase compressive strength", "To reduce the cost of construction"],
+    correct: 0
+  },
+  {
+    question: "What is the process of 'hydration' in concrete?",
+    answers: ["The chemical reaction between cement and water", "The process of mixing water into concrete", "The curing of concrete in hot conditions", "The addition of additives to improve strength"],
+    correct: 0
+  },
+  {
+    question: "What is the typical lifespan of a concrete structure when properly maintained?",
+    answers: ["50-100 years", "20-30 years", "200-300 years", "10-20 years"],
+    correct: 0
+  },
+  {
+    question: "What is the most common test to determine the workability of concrete?",
+    answers: ["Slump test", "Compressive strength test", "Tensile strength test", "Flexural strength test"],
+    correct: 0
+  },
+  {
+    question: "Which type of cement is commonly used for marine structures?",
+    answers: ["Ordinary Portland cement", "Sulphate-resistant cement", "Rapid-hardening cement", "White cement"],
+    correct: 1
+  },
+  {
+    question: "What does the term 'dead load' refer to in construction?",
+    answers: ["The weight of the structure itself", "The weight of movable objects", "The weight of snow and water", "The weight of wind"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a common method of preventing concrete from cracking during curing?",
+    answers: ["Curing with water", "Curing with air", "Covering with plastic sheets", "Using high-strength cement"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of using low-quality aggregates in concrete?",
+    answers: ["Reduced strength", "Increased workability", "Increased durability", "Faster setting time"],
+    correct: 0
+  },
+  {
+    question: "Which type of concrete is designed to resist freezing and thawing cycles?",
+    answers: ["Air-entrained concrete", "High-strength concrete", "Self-compacting concrete", "Lightweight concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the role of fly ash in concrete?",
+    answers: ["To improve workability and reduce heat", "To increase the cost of construction", "To speed up setting time", "To increase strength"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a load-bearing wall?",
+    answers: ["To support the structure above it", "To provide insulation", "To resist wind forces", "To separate rooms"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of a dam in a water reservoir?",
+    answers: ["To hold back water", "To provide electricity", "To irrigate farmland", "To maintain water quality"],
+    correct: 0
+  },
+  {
+    question: "What type of soil is most commonly used for foundation construction?",
+    answers: ["Clay", "Sand", "Gravel", "Loam"],
+    correct: 2
+  },
+  {
+    question: "What is the main function of a retaining wall?",
+    answers: ["To hold back soil or water", "To provide a flat surface", "To support lateral loads", "To prevent erosion"],
+    correct: 0
+  },
+  {
+    question: "What is the primary material used in the construction of roads?",
+    answers: ["Asphalt", "Steel", "Wood", "Concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of compaction in soil mechanics?",
+    answers: ["To increase soil density", "To reduce water retention", "To increase permeability", "To prevent soil erosion"],
+    correct: 0
+  },
+  {
+    question: "What is the primary role of a structural engineer?",
+    answers: ["Designing buildings", "Inspecting construction sites", "Providing structural analysis and recommendations", "Creating construction schedules"],
+    correct: 2
+  },
+  {
+    question: "What is the main benefit of using reinforced concrete?",
+    answers: ["It resists tensile forces", "It resists compressive forces", "It is lighter than other materials", "It is cheaper to produce"],
+    correct: 0
+  },
+  {
+    question: "What is the main characteristic of a cantilever beam?",
+    answers: ["It is supported at one end only", "It has no supports", "It is used for water distribution", "It is supported on both ends"],
+    correct: 0
+  },
+  {
+    question: "What is the formula for calculating the modulus of elasticity?",
+    answers: ["Stress / Strain", "Strain / Stress", "Force / Area", "Force / Displacement"],
+    correct: 0
+  },
+  {
+    question: "What is the primary cause of soil erosion?",
+    answers: ["Water runoff", "Wind", "Overgrazing", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which type of foundation is most suitable for weak or soft soils?",
+    answers: ["Pile foundation", "Raft foundation", "Strip foundation", "Slab foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main factor influencing the selection of construction materials?",
+    answers: ["Cost", "Durability", "Availability", "All of the above"],
+    correct: 3
+  },{
+    question: "What is the primary purpose of a bearing in a bridge?",
+    answers: ["To provide support", "To absorb vibration", "To resist compression", "To provide a smooth surface"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is used to improve soil stability for foundations?",
+    answers: ["Compaction", "Watering", "Straining", "Lime stabilization"],
+    correct: 3
+  },
+  {
+    question: "What is the function of a reticulated system in water distribution?",
+    answers: ["To filter water", "To supply water to the distribution network", "To store water", "To remove wastewater"],
+    correct: 1
+  },
+  {
+    question: "What is the basic ingredient in the production of concrete?",
+    answers: ["Cement", "Water", "Gravel", "Sand"],
+    correct: 0
+  },
+  {
+    question: "Which material is commonly used for constructing pavements?",
+    answers: ["Asphalt", "Clay", "Steel", "Glass"],
+    correct: 0
+  },
+  {
+    question: "Which type of foundation is best for rocky or hard soil?",
+    answers: ["Pile foundation", "Raft foundation", "Shallow foundation", "Strip foundation"],
+    correct: 2
+  },
+  {
+    question: "Which of the following is an example of a structural element that resists vertical loads?",
+    answers: ["Beam", "Column", "Slab", "Wall"],
+    correct: 2
+  },
+  {
+    question: "What is the primary role of a geotechnical engineer in construction?",
+    answers: ["Design foundations", "Analyze soil properties", "Determine structural loads", "Inspect building plans"],
+    correct: 1
+  },
+  {
+    question: "Which material is commonly used for reinforcing concrete?",
+    answers: ["Steel", "Aluminum", "Copper", "Lead"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'deflection' refer to in structural engineering?",
+    answers: ["Bending or displacement of a structural element", "The ability to absorb impact", "The resistance to heat", "The ability to resist compression"],
+    correct: 0
+  },
+  {
+    question: "What is the function of a diaphragm in a building?",
+    answers: ["To provide lateral support", "To distribute vertical loads", "To resist tension", "To resist earthquakes"],
+    correct: 0
+  },
+  {
+    question: "Which method is used for preventing water infiltration in buildings?",
+    answers: ["Waterproofing", "Curing", "Compaction", "Vibration"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a characteristic of high-strength concrete?",
+    answers: ["Increased compressive strength", "Decreased density", "Increased workability", "Reduced setting time"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'shear force' refer to in structural design?",
+    answers: ["The force that acts parallel to the cross section", "The force that resists bending", "The force due to gravity", "The force that resists torsion"],
+    correct: 0
+  },
+  {
+    question: "What is the typical strength of concrete used in building construction?",
+    answers: ["20-30 MPa", "30-50 MPa", "50-100 MPa", "100-200 MPa"],
+    correct: 0
+  },
+  {
+    question: "Which of the following tests is used to determine the strength of concrete?",
+    answers: ["Slump test", "Compressive strength test", "Flexural strength test", "Shrinkage test"],
+    correct: 1
+  },
+  {
+    question: "What is the main purpose of the 'clay' content in the soil for foundation construction?",
+    answers: ["To improve soil density", "To prevent water seepage", "To resist heavy loads", "To reduce the permeability"],
+    correct: 3
+  },
+  {
+    question: "What type of load is considered a dead load in structural design?",
+    answers: ["Temporary load", "Permanent load", "Live load", "Wind load"],
+    correct: 1
+  },
+  {
+    question: "Which of the following is used to stabilize soil in road construction?",
+    answers: ["Lime stabilization", "Water infiltration", "Soil replacement", "Compaction"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'shear strength' refer to in soil mechanics?",
+    answers: ["The ability of the soil to resist horizontal forces", "The ability of the soil to resist vertical forces", "The ability of the soil to resist tension", "The ability of the soil to absorb water"],
+    correct: 0
+  },
+  {
+    question: "Which of the following factors does NOT influence the load-bearing capacity of soil?",
+    answers: ["Soil type", "Soil density", "Soil texture", "Building design"],
+    correct: 3
+  },
+  {
+    question: "What is the purpose of the 'Ferrocement' technique in construction?",
+    answers: ["To reinforce concrete with steel mesh", "To reduce the cost of construction", "To reduce the weight of concrete", "To improve the aesthetic appearance"],
+    correct: 0
+  },
+  {
+    question: "What is the most commonly used type of cement in building construction?",
+    answers: ["Portland cement", "Sulphate-resistant cement", "Rapid-hardening cement", "White cement"],
+    correct: 0
+  },
+  {
+    question: "What is the primary cause of failure in a retaining wall?",
+    answers: ["Excessive water pressure", "Insufficient reinforcement", "Poor soil compaction", "Excessive load"],
+    correct: 0
+  },
+  {
+    question: "What is the primary objective of soil compaction?",
+    answers: ["To increase soil density", "To reduce permeability", "To increase moisture content", "To improve workability"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'elasticity' refer to in structural materials?",
+    answers: ["The ability to return to its original shape after deformation", "The ability to resist compressive forces", "The ability to conduct heat", "The ability to resist corrosion"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of the slump test?",
+    answers: ["To determine the workability of concrete", "To determine the compressive strength", "To measure the temperature of concrete", "To test the setting time of concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the role of 'reinforced steel' in concrete?",
+    answers: ["To resist tensile forces", "To resist compressive forces", "To provide thermal insulation", "To improve the appearance of concrete"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'overload' refer to in structural engineering?",
+    answers: ["Exceeding the maximum load capacity", "The weight of materials used in construction", "The effect of wind forces", "The weight of live loads"],
+    correct: 0
+  },
+  {
+    question: "What is the primary purpose of a structural column?",
+    answers: ["To carry vertical loads", "To resist lateral forces", "To provide aesthetic appeal", "To support beams and slabs"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a pile foundation?",
+    answers: ["To transfer load to deeper layers of soil", "To resist lateral forces", "To provide thermal insulation", "To increase workability"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a characteristic of a shear wall?",
+    answers: ["It resists lateral forces", "It resists vertical loads", "It provides support for beams", "It provides thermal insulation"],
+    correct: 0
+  },
+  {
+    question: "Which type of concrete is typically used for high-rise buildings?",
+    answers: ["High-strength concrete", "Self-compacting concrete", "Air-entrained concrete", "Lightweight concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the primary role of asphalt in road construction?",
+    answers: ["To provide a smooth surface", "To resist traffic loads", "To prevent water infiltration", "To provide a base for concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the most common method of preventing cracking in concrete?",
+    answers: ["Proper curing", "Using high-strength cement", "Increasing water content", "Decreasing aggregate size"],
+    correct: 0
+  },
+  {
+    question: "What is the role of expansion joints in construction?",
+    answers: ["To allow movement due to thermal expansion", "To improve the appearance of the structure", "To reduce the weight of the structure", "To resist wind forces"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a cause of settlement in soils?",
+    answers: ["Excessive moisture content", "Excessive compaction", "Excessive loading", "All of the above"],
+    correct: 3
+  },{
+        question: "What is the purpose of an expansion joint in a bridge?",
+        answers: ["To absorb thermal expansion", "To resist bending", "To increase strength", "To reduce vibrations"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'footing' refer to in civil engineering?",
+        answers: ["The base of a column", "A supporting structure for a building", "The top surface of a foundation", "A deep excavation"],
+        correct: 0
+    },
+    {
+        question: "What is the most commonly used method for reducing water penetration in buildings?",
+        answers: ["Waterproofing", "Curing", "Ventilation", "Sealing cracks"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a pile foundation?",
+        answers: ["To support heavy loads", "To resist lateral forces", "To improve soil density", "To transfer loads to stable soil layers"],
+        correct: 3
+    },
+    {
+        question: "What material is most commonly used for reinforcement in concrete?",
+        answers: ["Steel", "Copper", "Aluminum", "Glass"],
+        correct: 0
+    },
+    {
+        question: "What is the typical unit of measurement for concrete strength?",
+        answers: ["MPa (MegaPascal)", "N/mm²", "kg", "Pa (Pascal)"],
+        correct: 0
+    },
+    {
+        question: "What is the main cause of failure in a retaining wall?",
+        answers: ["Water pressure", "Poor soil conditions", "Overloading", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of using aggregate in concrete?",
+        answers: ["To reduce cost", "To increase workability", "To increase strength and durability", "To provide color to concrete"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a common use of reinforced concrete?",
+        answers: ["Pavement", "Bridges", "Roofs", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the function of a shear wall in a building?",
+        answers: ["To resist lateral forces", "To support vertical loads", "To distribute heat", "To improve aesthetics"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is typically added to concrete to prevent cracking during the curing process?",
+        answers: ["Water", "Plasticizers", "Fiber", "Aluminum"],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of a camber in a structural beam?",
+        answers: ["To counteract deflection", "To improve the appearance", "To reduce weight", "To improve load resistance"],
+        correct: 0
+    },
+    {
+        question: "What is the most commonly used method to protect a steel structure from corrosion?",
+        answers: ["Painting", "Galvanizing", "Cladding", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following methods is used to improve the stability of slopes?",
+        answers: ["Soil nailing", "Landscaping", "Paving", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the primary material used for pipes in water distribution systems?",
+        answers: ["PVC", "Copper", "Steel", "Concrete"],
+        correct: 0
+    },
+    {
+        question: "Which is the most important factor in determining the size of a foundation?",
+        answers: ["Type of structure", "Soil type", "Cost", "Climate"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'superstructure' refer to?",
+        answers: ["The part of a building above the ground level", "The foundation", "The roof", "The load-bearing walls"],
+        correct: 0
+    },
+    {
+        question: "What is the primary purpose of concrete curing?",
+        answers: ["To reduce drying time", "To ensure proper hydration of cement", "To improve aesthetics", "To increase weight"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a flexible pavement?",
+        answers: ["Asphalt pavement", "Concrete pavement", "Brick pavement", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the typical depth of a shallow foundation?",
+        answers: ["0.5m - 3m", "3m - 5m", "5m - 10m", "10m - 20m"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'load factor' refer to in structural design?",
+        answers: ["The ratio of applied load to the material strength", "The safety margin for load capacity", "The amount of weight a structure can support", "The resistance to seismic forces"],
+        correct: 1
+    },
+    {
+        question: "What is the role of a drainage system in road construction?",
+        answers: ["To prevent flooding", "To improve aesthetics", "To support the foundation", "To reduce soil erosion"],
+        correct: 0
+    },
+    {
+        question: "Which type of foundation is most suitable for soft or loose soil?",
+        answers: ["Raft foundation", "Shallow foundation", "Pile foundation", "Strip foundation"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is used to measure the strength of concrete?",
+        answers: ["Slump test", "Compressive strength test", "Flexural strength test", "Moisture content test"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of a retaining wall?",
+        answers: ["To prevent soil erosion", "To hold back earth or water", "To increase structural integrity", "All of the above"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a major consideration when designing a bridge?",
+        answers: ["Load capacity", "Material cost", "Aesthetic value", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What type of concrete is used for high-strength applications?",
+        answers: ["High-strength concrete", "Self-compacting concrete", "Lightweight concrete", "Reinforced concrete"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'soil compaction' refer to?",
+        answers: ["Increasing the soil density", "Decreasing the soil moisture", "Increasing the soil permeability", "Reducing the weight of soil"],
+        correct: 0
+    },
+    {
+        question: "What is the role of a foundation in construction?",
+        answers: ["To distribute the weight of the structure to the ground", "To resist environmental factors", "To provide aesthetic value", "To support the roof"],
+        correct: 0
+    },
+    {
+        question: "What type of testing is used to determine the quality of aggregate for concrete?",
+        answers: ["Sieve analysis", "Compressive strength test", "Moisture content test", "Flexural strength test"],
+        correct: 0
+    },
+    {
+        question: "What is the typical thickness of a concrete slab in residential construction?",
+        answers: ["100mm - 200mm", "200mm - 300mm", "300mm - 400mm", "400mm - 500mm"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a typical material used for pavement construction?",
+        answers: ["Asphalt", "Concrete", "Brick", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of a moisture barrier in concrete construction?",
+        answers: ["To prevent water from entering the concrete", "To increase the strength of the concrete", "To allow water drainage", "To enhance aesthetics"],
+        correct: 0
+    }, {
+        question: "What is the primary function of a concrete beam?",
+        answers: ["To resist bending", "To resist compression", "To provide stability", "To resist tension"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'bracing' refer to in structural design?",
+        answers: ["Support for vertical loads", "Diagonal supports to resist lateral forces", "Support for beams", "A method of increasing strength"],
+        correct: 1
+    },
+    {
+        question: "What is the most common type of footing used in shallow foundations?",
+        answers: ["Slab-on-grade", "Spread footing", "Pile foundation", "Raft foundation"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a method to reduce the impact of earthquakes on buildings?",
+        answers: ["Seismic bracing", "Increased weight", "Shorter buildings", "High density materials"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a pile in foundation construction?",
+        answers: ["To distribute the weight of the structure evenly", "To transfer loads to deeper, more stable soil", "To increase the surface area", "To reduce construction costs"],
+        correct: 1
+    },
+    {
+        question: "What is the primary purpose of a slump test in concrete testing?",
+        answers: ["To measure the workability of concrete", "To measure the strength of concrete", "To measure the moisture content", "To measure the temperature of concrete"],
+        correct: 0
+    },
+    {
+        question: "What is the typical mix ratio for a strong concrete mix?",
+        answers: ["1:2:3", "2:3:4", "3:4:5", "1:3:6"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to strengthen concrete in construction?",
+        answers: ["Fibers", "Cement", "Water", "Sand"],
+        correct: 0
+    },
+    {
+        question: "What is the most commonly used material for reinforcing concrete?",
+        answers: ["Steel", "Aluminum", "Plastic", "Wood"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is not a part of a bridge?",
+        answers: ["Deck", "Piers", "Substructure", "Grading"],
+        correct: 3
+    },
+    {
+        question: "What does the term 'dead load' refer to in structural design?",
+        answers: ["The permanent weight of the structure itself", "The weight of temporary loads", "The live load during an earthquake", "The weight of equipment installed on the structure"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a tie beam in construction?",
+        answers: ["To connect columns", "To distribute weight evenly", "To resist bending", "To support a foundation"],
+        correct: 0
+    },
+    {
+        question: "Which type of soil is most suitable for shallow foundations?",
+        answers: ["Clay", "Gravel", "Silt", "Sand"],
+        correct: 1
+    },
+    {
+        question: "What is the standard size of a brick in India?",
+        answers: ["190 x 90 x 90 mm", "200 x 100 x 70 mm", "230 x 110 x 70 mm", "200 x 120 x 90 mm"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'shear strength' of a material refer to?",
+        answers: ["The resistance to axial forces", "The resistance to bending", "The resistance to shearing forces", "The resistance to compression"],
+        correct: 2
+    },
+    {
+        question: "What is the typical depth of a raft foundation?",
+        answers: ["0.5m - 2m", "2m - 3m", "3m - 5m", "5m - 10m"],
+        correct: 0
+    },
+    {
+        question: "What is the primary factor considered while designing a drainage system?",
+        answers: ["Water flow rate", "Cost of construction", "Material used", "Aesthetic value"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'dead load' include?",
+        answers: ["Weight of the building and other permanent structures", "Weight of temporary structures", "Weight of snow", "Weight of people and furniture"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the most commonly used material for making bricks?",
+        answers: ["Clay", "Cement", "Plastic", "Stone"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a control joint in concrete?",
+        answers: ["To allow movement and prevent cracking", "To reduce weight", "To improve aesthetics", "To support live loads"],
+        correct: 0
+    },
+    {
+        question: "What is the role of a column in a building?",
+        answers: ["To support vertical loads", "To resist horizontal forces", "To enhance aesthetics", "To provide ventilation"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of the substructure of a building?",
+        answers: ["To resist compression forces", "To transfer the loads from the superstructure to the foundation", "To resist seismic forces", "To provide ventilation"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to determine the yield strength of concrete?",
+        answers: ["Compressive strength test", "Slump test", "Flexural strength test", "Impact test"],
+        correct: 0
+    }, {
+        question: "What is the main purpose of a retaining wall?",
+        answers: ["To support soil on a slope", "To provide drainage", "To support a building", "To resist wind loads"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a major type of foundation?",
+        answers: ["Shallow foundation", "Deep foundation", "Raft foundation", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What does the term 'moment of inertia' refer to in structural design?",
+        answers: ["The resistance to bending", "The ability to resist shear forces", "The ability to resist twisting", "The ability to resist axial loads"],
+        correct: 0
+    },
+    {
+        question: "Which material is commonly used for reinforcement in concrete?",
+        answers: ["Steel", "Aluminum", "Copper", "Brass"],
+        correct: 0
+    },
+    {
+        question: "Which type of cement is used for marine structures?",
+        answers: ["Ordinary Portland Cement", "Sulphate Resistant Cement", "White Cement", "Rapid Hardening Cement"],
+        correct: 1
+    },
+    {
+        question: "What is the primary purpose of a slab in building construction?",
+        answers: ["To provide a horizontal surface", "To support vertical loads", "To distribute the load evenly", "To resist bending"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'compactness' of soil refer to?",
+        answers: ["Soil's resistance to moisture", "The density of the soil", "The ability of soil to resist shear", "The porosity of the soil"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is NOT a type of retaining wall?",
+        answers: ["Gravity wall", "Cantilever wall", "Counterfort wall", "Shear wall"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of an expansion joint in a concrete structure?",
+        answers: ["To allow movement due to temperature changes", "To increase structural strength", "To prevent cracking", "To increase rigidity"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common method of foundation for high-rise buildings?",
+        answers: ["Pile foundation", "Shallow foundation", "Raft foundation", "Slab-on-grade"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'shear force' in structural analysis refer to?",
+        answers: ["The force causing a structure to deform", "The force that resists bending", "The force causing lateral movement", "The force causing slippage between materials"],
+        correct: 3
+    },
+    {
+        question: "What is the typical size of a concrete block?",
+        answers: ["400mm x 200mm x 200mm", "600mm x 300mm x 300mm", "300mm x 200mm x 200mm", "500mm x 250mm x 250mm"],
+        correct: 0
+    },
+    {
+        question: "What is the key factor in the design of a bridge?",
+        answers: ["Load distribution", "Cost", "Construction speed", "Aesthetics"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of reinforcing steel bars in concrete?",
+        answers: ["To resist tension and increase strength", "To resist compression", "To improve workability", "To improve the appearance of concrete"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a fluid mechanics principle?",
+        answers: ["Bernoulli’s principle", "Mohr's circle", "Fick's law", "Coulomb's law"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the best method for testing soil compaction?",
+        answers: ["Proctor test", "Slump test", "Compression test", "Tensile test"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to determine the workability of concrete?",
+        answers: ["Slump test", "Compressive strength test", "Flexural strength test", "Tensile strength test"],
+        correct: 0
+    },
+    {
+        question: "What is the most important property of steel in construction?",
+        answers: ["Tensile strength", "Elasticity", "Hardness", "Ductility"],
+        correct: 0
+    },
+    {
+        question: "Which is the standard unit for measuring the area of a plot of land?",
+        answers: ["Square meter", "Cubic meter", "Hectare", "Kilometer"],
+        correct: 2
+    },
+    {
+        question: "What is the primary purpose of a dam?",
+        answers: ["Water storage and management", "Flood control", "Power generation", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which is the most commonly used foundation type in low-rise buildings?",
+        answers: ["Slab-on-grade", "Pile foundation", "Spread footing", "Raft foundation"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'elastic modulus' refer to?",
+        answers: ["The ratio of stress to strain", "The material's resistance to deformation", "The material's ability to bend", "The material's ability to conduct heat"],
+        correct: 0
+    },
+    {
+        question: "What is the most widely used material for road construction?",
+        answers: ["Asphalt", "Concrete", "Gravel", "Clay"],
+        correct: 0
+    },
+    {
+        question: "What is the role of the modulus of resilience in material design?",
+        answers: ["To measure energy absorbed before yielding", "To measure the yield strength", "To measure tensile strength", "To measure the strain energy"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a survey in civil engineering?",
+        answers: ["To determine elevations", "To map land features", "To prepare construction plans", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following tests is used to measure the strength of concrete?",
+        answers: ["Compressive strength test", "Slump test", "Tensile test", "Flexural test"],
+        correct: 0
+    },
+    {
+        question: "What is the most commonly used material for constructing foundations?",
+        answers: ["Concrete", "Steel", "Wood", "Brick"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a shear wall in a building?",
+        answers: ["To resist lateral forces", "To provide insulation", "To resist vertical forces", "To improve aesthetics"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a factor affecting the design of a foundation?",
+        answers: ["Type of soil", "Load of the building", "Water table level", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the best method for testing the compaction of soil?",
+        answers: ["Proctor test", "Tensile test", "Compression test", "Slump test"],
+        correct: 0
+    },
+    {
+        question: "What is the standard mix ratio for a high-strength concrete mix?",
+        answers: ["1:2:3", "1:3:6", "1:1.5:3", "1:2:4"],
+        correct: 0
+    },
+    {
+        question: "What is the key property of reinforced concrete?",
+        answers: ["Tensile strength", "Compressive strength", "Ductility", "Flexibility"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'creep' refer to in concrete structures?",
+        answers: ["Long-term deformation under sustained load", "Temporary deformation", "Loss of volume", "Increase in density"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of an inclined plane in civil engineering?",
+        answers: ["To reduce the amount of force needed to lift objects", "To increase friction", "To provide support for vertical loads", "To increase surface area"],
+        correct: 0
+    }, {
+        question: "What is the main purpose of a shear wall in a building?",
+        answers: ["To resist lateral forces", "To resist vertical forces", "To provide insulation", "To increase the aesthetic value"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a factor that can affect the compaction of soil?",
+        answers: ["Moisture content", "Soil type", "Compaction effort", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is not a type of concrete?",
+        answers: ["Reinforced concrete", "Pre-stressed concrete", "Brittle concrete", "Lightweight concrete"],
+        correct: 2
+    },
+    {
+        question: "What is the role of steel reinforcement in concrete?",
+        answers: ["To resist tension", "To resist compression", "To resist shear", "To increase ductility"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of a foundation in construction?",
+        answers: ["To distribute the load of the structure", "To resist bending", "To resist wind forces", "To provide drainage"],
+        correct: 0
+    },
+    {
+        question: "What is the most common method used to join steel members in construction?",
+        answers: ["Welding", "Riveting", "Bolting", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a common method for testing concrete strength?",
+        answers: ["Compressive strength test", "Tensile test", "Flexural test", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'bearing capacity' refer to in foundation design?",
+        answers: ["The ability of soil to support loads without failure", "The ability of the structure to resist forces", "The maximum load a structure can bear", "The maximum depth of a foundation"],
+        correct: 0
+    },
+    {
+        question: "What is the term used for the rate of change of velocity with respect to time?",
+        answers: ["Acceleration", "Velocity", "Force", "Displacement"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to prevent the movement of water in soil?",
+        answers: ["Geotextiles", "Retaining walls", "Dams", "Permeable surfaces"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a concrete mix design?",
+        answers: ["To determine the appropriate proportions of ingredients for the desired strength", "To determine the color of the concrete", "To calculate the weight of the concrete", "To increase the workability of the mix"],
+        correct: 0
+    },
+    {
+        question: "What is the most important property of concrete?",
+        answers: ["Compressive strength", "Ductility", "Hardness", "Flexibility"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of expansion joints in a bridge?",
+        answers: ["To allow for the expansion and contraction due to temperature changes", "To resist wind forces", "To resist seismic forces", "To prevent water infiltration"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the most common type of bridge?",
+        answers: ["Beam bridge", "Suspension bridge", "Arch bridge", "Truss bridge"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of using rebar in concrete structures?",
+        answers: ["To prevent cracks due to tensile forces", "To increase compressive strength", "To prevent corrosion", "To improve workability"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the depth of a water body?",
+        answers: ["Sounding rod", "Theodolite", "Total station", "Plumb bob"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'silt content' refer to in soil testing?",
+        answers: ["The percentage of fine particles in the soil", "The water retention capacity of the soil", "The compactness of the soil", "The permeability of the soil"],
+        correct: 0
+    },
+    {
+        question: "What is the most common type of foundation used for high-rise buildings?",
+        answers: ["Pile foundation", "Shallow foundation", "Raft foundation", "Spread footing"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of a dam?",
+        answers: ["To store water", "To generate electricity", "To control flooding", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the primary factor affecting the design of a bridge?",
+        answers: ["Load capacity", "Aesthetics", "Construction time", "Cost"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a diaphragm wall in construction?",
+        answers: ["To support deep excavation", "To resist lateral forces", "To resist vertical forces", "To prevent water leakage"],
+        correct: 0
+    },
+    {
+        question: "What is the most common form of foundation used for residential buildings?",
+        answers: ["Strip foundation", "Pile foundation", "Raft foundation", "Slab-on-grade"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used for testing the compressive strength of concrete?",
+        answers: ["Cube test", "Slump test", "Tensile test", "Flexural test"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is used for soil stabilization?",
+        answers: ["Cement", "Lime", "Fly ash", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the primary cause of cracks in concrete structures?",
+        answers: ["Shrinking of concrete during curing", "Overloading of the structure", "Improper mixing of concrete", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the most common material used for reinforcing concrete?",
+        answers: ["Steel", "Aluminum", "Copper", "Titanium"],
+        correct: 0
+    },
+    {
+        question: "What is the standard unit for measuring force in the metric system?",
+        answers: ["Newton", "Kilogram", "Pound", "Joule"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to determine the workability of concrete?",
+        answers: ["Slump test", "Compression test", "Flexural test", "Tensile test"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'creep' refer to in concrete structures?",
+        answers: ["Long-term deformation under sustained load", "Loss of strength over time", "Change in material properties due to temperature", "Increase in volume over time"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a bearing in a bridge?",
+        answers: ["To transfer loads from the bridge deck to the foundation", "To resist wind forces", "To support the piers", "To increase the strength of the deck"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of an expansion joint in a bridge?",
+        answers: ["To allow movement due to temperature changes", "To resist seismic forces", "To prevent corrosion", "To reduce vibration"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'shear strength' refer to in materials?",
+        answers: ["The ability of a material to resist sliding failure", "The ability of a material to resist compressive forces", "The ability of a material to resist bending", "The ability of a material to resist tensile forces"],
+        correct: 0
+    }, {
+        question: "What is the main purpose of an accelerometer in surveying?",
+        answers: ["To measure acceleration", "To measure temperature", "To measure horizontal distances", "To measure angles"],
+        correct: 0
+    },
+    {
+        question: "What is the main advantage of a geodetic survey?",
+        answers: ["High accuracy over long distances", "Low cost", "Easy to implement", "No need for specialized equipment"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a secondary survey control?",
+        answers: ["Leveling points", "Geodetic stations", "Triangulation points", "GPS stations"],
+        correct: 2
+    },
+    {
+        question: "Which of the following materials is commonly used to improve the strength of concrete?",
+        answers: ["Cement", "Water", "Sand", "Fly ash"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is the main type of stress experienced by reinforced concrete under load?",
+        answers: ["Tensile stress", "Compressive stress", "Shear stress", "Bending stress"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of a column in building construction?",
+        answers: ["To provide lateral stability", "To support vertical loads", "To resist earthquakes", "To enhance aesthetic appearance"],
+        correct: 1
+    },
+    {
+        question: "What is the formula for calculating the volume of a cuboid?",
+        answers: ["Length × Width × Height", "Length × Width", "Width × Height", "Length × Height"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a retaining wall?",
+        answers: ["To support vertical loads", "To prevent soil erosion", "To prevent soil movement", "To resist water pressure"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a common method for soil compaction?",
+        answers: ["Vibratory rollers", "Hydraulic presses", "Centrifugal force", "Wind pressure"],
+        correct: 0
+    },
+    {
+        question: "Which type of concrete is used for precast elements?",
+        answers: ["Pre-stressed concrete", "Lightweight concrete", "Normal strength concrete", "High-performance concrete"],
+        correct: 0
+    },
+    {
+        question: "What is the most commonly used method of soil stabilization?",
+        answers: ["Cement stabilization", "Lime stabilization", "Fly ash stabilization", "Polymer stabilization"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a key characteristic of sustainable building materials?",
+        answers: ["Low environmental impact", "High durability", "High strength", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the main reason for using pre-cast concrete?",
+        answers: ["Faster construction time", "Lower cost", "Better aesthetic appearance", "Increased structural strength"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for calculating the area of a circle?",
+        answers: ["πr²", "2πr", "πd", "πr"],
+        correct: 0
+    },
+    {
+        question: "Which material is commonly used for making formwork in concrete construction?",
+        answers: ["Wood", "Steel", "Plastic", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the main function of a slump test in concrete?",
+        answers: ["To determine workability", "To determine density", "To measure compressive strength", "To measure tensile strength"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a factor that affects the strength of concrete?",
+        answers: ["Cement type", "Water-cement ratio", "Mixing time", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is the main purpose of geotechnical investigations?",
+        answers: ["To assess soil properties", "To determine the type of foundation", "To measure seismic activity", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the most common type of steel reinforcement used in concrete?",
+        answers: ["Mild steel", "High tensile steel", "Stainless steel", "Alloy steel"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a method of controlling corrosion in concrete structures?",
+        answers: ["Using corrosion inhibitors", "Using stainless steel", "Coating with epoxy", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the typical curing period for concrete?",
+        answers: ["7 days", "14 days", "28 days", "60 days"],
+        correct: 2
+    },
+    {
+        question: "What is the term for the process of removing excess water from freshly mixed concrete?",
+        answers: ["Compaction", "Vibration", "Curing", "De-watering"],
+        correct: 3
+    },
+    {
+        question: "What is the most common type of steel used for reinforcing concrete?",
+        answers: ["Mild steel", "High tensile steel", "Stainless steel", "Carbon steel"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of shear reinforcement in concrete?",
+        answers: ["To resist shear forces", "To resist bending", "To increase the strength of concrete", "To increase durability"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a foundation in construction?",
+        answers: ["To distribute the load of the structure", "To resist wind forces", "To resist earthquakes", "To provide insulation"],
+        correct: 0
+    },
+    {
+        question: "What is the typical concrete mix ratio for medium-strength concrete?",
+        answers: ["1:2:3", "1:3:4", "1:1.5:2.5", "1:2:4"],
+        correct: 3
+    },
+    {
+        question: "What is the main disadvantage of using concrete in construction?",
+        answers: ["Low strength", "Brittleness", "High weight", "High cost"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'structural integrity' refer to?",
+        answers: ["The strength of a structure", "The ability of a structure to resist collapse", "The aesthetic appeal of a structure", "The weight-bearing capacity of a structure"],
+        correct: 1
+    },
+    {
+        question: "What is the role of a structural engineer in building construction?",
+        answers: ["To design load-bearing structures", "To oversee construction", "To ensure the safety of the structure", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the main function of a brick in masonry construction?",
+        answers: ["To resist compression", "To resist tension", "To resist bending", "To provide insulation"],
+        correct: 0
+    },
+    {
+        question: "What is the term used for the ability of a material to return to its original shape after being deformed?",
+        answers: ["Elasticity", "Plasticity", "Brittleness", "Ductility"],
+        correct: 0
+    },
+    {
+        question: "What is the typical compressive strength of concrete?",
+        answers: ["10 MPa", "25 MPa", "35 MPa", "50 MPa"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of using a concrete vibrator?",
+        answers: ["To compact concrete", "To mix concrete", "To remove excess air", "To set the concrete"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the primary component of concrete?",
+        answers: ["Cement", "Water", "Sand", "Gravel"],
+        correct: 0
+    },
+    {
+        question: "What is the typical lifespan of a well-maintained concrete structure?",
+        answers: ["10-20 years", "20-50 years", "50-100 years", "100-150 years"],
+        correct: 2
+    },
+    {
+        question: "What is the primary function of a diaphragm wall?",
+        answers: ["To resist lateral forces", "To support excavation", "To prevent water infiltration", "To distribute loads"],
+        correct: 1
+    }, {
+        question: "Which surveying technique is most commonly used for measuring elevation changes?",
+        answers: ["Tachymetric survey", "Leveling survey", "Topographic survey", "Geodetic survey"],
+        correct: 1
+    },
+    {
+        question: "What is a 'benchmark' in surveying?",
+        answers: ["A reference point of known elevation", "A point with known coordinates", "A GPS station", "A control point used in topographic surveys"],
+        correct: 0
+    },
+    {
+        question: "Which instrument is used to measure horizontal and vertical angles in surveying?",
+        answers: ["Total station", "Theodolite", "GPS", "Dumpy level"],
+        correct: 1
+    },
+    {
+        question: "What is the function of a surveying prism?",
+        answers: ["To measure angles", "To reflect laser signals", "To measure distances", "To provide elevation data"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'azimuth' refer to in surveying?",
+        answers: ["A type of measurement for vertical angles", "The horizontal angle measured clockwise from the north", "A method of calculating distances", "A technique for elevation measurement"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used for detailed surveys of large areas?",
+        answers: ["Total station", "Leveling instrument", "GPS system", "Dumpy level"],
+        correct: 2
+    },
+    {
+        question: "In surveying, what does the term 'bearing' refer to?",
+        answers: ["A measurement of distance", "A type of angle measurement", "A reference line from a known point", "The angle between two points, measured from the north or south"],
+        correct: 3
+    },
+    {
+        question: "Which instrument is commonly used for measuring distances in geodetic surveys?",
+        answers: ["Total station", "GPS", "Measuring tape", "Tachymeter"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to determine the center of gravity of a body in surveying?",
+        answers: ["Level", "Plumb bob", "Clinometer", "Theodolite"],
+        correct: 1
+    },
+    {
+        question: "What does 'control survey' mean in surveying?",
+        answers: ["A survey conducted for mapping properties", "A survey for establishing the foundation of a building", "A survey used to establish reference points for other surveys", "A survey used to measure distances between points"],
+        correct: 2
+    },
+    {
+        question: "Which type of survey is best suited for creating contour maps?",
+        answers: ["Geodetic survey", "Topographic survey", "Land survey", "Boundary survey"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of a dumpy level in surveying?",
+        answers: ["To measure angles", "To measure distances", "To measure elevations", "To measure horizontal angles"],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of a 'control point' in surveying?",
+        answers: ["To establish a known location for measurement", "To measure distances between two points", "To measure elevations", "To calculate areas"],
+        correct: 0
+    },
+    {
+        question: "In surveying, what does the term 'geodetic' refer to?",
+        answers: ["Surveying on large scales", "Surveying with a focus on angles", "Surveying related to property lines", "Surveying based on elevation changes"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of using a reflector in surveying?",
+        answers: ["To measure angles", "To measure distances with laser signals", "To calculate elevation", "To measure slope"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'triangulation' refer to in surveying?",
+        answers: ["A method for measuring distances", "A method for measuring areas", "A method for determining points based on angles", "A technique for measuring elevation differences"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a key component of a total station?",
+        answers: ["Laser rangefinder", "Measuring tape", "Optical lens", "Plumb bob"],
+        correct: 0
+    },
+    {
+        question: "What type of surveying involves measuring changes in elevation over large areas?",
+        answers: ["Geodetic surveying", "Topographic surveying", "Leveling survey", "Boundary survey"],
+        correct: 2
+    },
+    {
+        question: "Which instrument is typically used to check verticality or plumbness in surveying?",
+        answers: ["Plumb bob", "Clinometer", "Level", "Laser rangefinder"],
+        correct: 0
+    },
+    {
+        question: "Which type of survey is used to determine the boundaries of land or property?",
+        answers: ["Geodetic survey", "Boundary survey", "Topographic survey", "Hydrographic survey"],
+        correct: 1
+    },
+    {
+        question: "In surveying, what is the purpose of an 'offset'?",
+        answers: ["To measure horizontal distances", "To create a reference line", "To calculate elevation", "To measure the distance between the survey line and a feature"],
+        correct: 3
+    },
+    {
+        question: "What is the typical purpose of using a tachymeter in surveying?",
+        answers: ["Measuring vertical angles", "Measuring horizontal distances", "Measuring distances and angles", "Mapping terrain features"],
+        correct: 2
+    },
+    {
+        question: "Which of the following methods can be used for measuring large distances in geodetic surveys?",
+        answers: ["Total station", "Measuring tape", "Laser rangefinder", "GPS system"],
+        correct: 3
+    },
+    {
+        question: "The most commonly used aggregate size for concrete work is?",
+        answers: ["10 mm", "20 mm", "40 mm", "60 mm"],
+        correct: 1
+    },
+    {
+        question: "The primary function of the superstructure in a building is?",
+        answers: ["To support the building's weight", "To resist earthquakes", "To distribute loads to the foundation", "To provide space for services"],
+        correct: 2
+    },
+    {
+        question: "Which of the following surveying instruments is used for measuring horizontal and vertical angles?",
+        answers: ["Total Station", "Theodolite", "Tacheometer", "Level"],
+        correct: 1
+    },
+    {
+        question: "Which material is used to prevent moisture from entering concrete structures?",
+        answers: ["Hydraulic Cement", "Bitumen", "Lime", "Fly Ash"],
+        correct: 1
+    },
+    {
+        question: "In structural engineering, what does the term 'dead load' refer to?",
+        answers: ["The weight of the building's structure", "The live load on the structure", "Wind load", "Seismic load"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a retaining wall in civil engineering?",
+        answers: ["To prevent soil erosion", "To support vertical loads", "To resist lateral pressure of soil", "To hold water"],
+        correct: 2
+    },
+    {
+        question: "What is the main component of asphalt concrete?",
+        answers: ["Portland Cement", "Bitumen", "Lime", "Gypsum"],
+        correct: 1
+    },
+    {
+        question: "In a soil test, what is the significance of the Atterberg limit?",
+        answers: ["To determine the grain size of soil", "To determine soil plasticity", "To measure the soil's permeability", "To determine soil compaction"],
+        correct: 1
+    },
+    {
+        question: "The primary function of the foundation is to?",
+        answers: ["Provide support to the superstructure", "Distribute loads from the superstructure to the ground", "Prevent water from entering the structure", "Provide an aesthetic appeal"],
+        correct: 1
+    },
+    {
+        question: "In concrete, what is the ideal water-cement ratio for optimum strength?",
+        answers: ["0.25", "0.40", "0.50", "0.60"],
+        correct: 2
+    },
+    {
+        question: "What is the characteristic strength of concrete?",
+        answers: ["Strength of concrete at 7 days", "Strength of concrete at 28 days", "Strength of concrete at 56 days", "Strength of concrete at 90 days"],
+        correct: 1
+    },
+    {
+        question: "Which of the following methods is used to measure the flow of water in pipes?",
+        answers: ["Venturi Meter", "Orifice Plate", "Turbine Flow Meter", "Rotameter"],
+        correct: 0
+    },
+    {
+        question: "Which type of soil has the best compaction characteristics?",
+        answers: ["Clay", "Silt", "Sand", "Gravel"],
+        correct: 3
+    },
+    {
+        question: "What is the role of steel reinforcement in concrete?",
+        answers: ["To increase the compressive strength", "To prevent cracking", "To resist tensile stresses", "To make the concrete waterproof"],
+        correct: 2
+    },
+    {
+        question: "In a building, the term 'live load' refers to?",
+        answers: ["The weight of the structure itself", "The load from occupants and furniture", "The wind load", "The snow load"],
+        correct: 1
+    },
+    {
+        question: "The process of removing air from freshly mixed concrete is called?",
+        answers: ["Curing", "Vibration", "Compaction", "Mixing"],
+        correct: 1
+    },
+    {
+        question: "In structural analysis, the term 'bending moment' refers to?",
+        answers: ["The moment caused by compressive forces", "The moment caused by tensile forces", "The internal moment that resists bending", "The external moment causing bending"],
+        correct: 3
+    },
+    {
+        question: "What is the most commonly used type of foundation in building construction?",
+        answers: ["Shallow foundation", "Deep foundation", "Pile foundation", "Raft foundation"],
+        correct: 0
+    },
+    {
+        question: "The maximum water content of a soil for full compaction is known as?",
+        answers: ["Plastic Limit", "Liquid Limit", "Optimum Moisture Content", "Shrinkage Limit"],
+        correct: 2
+    },{
+        question: "What is the primary purpose of a cross-section in surveying?",
+        answers: ["To determine the area of land", "To measure the depth of a river", "To determine the elevation differences", "To measure the slope of the land"],
+        correct: 2
+    },
+    {
+        question: "Which material is most commonly used in road construction?",
+        answers: ["Concrete", "Asphalt", "Clay", "Wood"],
+        correct: 1
+    },
+    {
+        question: "In surveying, which instrument is used to measure the horizontal distance?",
+        answers: ["Theodolite", "Total Station", "Measuring tape", "Chain"],
+        correct: 3
+    },
+    {
+        question: "Which of the following tests is conducted to determine the strength of concrete?",
+        answers: ["Slump test", "Compressive strength test", "Tensile strength test", "Density test"],
+        correct: 1
+    },
+    {
+        question: "What is the most common foundation type used for residential buildings?",
+        answers: ["Raft foundation", "Pile foundation", "Slab foundation", "Shallow foundation"],
+        correct: 3
+    },
+    {
+        question: "What does the term 'moment of inertia' refer to in structural analysis?",
+        answers: ["Resistance to shear stress", "Resistance to bending", "Resistance to torsion", "Resistance to axial stress"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is NOT a type of foundation?",
+        answers: ["Shallow foundation", "Deep foundation", "Pile foundation", "Floor foundation"],
+        correct: 3
+    },
+    {
+        question: "What is the main cause of corrosion in reinforced concrete structures?",
+        answers: ["Water absorption", "Alkaline environment", "High temperature", "Air exposure"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of the diaphragm wall in construction?",
+        answers: ["To provide support for the building's load", "To resist water penetration", "To divide internal spaces", "To provide thermal insulation"],
+        correct: 1
+    },
+    {
+        question: "Which material is most commonly used in the construction of bridges?",
+        answers: ["Wood", "Steel", "Brick", "Aluminum"],
+        correct: 1
+    },
+    {
+        question: "The 'clear cover' in reinforced concrete refers to?",
+        answers: ["The minimum distance between the reinforcement and the surface", "The spacing between two bars of reinforcement", "The area of the concrete around reinforcement", "The thickness of the concrete surface"],
+        correct: 0
+    },
+    {
+        question: "What is the standard unit for measuring the shear stress in structural elements?",
+        answers: ["N/m²", "Nm", "kg", "Pa"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a function of admixtures in concrete?",
+        answers: ["Increase the workability", "Increase the strength", "Reduce the curing time", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "In civil engineering, what does the term 'deflection' refer to?",
+        answers: ["The lateral displacement of a structure", "The vertical displacement under load", "The angular displacement of a beam", "The rotation of the foundation"],
+        correct: 1
+    },
+    {
+        question: "What is the formula to calculate the load-bearing capacity of a pile foundation?",
+        answers: ["Q = A × σ", "Q = F × d", "Q = P × L", "Q = m × A"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of a bridge expansion joint?",
+        answers: ["To allow movement of the bridge deck", "To reduce the weight of the bridge", "To provide drainage", "To prevent corrosion of the bridge deck"],
+        correct: 0
+    },
+    {
+        question: "Which type of cement is used in making precast concrete products?",
+        answers: ["Portland cement", "White cement", "Rapid hardening cement", "Pozzolanic cement"],
+        correct: 2
+    },
+    {
+        question: "The compressive strength of concrete is typically measured at which time period?",
+        answers: ["7 days", "28 days", "56 days", "90 days"],
+        correct: 1
+    },
+    {
+        question: "The minimum diameter of a bar used in reinforced concrete construction should be?",
+        answers: ["6 mm", "8 mm", "10 mm", "12 mm"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of grout in construction?",
+        answers: ["To fill voids", "To increase the strength of concrete", "To reduce water absorption", "To provide thermal insulation"],
+        correct: 0
+    },
+    {
+        question: "The flow of water in a pipe is primarily determined by?",
+        answers: ["The pressure difference", "The diameter of the pipe", "The type of pipe", "The length of the pipe"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a cantilever beam in structural design?",
+        answers: ["To resist lateral loads", "To transfer forces from columns to the foundation", "To resist bending from one side only", "To provide vertical support at one end"],
+        correct: 2
+    },
+    {
+        question: "The 'critical path method' (CPM) is used in construction project management to determine?",
+        answers: ["The longest sequence of activities", "The shortest time to complete the project", "The number of workers needed", "The cost of the project"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the most commonly used material for dam construction?",
+        answers: ["Stone", "Concrete", "Earth", "Wood"],
+        correct: 1
+    },
+    {
+        question: "In soil mechanics, the term 'permeability' refers to?",
+        answers: ["The ability of soil to retain water", "The ability of soil to allow water to pass through", "The compaction of soil", "The density of soil"],
+        correct: 1
+    },  {
+        question: "What is the primary function of a dam in water resources management?",
+        answers: ["To store water", "To provide electricity", "To prevent flooding", "To treat water"],
+        correct: 0
+    },
+    {
+        question: "Which soil type has the highest permeability?",
+        answers: ["Clay", "Silt", "Gravel", "Sand"],
+        correct: 2
+    },
+    {
+        question: "In road construction, what is the main purpose of sub-base material?",
+        answers: ["To support the pavement structure", "To provide drainage", "To improve aesthetic value", "To reduce cost"],
+        correct: 0
+    },
+    {
+        question: "What is the maximum allowable bending stress in reinforced concrete design according to IS codes?",
+        answers: ["5 MPa", "15 MPa", "20 MPa", "25 MPa"],
+        correct: 1
+    },
+    {
+        question: "What is the main use of Total Station in surveying?",
+        answers: ["Measuring vertical distances", "Measuring horizontal distances", "Measuring angles and distances", "For mapping floodplains"],
+        correct: 2
+    }, 
+    {
+    question: "What is the main use of Total Station in surveying?",
+    answers: ["Measuring vertical distances", "Measuring horizontal distances", "Measuring angles and distances", "For mapping floodplains"],
+    correct: 2
+  },
+  {
+    question: "Which of the following is a property of concrete?",
+    answers: ["Workability", "Elasticity", "Friction", "Thermal conductivity"],
+    correct: 0
+  },
+  {
+    question: "What is the unit of force in the SI system?",
+    answers: ["Newton", "Pascal", "Joule", "Watt"],
+    correct: 0
+  },
+  {
+    question: "Which material is commonly used for making bricks?",
+    answers: ["Clay", "Cement", "Steel", "Wood"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'shear strength' in soil mechanics refer to?",
+    answers: ["Ability of soil to resist lateral forces", "Ability of soil to resist vertical forces", "The load at which the soil fails", "The density of soil"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is used for waterproofing in construction?",
+    answers: ["Bitumen", "Steel", "Cement", "Glass"],
+    correct: 0
+  },
+  {
+    question: "What is the modulus of elasticity of steel typically in GPa?",
+    answers: ["100-200", "200-300", "300-400", "400-500"],
+    correct: 0
+  },
+  {
+    question: "Which method is used to analyze indeterminate structures?",
+    answers: ["Moment distribution method", "Joint method", "Section method", "Graphical method"],
+    correct: 0
+  },
+  {
+    question: "Which of these is used to reduce brittleness in concrete?",
+    answers: ["Fibers", "Water", "Admixtures", "Cement"],
+    correct: 0
+  },
+  {
+    question: "What is the primary function of a retaining wall?",
+    answers: ["To resist lateral pressure", "To support the structure", "To increase aesthetic value", "To act as a foundation"],
+    correct: 0
+  },
+  {
+    question: "Which type of foundation is typically used for high-rise buildings?",
+    answers: ["Pile foundation", "Shallow foundation", "Raft foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main cause of soil erosion in hilly regions?",
+    answers: ["Rainwater", "Wind", "Human activity", "Overgrazing"],
+    correct: 0
+  },
+  {
+    question: "What is the most commonly used material for reinforcing concrete?",
+    answers: ["Mild steel", "Stainless steel", "Aluminum", "Fiberglass"],
+    correct: 0
+  },
+  {
+    question: "What type of load is considered dead load in construction?",
+    answers: ["Weight of the structure", "Snow load", "Wind load", "Earthquake load"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of expansion joints in concrete structures?",
+    answers: ["To accommodate temperature expansion", "To resist seismic loads", "To support foundation movement", "To prevent cracking from wind loads"],
+    correct: 0
+  },
+  {
+    question: "What is the unit of pressure in the SI system?",
+    answers: ["Pascal", "Newton", "Bar", "Joule"],
+    correct: 0
+  },
+  {
+    question: "What is the typical modulus of elasticity for concrete?",
+    answers: ["20-40 GPa", "10-30 GPa", "30-50 GPa", "50-70 GPa"],
+    correct: 0
+  },
+  {
+    question: "Which type of foundation is used to transfer heavy loads to deep soil layers?",
+    answers: ["Pile foundation", "Raft foundation", "Shallow foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of a shear wall in buildings?",
+    answers: ["To resist lateral forces", "To resist vertical loads", "To provide foundation support", "To increase aesthetics"],
+    correct: 0
+  },
+  {
+    question: "What is the typical range of the water-cement ratio for concrete?",
+    answers: ["0.4 to 0.6", "0.6 to 0.8", "0.3 to 0.5", "0.2 to 0.4"],
+    correct: 0
+  },
+  {
+    question: "Which of the following materials is commonly used for making precast concrete?",
+    answers: ["Mild steel", "Concrete", "Steel", "Aluminum"],
+    correct: 1
+  },
+  {
+    question: "Which of these is used for the calculation of soil compaction?",
+    answers: ["Proctor test", "CBR test", "Slump test", "Compression test"],
+    correct: 0
+  },
+  {
+    question: "What is the main purpose of a diaphragm wall?",
+    answers: ["To resist lateral soil pressures", "To increase foundation depth", "To act as a basement wall", "To serve as a retaining wall"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of high temperature on concrete?",
+    answers: ["Reduces strength", "Increases strength", "No effect", "Increases workability"],
+    correct: 0
+  },
+  {
+    question: "Which type of reinforcement is used in prestressed concrete?",
+    answers: ["High-strength steel", "Mild steel", "Fiberglass", "Aluminum alloy"],
+    correct: 0
+  },
+  {
+    question: "What is the term for the maximum load a foundation can carry without failure?",
+    answers: ["Ultimate bearing capacity", "Factor of safety", "Safe load", "Shear strength"],
+    correct: 0
+  },
+  {
+    question: "What does a slump test measure?",
+    answers: ["Workability of concrete", "Compressive strength of concrete", "Setting time of concrete", "Density of concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the primary use of a truss in structural engineering?",
+    answers: ["To resist bending", "To resist shear", "To resist torsion", "To resist axial forces"],
+    correct: 3
+  },
+  {
+    question: "Which type of concrete is used for its high resistance to chemical attacks?",
+    answers: ["Sulphate-resistant concrete", "High-strength concrete", "Lightweight concrete", "Self-compacting concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of the critical path method in project management?",
+    answers: ["To identify the longest duration of the project", "To manage project costs", "To calculate risk", "To estimate material requirements"],
+    correct: 0
+  },
+  {
+    question: "Which of these is considered a live load in construction?",
+    answers: ["Furniture", "Weight of the structure", "Dead weight", "Snow"],
+    correct: 0
+  },
+  {
+    question: "What is the primary objective of soil compaction?",
+    answers: ["To increase soil strength", "To decrease soil permeability", "To remove water from soil", "To decrease shear strength"],
+    correct: 0
+  },
+  {
+    question: "What is the most common method of reinforcement for slabs?",
+    answers: ["Reinforced concrete", "Post-tensioning", "Pre-tensioning", "Fiber-reinforced concrete"],
+    correct: 0
+  },
+  {
+    question: "Which is the most common type of cement used in construction?",
+    answers: ["Portland cement", "Rapid hardening cement", "High-alumina cement", "Sulphate-resistant cement"],
+    correct: 0
+  },
+  {
+    question: "What type of structural analysis method uses equilibrium equations?",
+    answers: ["Force method", "Displacement method", "Flexibility method", "Moment distribution method"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'dead load' refer to in construction?",
+    answers: ["Permanent loads like the weight of the structure", "Temporary loads like snow or wind", "Loads from moving vehicles", "Seismic loads"],
+    correct: 0
+  },
+  {
+    question: "Which is a key advantage of using pre-stressed concrete?",
+    answers: ["Higher strength", "Lower cost", "Better durability", "Improved aesthetic"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is the primary cause of soil erosion?",
+    answers: ["Water", "Wind", "Human activity", "All of the above"],
+    correct: 0
+  }, {
+    question: "What is the main use of Total Station in surveying?",
+    answers: ["Measuring vertical distances", "Measuring horizontal distances", "Measuring angles and distances", "For mapping floodplains"],
+    correct: 2
+  },
+  {
+    question: "Which of the following is a property of concrete?",
+    answers: ["Workability", "Elasticity", "Friction", "Thermal conductivity"],
+    correct: 0
+  },
+  {
+    question: "What is the unit of force in the SI system?",
+    answers: ["Newton", "Pascal", "Joule", "Watt"],
+    correct: 0
+  },
+  {
+    question: "Which material is commonly used for making bricks?",
+    answers: ["Clay", "Cement", "Steel", "Wood"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'shear strength' in soil mechanics refer to?",
+    answers: ["Ability of soil to resist lateral forces", "Ability of soil to resist vertical forces", "The load at which the soil fails", "The density of soil"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is used for waterproofing in construction?",
+    answers: ["Bitumen", "Steel", "Cement", "Glass"],
+    correct: 0
+  },
+  {
+    question: "What is the modulus of elasticity of steel typically in GPa?",
+    answers: ["100-200", "200-300", "300-400", "400-500"],
+    correct: 0
+  },
+  {
+    question: "Which method is used to analyze indeterminate structures?",
+    answers: ["Moment distribution method", "Joint method", "Section method", "Graphical method"],
+    correct: 0
+  },
+  {
+    question: "Which of these is used to reduce brittleness in concrete?",
+    answers: ["Fibers", "Water", "Admixtures", "Cement"],
+    correct: 0
+  },
+  {
+    question: "What is the primary function of a retaining wall?",
+    answers: ["To resist lateral pressure", "To support the structure", "To increase aesthetic value", "To act as a foundation"],
+    correct: 0
+  },
+  {
+    question: "Which type of foundation is typically used for high-rise buildings?",
+    answers: ["Pile foundation", "Shallow foundation", "Raft foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main cause of soil erosion in hilly regions?",
+    answers: ["Rainwater", "Wind", "Human activity", "Overgrazing"],
+    correct: 0
+  },
+  {
+    question: "What is the most commonly used material for reinforcing concrete?",
+    answers: ["Mild steel", "Stainless steel", "Aluminum", "Fiberglass"],
+    correct: 0
+  },
+  {
+    question: "What type of load is considered dead load in construction?",
+    answers: ["Weight of the structure", "Snow load", "Wind load", "Earthquake load"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of expansion joints in concrete structures?",
+    answers: ["To accommodate temperature expansion", "To resist seismic loads", "To support foundation movement", "To prevent cracking from wind loads"],
+    correct: 0
+  },
+  {
+    question: "What is the unit of pressure in the SI system?",
+    answers: ["Pascal", "Newton", "Bar", "Joule"],
+    correct: 0
+  },
+  {
+    question: "What is the typical modulus of elasticity for concrete?",
+    answers: ["20-40 GPa", "10-30 GPa", "30-50 GPa", "50-70 GPa"],
+    correct: 0
+  },
+  {
+    question: "Which type of foundation is used to transfer heavy loads to deep soil layers?",
+    answers: ["Pile foundation", "Raft foundation", "Shallow foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of a shear wall in buildings?",
+    answers: ["To resist lateral forces", "To resist vertical loads", "To provide foundation support", "To increase aesthetics"],
+    correct: 0
+  },
+  {
+    question: "What is the typical range of the water-cement ratio for concrete?",
+    answers: ["0.4 to 0.6", "0.6 to 0.8", "0.3 to 0.5", "0.2 to 0.4"],
+    correct: 0
+  },
+  {
+    question: "Which of these materials is commonly used for making precast concrete?",
+    answers: ["Mild steel", "Concrete", "Steel", "Aluminum"],
+    correct: 1
+  },
+  {
+    question: "Which of these is used for the calculation of soil compaction?",
+    answers: ["Proctor test", "CBR test", "Slump test", "Compression test"],
+    correct: 0
+  },
+  {
+    question: "What is the primary purpose of a diaphragm wall?",
+    answers: ["To resist lateral soil pressures", "To increase foundation depth", "To act as a basement wall", "To serve as a retaining wall"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of high temperature on concrete?",
+    answers: ["Reduces strength", "Increases strength", "No effect", "Increases workability"],
+    correct: 0
+  },
+  {
+    question: "Which type of reinforcement is used in prestressed concrete?",
+    answers: ["High-strength steel", "Mild steel", "Fiberglass", "Aluminum alloy"],
+    correct: 0
+  },
+  {
+    question: "What is the term for the maximum load a foundation can carry without failure?",
+    answers: ["Ultimate bearing capacity", "Factor of safety", "Safe load", "Shear strength"],
+    correct: 0
+  },
+  {
+    question: "What does a slump test measure?",
+    answers: ["Workability of concrete", "Compressive strength of concrete", "Setting time of concrete", "Density of concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the primary use of a truss in structural engineering?",
+    answers: ["To resist bending", "To resist shear", "To resist torsion", "To resist axial forces"],
+    correct: 3
+  },
+  {
+    question: "Which type of concrete is used for its high resistance to chemical attacks?",
+    answers: ["Sulphate-resistant concrete", "High-strength concrete", "Lightweight concrete", "Self-compacting concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of the critical path method in project management?",
+    answers: ["To identify the longest duration of the project", "To manage project costs", "To calculate risk", "To estimate material requirements"],
+    correct: 0
+  },
+  {
+    question: "Which of these is considered a live load in construction?",
+    answers: ["Furniture", "Weight of the structure", "Dead weight", "Snow"],
+    correct: 0
+  },
+  {
+    question: "What is the primary objective of soil compaction?",
+    answers: ["To increase soil strength", "To decrease soil permeability", "To remove water from soil", "To decrease shear strength"],
+    correct: 0
+  },
+  {
+    question: "What is the most common method of reinforcement for slabs?",
+    answers: ["Reinforced concrete", "Post-tensioning", "Pre-tensioning", "Fiber-reinforced concrete"],
+    correct: 0
+  },
+  {
+    question: "Which is the most common type of cement used in construction?",
+    answers: ["Portland cement", "Rapid hardening cement", "High-alumina cement", "Sulphate-resistant cement"],
+    correct: 0
+  },
+  {
+    question: "What type of structural analysis method uses equilibrium equations?",
+    answers: ["Force method", "Displacement method", "Flexibility method", "Moment distribution method"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'dead load' refer to in construction?",
+    answers: ["Permanent loads like the weight of the structure", "Temporary loads like snow or wind", "Loads from moving vehicles", "Seismic loads"],
+    correct: 0
+  },
+  {
+    question: "Which is a key advantage of using pre-stressed concrete?",
+    answers: ["Higher strength", "Lower cost", "Better durability", "Improved aesthetic"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is the primary cause of soil erosion?",
+    answers: ["Water", "Wind", "Human activity", "All of the above"],
+    correct: 0
+  },{
+    question: "What is the unit of measurement for stress?",
+    answers: ["Pascal", "Newton", "Meter", "Kilogram"],
+    correct: 0
+  },
+  {
+    question: "Which type of cement is used for underwater concrete works?",
+    answers: ["Hydraulic cement", "Portland cement", "Rapid-hardening cement", "Aluminous cement"],
+    correct: 0
+  },
+  {
+    question: "What is the primary purpose of a building foundation?",
+    answers: ["To distribute the load of the building to the soil", "To support the roof", "To enhance aesthetic value", "To store water"],
+    correct: 0
+  },
+  {
+    question: "Which test is used to determine the compressive strength of concrete?",
+    answers: ["Cube test", "Slump test", "Pull-out test", "Tensile test"],
+    correct: 0
+  },
+  {
+    question: "What is the typical curing time for concrete?",
+    answers: ["28 days", "14 days", "7 days", "21 days"],
+    correct: 0
+  },
+  {
+    question: "Which of these is a non-destructive testing method for concrete?",
+    answers: ["Ultrasonic pulse velocity", "Cube testing", "Slump test", "Tensile strength test"],
+    correct: 0
+  },
+  {
+    question: "What is the strength of concrete after 7 days?",
+    answers: ["70% of 28-day strength", "50% of 28-day strength", "90% of 28-day strength", "25% of 28-day strength"],
+    correct: 0
+  },
+  {
+    question: "What is the term for a concrete mixture that has been pre-mixed and delivered on-site?",
+    answers: ["Ready-mix concrete", "Precast concrete", "Self-compacting concrete", "Lightweight concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the typical slump value for normal concrete?",
+    answers: ["75 mm", "150 mm", "200 mm", "250 mm"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of the accelerators in concrete?",
+    answers: ["To speed up the setting time", "To slow down the setting time", "To make concrete lighter", "To increase workability"],
+    correct: 0
+  },
+  {
+    question: "What is the function of the mix design in concrete?",
+    answers: ["To determine the appropriate proportions of materials", "To make the concrete stronger", "To reduce cost", "To increase the workability"],
+    correct: 0
+  },
+  {
+    question: "What is the main cause of cracking in concrete?",
+    answers: ["Shrinkage", "Overloading", "Water leakage", "High temperature"],
+    correct: 0
+  },
+  {
+    question: "Which of these is a property of steel used in reinforcement?",
+    answers: ["High tensile strength", "Low thermal conductivity", "High compressive strength", "Low ductility"],
+    correct: 0
+  },
+  {
+    question: "Which is the most common type of reinforcing steel used in construction?",
+    answers: ["Mild steel", "High-strength steel", "Stainless steel", "Alloy steel"],
+    correct: 0
+  },
+  {
+    question: "What is the typical size of a reinforced concrete column?",
+    answers: ["300 mm x 300 mm", "450 mm x 450 mm", "200 mm x 200 mm", "500 mm x 500 mm"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of high humidity on concrete curing?",
+    answers: ["Increases curing rate", "Decreases curing rate", "No effect", "Makes concrete brittle"],
+    correct: 0
+  },
+  {
+    question: "What is the common method used to prevent corrosion in reinforced concrete?",
+    answers: ["Galvanization", "Coating with anti-corrosion material", "Use of high strength steel", "Increasing concrete cover thickness"],
+    correct: 0
+  },
+  {
+    question: "Which type of structural element resists bending in a building?",
+    answers: ["Beam", "Column", "Slab", "Foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main reason for soil settlement?",
+    answers: ["Compaction", "Water infiltration", "Overloading", "All of the above"],
+    correct: 0
+  },
+  {
+    question: "Which of these methods is used for controlling soil erosion?",
+    answers: ["Vegetative cover", "Mulching", "Terracing", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What type of aggregate is used for lightweight concrete?",
+    answers: ["Expanded clay aggregate", "Crushed stone", "Gravel", "Sand"],
+    correct: 0
+  },
+  {
+    question: "What is the typical range for the density of concrete?",
+    answers: ["2200–2500 kg/m³", "2000–2200 kg/m³", "2500–2800 kg/m³", "1800–2000 kg/m³"],
+    correct: 0
+  },
+  {
+    question: "What is the term used to describe the resistance of concrete to water penetration?",
+    answers: ["Waterproofing", "Permeability", "Hydration", "Curing"],
+    correct: 1
+  },
+  {
+    question: "Which of the following is a method used to reduce concrete's permeability?",
+    answers: ["Adding pozzolans", "Reducing water-cement ratio", "Increasing the cement content", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which type of crane is commonly used for lifting materials on construction sites?",
+    answers: ["Tower crane", "Mobile crane", "Overhead crane", "Crawler crane"],
+    correct: 0
+  },
+  {
+    question: "What is the typical type of mortar used for brick masonry?",
+    answers: ["Cement-lime mortar", "Clay mortar", "Gypsum mortar", "Lime mortar"],
+    correct: 0
+  },
+  {
+    question: "Which of these is the correct formula for calculating workability of concrete?",
+    answers: ["Slump test", "Compaction factor test", "Vebe test", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which type of foundation is used when soil conditions are weak?",
+    answers: ["Pile foundation", "Raft foundation", "Shallow foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of high water-cement ratio in concrete?",
+    answers: ["Increases workability", "Decreases strength", "Increases strength", "Both A and B"],
+    correct: 3
+  },
+  {
+    question: "Which of the following is the primary cause of concrete cracks?",
+    answers: ["Shrinkage", "Temperature variation", "Overloading", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the name of the process that involves the use of high-strength steel to improve the performance of concrete?",
+    answers: ["Prestressing", "Post-tensioning", "Pre-tensioning", "All of the above"],
+    correct: 0
+  },
+  {
+    question: "What is the main reason for using fiber-reinforced concrete?",
+    answers: ["To improve tensile strength", "To reduce water-cement ratio", "To reduce cost", "To increase workability"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a concrete vibrator during construction?",
+    answers: ["To remove air pockets", "To compact the concrete", "To improve strength", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What type of steel is used for reinforcing concrete?",
+    answers: ["Mild steel", "High-strength steel", "Stainless steel", "Alloy steel"],
+    correct: 0
+  },
+  {
+    question: "What is the main reason for soil testing before construction?",
+    answers: ["To determine the bearing capacity", "To assess soil drainage", "To check for contaminants", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which of these materials is used for forming precast concrete?",
+    answers: ["Steel molds", "Wooden molds", "Fiberglass molds", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the primary function of a column in a building?",
+    answers: ["To resist vertical loads", "To resist horizontal loads", "To transfer loads to the foundation", "Both A and C"],
+    correct: 3
+  },
+  {
+    question: "Which of these tests is commonly used to determine the moisture content of soil?",
+    answers: ["Oven drying method", "Proctor test", "Slump test", "Cone penetration test"],
+    correct: 0
+  },
+  {
+    question: "Which method is used to prevent the settlement of soil?",
+    answers: ["Soil compaction", "Soil replacement", "Soil stabilization", "All of the above"],
+    correct: 3
+  }, {
+    question: "What is the usual concrete mix ratio for a general-purpose mix?",
+    answers: ["1:2:4", "1:1:2", "1:3:6", "2:3:5"],
+    correct: 0
+  },
+  {
+    question: "What is the function of a steel reinforcement in concrete?",
+    answers: ["To resist tensile stress", "To resist compressive stress", "To increase thermal conductivity", "To increase workability"],
+    correct: 0
+  },
+  {
+    question: "What is the standard size of a brick in India?",
+    answers: ["190mm x 90mm x 90mm", "200mm x 100mm x 100mm", "210mm x 100mm x 75mm", "180mm x 90mm x 80mm"],
+    correct: 2
+  },
+  {
+    question: "What is the most commonly used form of concrete reinforcement?",
+    answers: ["Reinforcing bars (rebars)", "Wire mesh", "Fiber reinforcement", "Prestressed cables"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of a cement mixer?",
+    answers: ["To mix and blend the ingredients of concrete", "To cure the concrete", "To increase concrete strength", "To mold concrete into shapes"],
+    correct: 0
+  },
+  {
+    question: "What is the primary purpose of a dam?",
+    answers: ["Water storage", "Flood control", "Hydropower generation", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the most important property of a good soil for foundation?",
+    answers: ["High bearing capacity", "High permeability", "Low plasticity", "Low shrinkage"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a type of shallow foundation?",
+    answers: ["Strip foundation", "Pile foundation", "Caisson foundation", "Raft foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a geotechnical survey?",
+    answers: ["To determine the soil properties", "To assess the water table level", "To evaluate the stability of the site", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the main reason to use waterproofing in buildings?",
+    answers: ["To protect from water leakage", "To increase the strength of concrete", "To improve aesthetic value", "To reduce temperature fluctuations"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is used for bonding cement and aggregate in concrete?",
+    answers: ["Water", "Admixtures", "Cement", "Both A and B"],
+    correct: 3
+  },
+  {
+    question: "Which of the following materials is used in the production of precast concrete?",
+    answers: ["Steel", "Wood", "Plastic", "Aluminum"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of grout in construction?",
+    answers: ["To fill gaps and voids", "To make surfaces smoother", "To provide additional strength", "To add color to concrete"],
+    correct: 0
+  },
+  {
+    question: "Which type of concrete is used for large mass concrete structures?",
+    answers: ["Mass concrete", "High-strength concrete", "Self-compacting concrete", "Lightweight concrete"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is used to test the workability of concrete?",
+    answers: ["Slump test", "Compressive strength test", "Tensile strength test", "Impact test"],
+    correct: 0
+  },
+  {
+    question: "What is the primary cause of air voids in concrete?",
+    answers: ["Water-cement ratio", "Agglomeration of fine particles", "Excessive vibration", "Mixing time"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'settlement' refer to in construction?",
+    answers: ["The sinking or lowering of the foundation", "The curing of concrete", "The cracking of soil", "The heating of soil"],
+    correct: 0
+  },
+  {
+    question: "What is the main component of Portland cement?",
+    answers: ["Lime", "Aluminum oxide", "Silica", "Magnesia"],
+    correct: 0
+  },
+  {
+    question: "Which of the following tests is used to determine the workability of concrete?",
+    answers: ["Slump test", "Cube test", "Hydration test", "Permeability test"],
+    correct: 0
+  },
+  {
+    question: "What is the function of lime in cement?",
+    answers: ["To act as a binding agent", "To increase the strength", "To control the setting time", "To prevent shrinkage"],
+    correct: 0
+  },
+  {
+    question: "Which of these is used to reduce the temperature of concrete in hot climates?",
+    answers: ["Retarders", "Accelerators", "Plasticizers", "Air-entraining agents"],
+    correct: 0
+  },
+  {
+    question: "What is the typical percentage of water in the water-cement ratio?",
+    answers: ["30-35%", "40-45%", "50-55%", "60-65%"],
+    correct: 1
+  },
+  {
+    question: "Which of these is the most important property of construction soil?",
+    answers: ["Bearing capacity", "Plasticity", "Compressibility", "Moisture content"],
+    correct: 0
+  },
+  {
+    question: "What is the typical dimension for a concrete slab in residential buildings?",
+    answers: ["150 mm", "100 mm", "200 mm", "250 mm"],
+    correct: 0
+  },
+  {
+    question: "Which material is used as the aggregate in concrete?",
+    answers: ["Gravel", "Sand", "Crushed stone", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which material is used in concrete to improve its durability?",
+    answers: ["Fly ash", "Silica fume", "Ground granulated blast furnace slag", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the main function of a concrete formwork?",
+    answers: ["To support concrete until it sets", "To reduce the weight of concrete", "To enhance concrete's appearance", "To insulate concrete"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is used for temporary support during construction?",
+    answers: ["Scaffolding", "Shoring", "Formwork", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the effect of using excessive water in concrete?",
+    answers: ["Reduces strength", "Increases workability", "Improves durability", "Makes concrete easier to pour"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is an example of non-destructive testing for concrete?",
+    answers: ["Ultrasonic pulse velocity test", "Compressive strength test", "Slump test", "Impact hammer test"],
+    correct: 0
+  },
+  {
+    question: "What is the function of a water stop in concrete construction?",
+    answers: ["To prevent water leakage", "To enhance workability", "To increase strength", "To reduce cracking"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is commonly used as a form of reinforcement in concrete?",
+    answers: ["Steel rebar", "Wooden planks", "Plastic mesh", "Glass fiber"],
+    correct: 0
+  },
+  {
+    question: "What does 'prestressed concrete' refer to?",
+    answers: ["Concrete subjected to tensile stress before loading", "Concrete with embedded steel", "Concrete with high workability", "Concrete mixed with air-entraining agents"],
+    correct: 0
+  },
+  {
+    question: "What is the main purpose of a retaining wall?",
+    answers: ["To support soil", "To decorate the garden", "To prevent water flow", "To increase the load-bearing capacity of soil"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a disadvantage of using steel reinforcement in concrete?",
+    answers: ["Corrosion", "High cost", "Low strength", "None of the above"],
+    correct: 0
+  },
+  {
+    question: "What is the main purpose of an expansion joint in a concrete structure?",
+    answers: ["To allow for thermal expansion", "To reduce weight", "To make the structure visually appealing", "To reduce maintenance costs"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of an asphalt binder in road construction?",
+    answers: ["To hold the aggregate together", "To prevent water penetration", "To improve skid resistance", "To reduce construction time"],
+    correct: 0
+  },
+  {
+    question: "What is the term used for a structure built to support a load during construction?",
+    answers: ["Scaffolding", "Formwork", "Shoring", "Reinforcement"],
+    correct: 2
+  },
+  {
+    question: "What is the most common material used in the construction of road surfaces?",
+    answers: ["Asphalt", "Concrete", "Gravel", "Clay"],
+    correct: 0
+  },
+  {
+    question: "What is the function of a weep hole in a wall?",
+    answers: ["To allow water to drain", "To increase air circulation", "To reduce the weight of the wall", "To improve the insulation properties"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of curing concrete?",
+    answers: ["To enhance hydration", "To increase tensile strength", "To reduce the cost of concrete", "To add color to concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the main cause of cracking in concrete structures?",
+    answers: ["Shrinkage", "Water content", "Excessive heat", "Improper mixing"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is commonly used to improve soil stability?",
+    answers: ["Geogrids", "Concrete", "Plaster", "Mortar"],
+    correct: 0
+  },
+  {
+    question: "What is the typical range of compressive strength for normal concrete?",
+    answers: ["20-40 MPa", "40-60 MPa", "60-80 MPa", "80-100 MPa"],
+    correct: 0
+  },
+  {
+    question: "What is the primary function of a damp-proof course?",
+    answers: ["To prevent moisture rise in walls", "To increase thermal resistance", "To strengthen concrete", "To make the structure earthquake resistant"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a diaphragm wall?",
+    answers: ["To support structures during excavation", "To hold water", "To increase the load-bearing capacity of the soil", "To prevent water seepage"],
+    correct: 0
+  },
+  {
+    question: "Which type of foundation is most suitable for unstable or soft soils?",
+    answers: ["Pile foundation", "Shallow foundation", "Strip foundation", "Raft foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of a slump test?",
+    answers: ["To measure the workability of concrete", "To check the setting time", "To evaluate the durability", "To check for air voids"],
+    correct: 0
+  },
+  {
+    question: "Which material is used in high-strength concrete to enhance its durability?",
+    answers: ["Silica fume", "Lime", "Fly ash", "Cement"],
+    correct: 0
+  },
+  {
+    question: "What is the most common cause of structural failure in concrete buildings?",
+    answers: ["Poor design", "Excessive load", "Improper curing", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the purpose of a vapor barrier in construction?",
+    answers: ["To prevent moisture from entering the building", "To increase the strength of concrete", "To make the building earthquake resistant", "To provide insulation"],
+    correct: 0
+  },
+  {
+    question: "What type of concrete is used for the construction of pavements and roads?",
+    answers: ["Plain concrete", "Reinforced concrete", "High-strength concrete", "Air-entrained concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the process of 'prestressing' in concrete?",
+    answers: ["Applying a compressive force before loading", "Mixing different types of aggregates", "Increasing the cement content", "Adding more water to the mix"],
+    correct: 0
+  },
+  {
+    question: "What is the term used for the concrete that is mixed with air-entraining agents?",
+    answers: ["Air-entrained concrete", "High-strength concrete", "Self-compacting concrete", "Lightweight concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the primary reason for using high-strength concrete in construction?",
+    answers: ["To reduce the weight of the structure", "To increase durability", "To reduce the cost", "To increase workability"],
+    correct: 1
+  },
+  {
+    question: "What is the primary function of a cement mixer?",
+    answers: ["To mix cement, water, and aggregates", "To add chemicals to concrete", "To pump concrete to high floors", "To increase concrete strength"],
+    correct: 0
+  },
+  {
+    question: "What is the primary function of lime in construction?",
+    answers: ["To bind particles together", "To prevent water penetration", "To increase workability", "To make the structure more flexible"],
+    correct: 0
+  },
+  {
+    question: "What is the most commonly used material for road construction?",
+    answers: ["Asphalt", "Concrete", "Wood", "Gravel"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'concrete slump' refer to?",
+    answers: ["A test of concrete consistency", "The drop in concrete strength over time", "The level of concrete after pouring", "The density of concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the most common test for determining the strength of concrete?",
+    answers: ["Compressive strength test", "Tensile strength test", "Bending strength test", "Impact strength test"],
+    correct: 0
+  },
+  {
+    question: "What does the term 'shrinkage' refer to in concrete?",
+    answers: ["The reduction in volume as the concrete cures", "The increase in volume as the concrete hardens", "The failure of concrete due to excessive load", "The expansion of concrete over time"],
+    correct: 0
+  },
+  {
+    question: "What is the best way to reduce the risk of concrete cracking?",
+    answers: ["By controlling the water-cement ratio", "By increasing the strength of the cement", "By adding more aggregate", "By curing the concrete for longer periods"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of curing concrete?",
+    answers: ["To keep it moist and promote hydration", "To reduce the weight", "To improve tensile strength", "To make it more resistant to weathering"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of high temperature on concrete?",
+    answers: ["Increases strength", "Reduces strength", "Improves durability", "Increases workability"],
+    correct: 1
+  },
+  {
+    question: "What is the primary function of formwork in concrete construction?",
+    answers: ["To shape and support concrete during curing", "To prevent shrinkage cracks", "To improve concrete's strength", "To reduce the curing time"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a vibrator in concrete work?",
+    answers: ["To remove air voids", "To increase workability", "To reduce curing time", "To improve strength"],
+    correct: 0
+  },{
+    question: "What is the main purpose of a slab in construction?",
+    answers: ["To support vertical loads", "To provide shelter", "To resist lateral forces", "To provide a flat surface"],
+    correct: 3
+  },
+  {
+    question: "What does the term 'formwork' refer to in construction?",
+    answers: ["A temporary mold used to shape concrete", "A structural component of a building", "A method of insulating walls", "A type of concrete mix"],
+    correct: 0
+  },
+  {
+    question: "What is the primary cause of corrosion in reinforced concrete?",
+    answers: ["Water ingress", "High temperatures", "Insufficient curing", "High load"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a common cause of soil settlement?",
+    answers: ["Excessive load", "High water content", "Compaction", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "What is the role of a geotechnical engineer in construction?",
+    answers: ["To assess soil stability", "To design the foundation system", "To evaluate site conditions", "All of the above"],
+    correct: 3
+  },
+  {
+    question: "Which of the following materials is known for its high strength-to-weight ratio?",
+    answers: ["Steel", "Concrete", "Wood", "Brick"],
+    correct: 0
+  },
+  {
+    question: "What is the primary purpose of a foundation?",
+    answers: ["To transfer loads from the structure to the soil", "To provide a flat surface", "To reduce vibrations", "To improve aesthetic appeal"],
+    correct: 0
+  },
+  {
+    question: "Which type of concrete is known for its ability to flow without mechanical vibration?",
+    answers: ["Self-compacting concrete", "High-strength concrete", "Lightweight concrete", "Air-entrained concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the primary component of Portland cement?",
+    answers: ["Calcium silicate", "Silica", "Aluminum oxide", "Magnesium oxide"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of excessive water in a concrete mix?",
+    answers: ["It reduces strength", "It increases workability", "It increases durability", "It speeds up curing time"],
+    correct: 0
+  },
+  {
+    question: "What type of foundation is used for tall buildings and skyscrapers?",
+    answers: ["Pile foundation", "Raft foundation", "Shallow foundation", "Strip foundation"],
+    correct: 0
+  },
+  {
+    question: "What is the main reason for using reinforcement in concrete?",
+    answers: ["To resist tensile forces", "To improve workability", "To increase compressive strength", "To reduce the cost of construction"],
+    correct: 0
+  },
+  {
+    question: "What is the process of 'hydration' in concrete?",
+    answers: ["The chemical reaction between cement and water", "The process of mixing water into concrete", "The curing of concrete in hot conditions", "The addition of additives to improve strength"],
+    correct: 0
+  },
+  {
+    question: "What is the typical lifespan of a concrete structure when properly maintained?",
+    answers: ["50-100 years", "20-30 years", "200-300 years", "10-20 years"],
+    correct: 0
+  },
+  {
+    question: "What is the most common test to determine the workability of concrete?",
+    answers: ["Slump test", "Compressive strength test", "Tensile strength test", "Flexural strength test"],
+    correct: 0
+  },
+  {
+    question: "Which type of cement is commonly used for marine structures?",
+    answers: ["Ordinary Portland cement", "Sulphate-resistant cement", "Rapid-hardening cement", "White cement"],
+    correct: 1
+  },
+  {
+    question: "What does the term 'dead load' refer to in construction?",
+    answers: ["The weight of the structure itself", "The weight of movable objects", "The weight of snow and water", "The weight of wind"],
+    correct: 0
+  },
+  {
+    question: "Which of the following is a common method of preventing concrete from cracking during curing?",
+    answers: ["Curing with water", "Curing with air", "Covering with plastic sheets", "Using high-strength cement"],
+    correct: 0
+  },
+  {
+    question: "What is the effect of using low-quality aggregates in concrete?",
+    answers: ["Reduced strength", "Increased workability", "Increased durability", "Faster setting time"],
+    correct: 0
+  },
+  {
+    question: "Which type of concrete is designed to resist freezing and thawing cycles?",
+    answers: ["Air-entrained concrete", "High-strength concrete", "Self-compacting concrete", "Lightweight concrete"],
+    correct: 0
+  },
+  {
+    question: "What is the role of fly ash in concrete?",
+    answers: ["To improve workability and reduce heat", "To increase the cost of construction", "To speed up setting time", "To increase strength"],
+    correct: 0
+  },
+  {
+    question: "What is the purpose of a load-bearing wall?",
+    answers: ["To support the structure above it", "To provide insulation", "To resist wind forces", "To separate rooms"],
+    correct: 0
+  },
+  {
+    question: "What is the main function of a dam in a water reservoir?",
+    answers: ["To hold back water", "To provide electricity", "To irrigate farmland", "To maintain water quality"],
+    correct: 0
+  },
+  {
+    question: "What type of soil is most commonly used for foundation construction?",
+    answers: ["Clay", "Sand", "Gravel", "Loam"],
+    correct: 2
+  }
+];
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

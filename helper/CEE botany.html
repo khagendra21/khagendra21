@@ -1,0 +1,4821 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+                
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+   const questions = [
+  
+    // Plant Anatomy
+    {
+        question: "What is the main function of phloem in plants?",
+        answers: [
+            "Transport of water from roots to leaves",
+            "Transport of sugars and nutrients",
+            "Support for the plant structure",
+            "Protection against pathogens"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the main tissue responsible for the transport of water in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Parenchyma",
+            "Collenchyma"
+        ],
+        correct: 1
+    },
+
+    // Photosynthesis
+    {
+        question: "In which part of the plant does photosynthesis mainly occur?",
+        answers: [
+            "Roots",
+            "Stem",
+            "Leaves",
+            "Flowers"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the primary pigment involved in photosynthesis?",
+        answers: [
+            "Chlorophyll",
+            "Carotenoid",
+            "Phycocyanin",
+            "Xanthophyll"
+        ],
+        correct: 0
+    },
+
+    // Genetics
+    {
+        question: "What is the term used for the physical expression of genes in an organism?",
+        answers: [
+            "Genotype",
+            "Phenotype",
+            "Allele",
+            "Chromosome"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is responsible for the genetic variation in sexually reproducing organisms?",
+        answers: [
+            "Mitosis",
+            "Meiosis",
+            "Binary fission",
+            "Cloning"
+        ],
+        correct: 1
+    },
+
+    // Reproduction in Plants
+    {
+        question: "Which of the following is a type of asexual reproduction in plants?",
+        answers: [
+            "Pollination",
+            "Fertilization",
+            "Vegetative propagation",
+            "Cross-pollination"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the term used for the fusion of male and female gametes in plants?",
+        answers: [
+            "Germination",
+            "Fertilization",
+            "Meiosis",
+            "Mitosis"
+        ],
+        correct: 1
+    },
+
+    // Ecology
+    {
+        question: "Which of the following is an example of a biotic factor in an ecosystem?",
+        answers: [
+            "Temperature",
+            "Water",
+            "Soil",
+            "Plants"
+        ],
+        correct: 3
+    },
+    {
+        question: "What is the role of decomposers in an ecosystem?",
+        answers: [
+            "To produce food for plants",
+            "To consume primary producers",
+            "To recycle nutrients from dead organisms",
+            "To maintain population control"
+        ],
+        correct: 2
+    },
+
+    // Plant Growth
+    {
+        question: "Which hormone is primarily responsible for promoting plant cell growth?",
+        answers: [
+            "Auxin",
+            "Gibberellin",
+            "Cytokinin",
+            "Ethylene"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the process by which plants convert light energy into chemical energy?",
+        answers: [
+            "Respiration",
+            "Fermentation",
+            "Photosynthesis",
+            "Transpiration"
+        ],
+        correct: 2
+    },
+
+    // Plant Physiology
+    {
+        question: "What is the role of stomata in plants?",
+        answers: [
+            "Absorbing nutrients",
+            "Storing water",
+            "Gas exchange",
+            "Transporting food"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is transpiration in plants?",
+        answers: [
+            "The absorption of water by roots",
+            "The movement of water through xylem",
+            "The loss of water vapor from the leaves",
+            "The process of photosynthesis"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following plants is classified as a gymnosperm?",
+        answers: [
+            "Rose",
+            "Pine tree",
+            "Mango",
+            "Wheat"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which group of plants produces seeds in fruits?",
+        answers: [
+            "Bryophytes",
+            "Pteridophytes",
+            "Gymnosperms",
+            "Angiosperms"
+        ],
+        correct: 3
+    },
+
+    // Plant Diseases
+    {
+        question: "What is the cause of plant diseases like blight and rust?",
+        answers: [
+            "Bacteria",
+            "Fungi",
+            "Viruses",
+            "Insects"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a viral disease affecting plants?",
+        answers: [
+            "Black spot disease",
+            "Powdery mildew",
+            "Tobacco mosaic virus",
+            "Root rot"
+        ],
+        correct: 2
+    },
+
+    // Biotechnology
+    {
+        question: "What is the technique of transferring genes from one organism to another called?",
+        answers: [
+            "Gene therapy",
+            "Genetic engineering",
+            "Cloning",
+            "Bioremediation"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of Bt crops?",
+        answers: [
+            "To increase the growth rate of plants",
+            "To resist herbicide treatments",
+            "To resist insect pests",
+            "To improve the taste of crops"
+        ],
+        correct: 2
+    },
+
+    // Phylogeny
+    {
+        question: "Which of the following is the correct order of taxonomic classification?",
+        answers: [
+            "Kingdom, Phylum, Class, Order, Family, Genus, Species",
+            "Class, Order, Kingdom, Phylum, Family, Genus, Species",
+            "Family, Order, Class, Phylum, Genus, Species, Kingdom",
+            "Phylum, Class, Family, Order, Kingdom, Genus, Species"
+        ],
+        correct: 0
+    },
+    {
+        question: "Who is known as the father of modern taxonomy?",
+        answers: [
+            "Gregor Mendel",
+            "Carl Linnaeus",
+            "Charles Darwin",
+            "Louis Pasteur"
+        ],
+        correct: 1
+    },
+
+    // Plant Hormones
+    {
+        question: "Which plant hormone is involved in the ripening of fruits?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Ethylene",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the role of auxin in plants?",
+        answers: [
+            "Promotes seed germination",
+            "Inhibits flowering",
+            "Promotes root growth",
+            "Delays fruit ripening"
+        ],
+        correct: 2
+    },// Photosynthesis and Plant Physiology
+    {
+        question: "Which of the following is true about chloroplasts?",
+        answers: [
+            "They are the site of cellular respiration.",
+            "They contain chlorophyll, which is essential for photosynthesis.",
+            "They are found only in animal cells.",
+            "They store starch and other nutrients."
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the main role of water in the process of photosynthesis?",
+        answers: [
+            "To provide energy for the synthesis of glucose.",
+            "To serve as an electron donor in the light reactions.",
+            "To form carbon dioxide.",
+            "To trap sunlight."
+        ],
+        correct: 1
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which of the following is a symptom of nitrogen deficiency in plants?",
+        answers: [
+            "Yellowing of leaves",
+            "Stunted growth",
+            "Excessive branching",
+            "Red spots on leaves"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following hormones is responsible for fruit ripening?",
+        answers: [
+            "Gibberellins",
+            "Auxins",
+            "Ethylene",
+            "Cytokinins"
+        ],
+        correct: 2
+    },
+
+    // Genetics and Evolution
+    {
+        question: "Which law of inheritance states that alleles separate during the formation of gametes?",
+        answers: [
+            "Law of Dominance",
+            "Law of Independent Assortment",
+            "Law of Segregation",
+            "Law of Codominance"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following represents a possible genotype for a heterozygous tall pea plant (Tt)?",
+        answers: [
+            "TT",
+            "Tt",
+            "tt",
+            "TT or tt"
+        ],
+        correct: 1
+    },
+
+    // Plant Reproduction
+    {
+        question: "Which part of the flower is responsible for the production of pollen?",
+        answers: [
+            "Anther",
+            "Stigma",
+            "Style",
+            "Ovary"
+        ],
+        correct: 0
+    },
+    {
+        question: "In which part of the plant does fertilization occur?",
+        answers: [
+            "Anther",
+            "Ovary",
+            "Pistil",
+            "Stigma"
+        ],
+        correct: 1
+    },
+
+    // Ecology and Environment
+    {
+        question: "Which of the following organisms is an example of a producer in an ecosystem?",
+        answers: [
+            "Fungi",
+            "Plants",
+            "Herbivores",
+            "Carnivores"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the term for the total biomass of all the producers in an ecosystem?",
+        answers: [
+            "Primary productivity",
+            "Biomagnification",
+            "Trophic efficiency",
+            "Net primary productivity"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following is a viral plant disease?",
+        answers: [
+            "Powdery mildew",
+            "Tobacco mosaic",
+            "Rust",
+            "Blight"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which fungus causes 'wilt' disease in plants?",
+        answers: [
+            "Phytophthora",
+            "Fusarium",
+            "Trichoderma",
+            "Aspergillus"
+        ],
+        correct: 1
+    },
+
+    // Plant Hormones
+    {
+        question: "Which hormone is involved in the process of stomatal closure?",
+        answers: [
+            "Cytokinin",
+            "Ethylene",
+            "Abscisic acid",
+            "Auxin"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following hormones promotes the elongation of cells in plants?",
+        answers: [
+            "Ethylene",
+            "Gibberellin",
+            "Cytokinin",
+            "Auxin"
+        ],
+        correct: 3
+    },
+
+    // Classification and Taxonomy
+    {
+        question: "Which of the following is characteristic of monocot plants?",
+        answers: [
+            "Two cotyledons",
+            "Parallel-veined leaves",
+            "Taproot system",
+            "Flower parts in multiples of four or five"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following categories is the largest taxonomic unit?",
+        answers: [
+            "Family",
+            "Class",
+            "Kingdom",
+            "Phylum"
+        ],
+        correct: 2
+    },
+
+    // Biotechnology and Genetic Engineering
+    {
+        question: "What is the main aim of genetic engineering?",
+        answers: [
+            "To change the genetic makeup of an organism",
+            "To increase the size of the plant",
+            "To improve the aesthetic qualities of plants",
+            "To prevent diseases in plants"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the role of plasmids in genetic engineering?",
+        answers: [
+            "They act as carriers for genes",
+            "They provide nutrients to cells",
+            "They control cell division",
+            "They provide resistance to diseases"
+        ],
+        correct: 0
+    },
+
+    // Phylogeny and Evolution
+    {
+        question: "Which scientist is credited with developing the theory of evolution by natural selection?",
+        answers: [
+            "Charles Darwin",
+            "Gregor Mendel",
+            "Jean-Baptiste Lamarck",
+            "Louis Pasteur"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of an adaptive radiation?",
+        answers: [
+            "Darwin's finches",
+            "The evolution of eukaryotic cells",
+            "The development of antibiotic resistance in bacteria",
+            "The origin of multicellular organisms"
+        ],
+        correct: 0
+    },
+
+    // Plant Metabolism
+    {
+        question: "In which part of the plant cell does glycolysis occur?",
+        answers: [
+            "Mitochondria",
+            "Cytoplasm",
+            "Chloroplast",
+            "Nucleus"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the end product of alcoholic fermentation in plants?",
+        answers: [
+            "Lactic acid",
+            "Oxygen",
+            "Ethanol",
+            "Glucose"
+        ],
+        correct: 2
+    }, // Photosynthesis and Plant Physiology
+    {
+        question: "Which of the following best describes the process of transpiration?",
+        answers: [
+            "Movement of water through the plant roots to the leaves.",
+            "Evaporation of water from plant leaves into the atmosphere.",
+            "Absorption of carbon dioxide by plants from the air.",
+            "Synthesis of glucose from water and carbon dioxide."
+        ],
+        correct: 1
+    },
+    {
+        question: "Which pigment is responsible for capturing light energy in the process of photosynthesis?",
+        answers: [
+            "Carotenoids",
+            "Chlorophyll",
+            "Anthocyanin",
+            "Xanthophyll"
+        ],
+        correct: 1
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which of the following is a primary function of auxins in plants?",
+        answers: [
+            "Cell elongation",
+            "Inhibition of growth",
+            "Flowering promotion",
+            "Leaf shedding"
+        ],
+        correct: 0
+    },
+    {
+        question: "What does the term ‘photoperiodism’ refer to in plants?",
+        answers: [
+            "The response of plants to day and night length.",
+            "The growth of plants in the direction of light.",
+            "The mechanism of water absorption in plants.",
+            "The process of flower fertilization in plants."
+        ],
+        correct: 0
+    },
+
+    // Plant Genetics and Evolution
+    {
+        question: "Which of the following terms refers to the observable characteristics of an organism?",
+        answers: [
+            "Genotype",
+            "Phenotype",
+            "Alleles",
+            "Dominance"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which is the correct sequence of events during the process of genetic recombination?",
+        answers: [
+            "Fertilization → Meiosis → Cross over",
+            "Meiosis → Fertilization → Cross over",
+            "Cross over → Meiosis → Fertilization",
+            "Meiosis → Cross over → Fertilization"
+        ],
+        correct: 3
+    },
+
+    // Reproduction in Plants
+    {
+        question: "In which part of the plant does pollination occur?",
+        answers: [
+            "Anther",
+            "Stigma",
+            "Ovary",
+            "Style"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of asexual reproduction in plants?",
+        answers: [
+            "Seeds",
+            "Cuttings",
+            "Pollination",
+            "Flowering"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following factors is a biotic factor in an ecosystem?",
+        answers: [
+            "Temperature",
+            "Soil composition",
+            "Predation",
+            "Sunlight"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the main cause of desertification?",
+        answers: [
+            "Deforestation",
+            "Overgrazing by livestock",
+            "Water pollution",
+            "Industrialization"
+        ],
+        correct: 1
+    },
+
+    // Plant Diseases and Protection
+    {
+        question: "Which of the following fungi causes the plant disease ‘rust’?",
+        answers: [
+            "Puccinia",
+            "Fusarium",
+            "Phytophthora",
+            "Aspergillus"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the most common method used to control plant pests?",
+        answers: [
+            "Chemical pesticides",
+            "Biological control",
+            "Genetic modification",
+            "Mechanical barriers"
+        ],
+        correct: 1
+    },
+
+    // Plant Metabolism and Biochemistry
+    {
+        question: "Which process is responsible for the production of ATP in plants?",
+        answers: [
+            "Glycolysis",
+            "Citric acid cycle",
+            "Electron transport chain",
+            "Fermentation"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the main product of the Calvin cycle in photosynthesis?",
+        answers: [
+            "Oxygen",
+            "ATP",
+            "Glucose",
+            "Carbon dioxide"
+        ],
+        correct: 2
+    },
+
+    // Classification and Taxonomy
+    {
+        question: "Which of the following is the most specific taxonomic rank?",
+        answers: [
+            "Family",
+            "Genus",
+            "Order",
+            "Species"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which system is used to classify plants based on their characteristics and evolutionary history?",
+        answers: [
+            "Linnaean classification",
+            "Phenetic classification",
+            "Cladistic classification",
+            "Binomial nomenclature"
+        ],
+        correct: 2
+    },
+
+    // Biotechnology and Genetic Engineering
+    {
+        question: "Which of the following is the first step in genetic engineering?",
+        answers: [
+            "Cutting the DNA",
+            "Inserting the foreign gene",
+            "Isolating the gene of interest",
+            "Transforming the host organism"
+        ],
+        correct: 2
+    },
+    {
+        question: "What does the term ‘GMOs’ refer to?",
+        answers: [
+            "Genetically Modified Organisms",
+            "Green Mitochondrial Organisms",
+            "General Molecular Organisms",
+            "Genetically Mutated Organisms"
+        ],
+        correct: 0
+    },
+
+    // Phylogeny and Evolution
+    {
+        question: "Which of the following best describes the process of adaptive radiation?",
+        answers: [
+            "Species evolve to fill different ecological niches.",
+            "Species undergo a sudden genetic mutation.",
+            "Species evolve through the process of natural selection.",
+            "Species migrate to new habitats and change over time."
+        ],
+        correct: 0
+    },
+    {
+        question: "What term is used to describe the process where one species evolves into many different species?",
+        answers: [
+            "Convergent evolution",
+            "Divergent evolution",
+            "Parallel evolution",
+            "Co-evolution"
+        ],
+        correct: 1
+    }, // Photosynthesis and Plant Physiology
+    {
+        question: "Which of the following is NOT a product of the light reaction of photosynthesis?",
+        answers: [
+            "ATP",
+            "Oxygen",
+            "NADPH",
+            "Glucose"
+        ],
+        correct: 3
+    },
+    {
+        question: "The process by which water molecules are split during photosynthesis is called:",
+        answers: [
+            "Photophosphorylation",
+            "Photolysis",
+            "Transpiration",
+            "Reduction"
+        ],
+        correct: 1
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which of the following hormones is primarily responsible for the growth of the stem in plants?",
+        answers: [
+            "Cytokinins",
+            "Auxins",
+            "Gibberellins",
+            "Abscisic acid"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the role of gibberellins in plants?",
+        answers: [
+            "Inhibition of seed germination",
+            "Promotion of flowering",
+            "Promotion of stem elongation",
+            "Inhibition of leaf abscission"
+        ],
+        correct: 2
+    },
+
+    // Plant Genetics and Evolution
+    {
+        question: "What is the primary difference between genotype and phenotype?",
+        answers: [
+            "Genotype is the genetic makeup, while phenotype is the physical appearance.",
+            "Genotype refers to the appearance, while phenotype refers to the genetic makeup.",
+            "Genotype involves only recessive traits, while phenotype involves dominant traits.",
+            "Genotype is inherited from the mother, while phenotype is inherited from the father."
+        ],
+        correct: 0
+    },
+    {
+        question: "In the process of meiosis, homologous chromosomes are separated during which stage?",
+        answers: [
+            "Prophase I",
+            "Metaphase I",
+            "Anaphase I",
+            "Telophase I"
+        ],
+        correct: 2
+    },
+
+    // Reproduction in Plants
+    {
+        question: "What type of plant reproduction involves the fusion of male and female gametes?",
+        answers: [
+            "Asexual reproduction",
+            "Sexual reproduction",
+            "Vegetative reproduction",
+            "Spore formation"
+        ],
+        correct: 1
+    },
+    {
+        question: "In plants, what is the function of the stigma in the flower?",
+        answers: [
+            "To protect the ovary",
+            "To receive pollen during pollination",
+            "To produce seeds",
+            "To hold the flower in place"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which term refers to the relationship between two organisms where both benefit?",
+        answers: [
+            "Parasitism",
+            "Mutualism",
+            "Commensalism",
+            "Competition"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an abiotic factor affecting plant growth?",
+        answers: [
+            "Soil nutrients",
+            "Predators",
+            "Plant diseases",
+            "Pollinators"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases and Protection
+    {
+        question: "Which of the following fungi is responsible for the disease known as ‘downy mildew’ in plants?",
+        answers: [
+            "Puccinia",
+            "Fusarium",
+            "Plasmopara",
+            "Phytophthora"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following methods is primarily used for controlling plant pests without using chemicals?",
+        answers: [
+            "Pesticide application",
+            "Biological control",
+            "Crop rotation",
+            "Monoculture"
+        ],
+        correct: 1
+    },
+
+    // Plant Metabolism and Biochemistry
+    {
+        question: "Which part of the plant is responsible for the synthesis of proteins?",
+        answers: [
+            "Chloroplasts",
+            "Ribosomes",
+            "Mitochondria",
+            "Endoplasmic Reticulum"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is NOT part of the Calvin cycle?",
+        answers: [
+            "Carbon fixation",
+            "Reduction",
+            "Regeneration of RuBP",
+            "Oxygen production"
+        ],
+        correct: 3
+    },
+
+    // Classification and Taxonomy
+    {
+        question: "Which taxonomic rank is immediately below the 'family' in the classification of organisms?",
+        answers: [
+            "Order",
+            "Genus",
+            "Species",
+            "Class"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which scientist is known for the binomial nomenclature system?",
+        answers: [
+            "Linnaeus",
+            "Darwin",
+            "Mendel",
+            "Wallace"
+        ],
+        correct: 0
+    },
+
+    // Biotechnology and Genetic Engineering
+    {
+        question: "What is the function of a plasmid in genetic engineering?",
+        answers: [
+            "It acts as a vector for transferring genetic material.",
+            "It produces enzymes for genetic modification.",
+            "It helps in the regulation of gene expression.",
+            "It acts as an organelle for cellular respiration."
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main aim of cloning plants using tissue culture?",
+        answers: [
+            "To produce genetically identical plants.",
+            "To create genetically diverse plants.",
+            "To promote hybrid vigor.",
+            "To improve plant resistance to diseases."
+        ],
+        correct: 0
+    },
+
+    // Phylogeny and Evolution
+    {
+        question: "What is the primary driving force behind the process of natural selection?",
+        answers: [
+            "Mutation",
+            "Random genetic drift",
+            "Differential survival and reproduction",
+            "Migration"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following describes the concept of ‘co-evolution’?",
+        answers: [
+            "Species evolve in response to interactions with other species.",
+            "Species evolve in isolation from other species.",
+            "Species evolve due to environmental pressures alone.",
+            "Species evolve through random genetic mutations."
+        ],
+        correct: 0
+    },{
+        question: "Which part of the plant is responsible for transporting water and nutrients?",
+        answers: [
+            "Xylem",
+            "Phloem",
+            "Cambium",
+            "Epidermis"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which cells are responsible for water transport in xylem?",
+        answers: [
+            "Tracheids and vessel elements",
+            "Parenchyma and sclerenchyma",
+            "Collenchyma and sieve tubes",
+            "Guard cells and companion cells"
+        ],
+        correct: 0
+    },
+
+    // Plant Ecology and Environment
+    {
+        question: "Which type of plant is most likely to thrive in low-light conditions?",
+        answers: [
+            "Hydrophytes",
+            "Mesophytes",
+            "Xerophytes",
+            "Hygrophytes"
+        ],
+        correct: 3
+    },
+    {
+        question: "The adaptation of leaves in xerophytes includes:",
+        answers: [
+            "Large surface area to absorb sunlight",
+            "Thick cuticle to reduce water loss",
+            "Presence of stomata for better transpiration",
+            "Thin leaves for efficient gas exchange"
+        ],
+        correct: 1
+    },
+
+    // Plant Genetics and Evolution
+    {
+        question: "What is the primary source of genetic variation in populations?",
+        answers: [
+            "Genetic drift",
+            "Mutation",
+            "Natural selection",
+            "Gene flow"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which process in plants leads to the formation of gametes?",
+        answers: [
+            "Meiosis",
+            "Mitosis",
+            "Fertilization",
+            "Transpiration"
+        ],
+        correct: 0
+    },
+
+    // Plant Reproduction
+    {
+        question: "What is the term for the fusion of male and female gametes in plants?",
+        answers: [
+            "Fertilization",
+            "Pollination",
+            "Germination",
+            "Spore formation"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which part of the flower produces pollen?",
+        answers: [
+            "Anther",
+            "Ovary",
+            "Stigma",
+            "Filament"
+        ],
+        correct: 0
+    },
+
+    // Plant Disease and Protection
+    {
+        question: "Which of the following is a common bacterial disease in plants?",
+        answers: [
+            "Rust",
+            "Blight",
+            "Canker",
+            "Wilt"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the best method of controlling fungal diseases in plants?",
+        answers: [
+            "Use of fungicides",
+            "Use of pesticides",
+            "Planting genetically resistant varieties",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which technique is used to produce genetically modified plants?",
+        answers: [
+            "Tissue culture",
+            "Polymerase chain reaction",
+            "Gene transfer",
+            "All of the above"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which enzyme is used in the process of gene cloning?",
+        answers: [
+            "DNA polymerase",
+            "Restriction enzymes",
+            "Ligase",
+            "Transcriptase"
+        ],
+        correct: 1
+    },
+
+    // Photosynthesis and Respiration
+    {
+        question: "In the Calvin cycle, what is the first product formed?",
+        answers: [
+            "3-phosphoglycerate",
+            "Glyceraldehyde-3-phosphate",
+            "Ribulose bisphosphate",
+            "Glucose"
+        ],
+        correct: 0
+    },
+    {
+        question: "During which stage of cellular respiration is the most ATP produced?",
+        answers: [
+            "Glycolysis",
+            "Citric acid cycle",
+            "Electron transport chain",
+            "Fermentation"
+        ],
+        correct: 2
+    },
+
+    // Plant Morphology and Anatomy
+    {
+        question: "What type of leaf venation is found in dicot plants?",
+        answers: [
+            "Parallel venation",
+            "Reticulate venation",
+            "Pinnate venation",
+            "Palmate venation"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following cells in plants are responsible for photosynthesis?",
+        answers: [
+            "Parenchyma cells",
+            "Sclerenchyma cells",
+            "Collenchyma cells",
+            "Phloem cells"
+        ],
+        correct: 0
+    },
+
+    // Plant Taxonomy
+    {
+        question: "Who is known as the father of modern taxonomy?",
+        answers: [
+            "Charles Darwin",
+            "Gregor Mendel",
+            "Carl Linnaeus",
+            "Jean-Baptiste Lamarck"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a monocot plant?",
+        answers: [
+            "Pea plant",
+            "Sunflower",
+            "Rice",
+            "Rose"
+        ],
+        correct: 2
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which hormone is responsible for fruit ripening?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Ethylene",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which part of the plant absorbs water and minerals from the soil?",
+        answers: [
+            "Root hairs",
+            "Leaves",
+            "Stem",
+            "Flowers"
+        ],
+        correct: 0
+    },
+
+    // Plant Adaptations
+    {
+        question: "What is the main adaptation of plants in a desert environment?",
+        answers: [
+            "Large leaves for water storage",
+            "Small leaves or spines to reduce water loss",
+            "High number of stomata for increased transpiration",
+            "Shallow roots for quick water absorption"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following adaptations help aquatic plants survive in water?",
+        answers: [
+            "Thick cuticle",
+            "Aerenchyma tissue for buoyancy",
+            "Fewer stomata",
+            "Small surface area of leaves"
+        ],
+        correct: 1
+    }, {
+        question: "In the Calvin cycle, what is the first product formed?",
+        answers: [
+            "3-phosphoglycerate",
+            "Glyceraldehyde-3-phosphate",
+            "Ribulose bisphosphate",
+            "Glucose"
+        ],
+        correct: 0
+    },
+    {
+        question: "During which stage of cellular respiration is the most ATP produced?",
+        answers: [
+            "Glycolysis",
+            "Citric acid cycle",
+            "Electron transport chain",
+            "Fermentation"
+        ],
+        correct: 2
+    },
+
+    // Plant Morphology and Anatomy
+    {
+        question: "What type of leaf venation is found in dicot plants?",
+        answers: [
+            "Parallel venation",
+            "Reticulate venation",
+            "Pinnate venation",
+            "Palmate venation"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following cells in plants are responsible for photosynthesis?",
+        answers: [
+            "Parenchyma cells",
+            "Sclerenchyma cells",
+            "Collenchyma cells",
+            "Phloem cells"
+        ],
+        correct: 0
+    },
+
+    // Plant Taxonomy
+    {
+        question: "Who is known as the father of modern taxonomy?",
+        answers: [
+            "Charles Darwin",
+            "Gregor Mendel",
+            "Carl Linnaeus",
+            "Jean-Baptiste Lamarck"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a monocot plant?",
+        answers: [
+            "Pea plant",
+            "Sunflower",
+            "Rice",
+            "Rose"
+        ],
+        correct: 2
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which hormone is responsible for fruit ripening?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Ethylene",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which part of the plant absorbs water and minerals from the soil?",
+        answers: [
+            "Root hairs",
+            "Leaves",
+            "Stem",
+            "Flowers"
+        ],
+        correct: 0
+    },
+
+    // Plant Adaptations
+    {
+        question: "What is the main adaptation of plants in a desert environment?",
+        answers: [
+            "Large leaves for water storage",
+            "Small leaves or spines to reduce water loss",
+            "High number of stomata for increased transpiration",
+            "Shallow roots for quick water absorption"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following adaptations help aquatic plants survive in water?",
+        answers: [
+            "Thick cuticle",
+            "Aerenchyma tissue for buoyancy",
+            "Fewer stomata",
+            "Small surface area of leaves"
+        ],
+        correct: 1
+    }
+,
+    {
+        question: "Which element is essential for the formation of chlorophyll in plants?",
+        answers: [
+            "Magnesium",
+            "Calcium",
+            "Nitrogen",
+            "Iron"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a macronutrient for plant growth?",
+        answers: [
+            "Zinc",
+            "Boron",
+            "Phosphorus",
+            "Copper"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which hormone promotes the elongation of cells in stems?",
+        answers: [
+            "Auxins",
+            "Gibberellins",
+            "Cytokinins",
+            "Ethylene"
+        ],
+        correct: 0
+    },
+    {
+        question: "The process of seed dormancy is primarily regulated by which plant hormone?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Abscisic acid",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+
+    // Photosynthesis
+    {
+        question: "The Calvin cycle is also known as the:",
+        answers: [
+            "Light reaction",
+            "Dark reaction",
+            "Electron transport chain",
+            "Krebs cycle"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is required for the light-dependent reactions of photosynthesis?",
+        answers: [
+            "Carbon dioxide",
+            "Water",
+            "Oxygen",
+            "Glucose"
+        ],
+        correct: 1
+    },
+
+    // Plant Reproduction
+    {
+        question: "The fusion of male and female gametes in plants is called:",
+        answers: [
+            "Germination",
+            "Fertilization",
+            "Pollination",
+            "Dispersal"
+        ],
+        correct: 1
+    },
+    {
+        question: "In plants, the process of transferring pollen from the male to the female reproductive organs is known as:",
+        answers: [
+            "Pollination",
+            "Fertilization",
+            "Germination",
+            "Seed formation"
+        ],
+        correct: 0
+    },
+
+    // Genetics and Evolution
+    {
+        question: "Which term describes the observable traits of an organism?",
+        answers: [
+            "Genotype",
+            "Phenotype",
+            "Allele",
+            "Chromosome"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of natural selection?",
+        answers: [
+            "A dog being trained to fetch",
+            "Plants growing toward sunlight",
+            "Pesticides killing resistant insects",
+            "A bird migrating to a warmer climate"
+        ],
+        correct: 2
+    },
+
+    // Plant Ecology
+    {
+        question: "The movement of species into an ecosystem is called:",
+        answers: [
+            "Immigration",
+            "Emigration",
+            "Succession",
+            "Competition"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a primary producer in an ecosystem?",
+        answers: [
+            "Bacteria",
+            "Herbivores",
+            "Autotrophs",
+            "Carnivores"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification
+    {
+        question: "Which group of plants are characterized by the presence of seeds but not flowers?",
+        answers: [
+            "Bryophytes",
+            "Angiosperms",
+            "Gymnosperms",
+            "Ferns"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which plant group produces spores instead of seeds?",
+        answers: [
+            "Angiosperms",
+            "Gymnosperms",
+            "Pteridophytes",
+            "Bryophytes"
+        ],
+        correct: 2
+    },
+
+    // Plant Anatomy
+    {
+        question: "Which of the following tissues is responsible for transporting water in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Cortex",
+            "Epidermis"
+        ],
+        correct: 1
+    },
+    {
+        question: "The epidermis of a plant is primarily responsible for:",
+        answers: [
+            "Photosynthesis",
+            "Water absorption",
+            "Protection",
+            "Transport"
+        ],
+        correct: 2
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following diseases is caused by a virus?",
+        answers: [
+            "Rust",
+            "Mosaic",
+            "Blight",
+            "Canker"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which organism is responsible for causing powdery mildew in plants?",
+        answers: [
+            "Bacteria",
+            "Fungi",
+            "Virus",
+            "Protozoa"
+        ],
+        correct: 1
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following is a genetically modified crop?",
+        answers: [
+            "Bt corn",
+            "Wheat",
+            "Rice",
+            "Barley"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which technique is used to produce genetically modified plants?",
+        answers: [
+            "Gene splicing",
+            "Polymerase chain reaction",
+            "Gel electrophoresis",
+            "Cloning"
+        ],
+        correct: 0
+    },
+
+    // Water and Plant Relations
+    {
+        question: "The process by which plants lose water through their leaves is called:",
+        answers: [
+            "Absorption",
+            "Transpiration",
+            "Photosynthesis",
+            "Respiration"
+        ],
+        correct: 1
+    },
+    {
+        question: "In which of the following conditions does wilting occur in plants?",
+        answers: [
+            "High temperature and low humidity",
+            "Low temperature and high humidity",
+            "Low soil moisture",
+            "High soil moisture"
+        ],
+        correct: 0
+    },
+
+    // Plant Respiration
+    {
+        question: "During anaerobic respiration, plants produce which of the following?",
+        answers: [
+            "Oxygen",
+            "Carbon dioxide",
+            "Lactic acid",
+            "Ethanol"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following processes occurs in the mitochondria of plant cells?",
+        answers: [
+            "Photosynthesis",
+            "Fermentation",
+            "Respiration",
+            "Transpiration"
+        ],
+        correct: 2
+    },
+
+    // Plant Hormones
+    {
+        question: "Which hormone is primarily responsible for apical dominance in plants?",
+        answers: [
+            "Cytokinin",
+            "Gibberellins",
+            "Auxin",
+            "Ethylene"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which hormone promotes seed germination?",
+        answers: [
+            "Abscisic acid",
+            "Gibberellins",
+            "Cytokinin",
+            "Auxin"
+        ],
+        correct: 1
+    },
+
+    // Plant Morphology
+    {
+        question: "Which of the following is NOT a type of plant leaf venation?",
+        answers: [
+            "Parallel",
+            "Reticulate",
+            "Pinnate",
+            "Cystic"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which modification of stem occurs in potato plants?",
+        answers: [
+            "Rhizome",
+            "Tuber",
+            "Cladode",
+            "Bulb"
+        ],
+        correct: 1
+    },
+
+    // Plant Evolution
+    {
+        question: "Which type of plant exhibits alternation of generations?",
+        answers: [
+            "Angiosperms",
+            "Gymnosperms",
+            "Ferns",
+            "Algae"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following mechanisms is responsible for the evolution of new species?",
+        answers: [
+            "Genetic drift",
+            "Gene flow",
+            "Natural selection",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Miscellaneous
+    {
+        question: "What is the primary function of root hairs in plants?",
+        answers: [
+            "Anchoring the plant",
+            "Absorbing water and nutrients",
+            "Transporting water",
+            "Producing hormones"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following plants is known for having the largest flower?",
+        answers: [
+            "Titan arum",
+            "Rose",
+            "Tulip",
+            "Sunflower"
+        ],
+        correct: 0
+    },
+
+    // Climate and Plants
+    {
+        question: "Which type of plants are adapted to cold climates?",
+        answers: [
+            "Xerophytes",
+            "Mesophytes",
+            "Hydrophytes",
+            "Cryophytes"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following factors can increase transpiration in plants?",
+        answers: [
+            "Increased humidity",
+            "Increased light intensity",
+            "Reduced temperature",
+            "Decreased wind speed"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following is an example of an abiotic factor in an ecosystem?",
+        answers: [
+            "Temperature",
+            "Predation",
+            "Competition",
+            "Parasitism"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which biome is characterized by low precipitation and harsh winds?",
+        answers: [
+            "Tundra",
+            "Tropical rainforest",
+            "Savanna",
+            "Desert"
+        ],
+        correct: 3
+    },{
+        question: "Which plant hormone is responsible for the growth of lateral buds?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Gibberellin",
+            "Ethylene"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which part of the plant is responsible for the production of oxygen during photosynthesis?",
+        answers: [
+            "Roots",
+            "Stem",
+            "Leaves",
+            "Flowers"
+        ],
+        correct: 2
+    },
+
+    // Photosynthesis
+    {
+        question: "In the photosynthesis process, the primary pigment involved in light absorption is:",
+        answers: [
+            "Carotene",
+            "Chlorophyll",
+            "Xanthophyll",
+            "Melanin"
+        ],
+        correct: 1
+    },
+    {
+        question: "The light-independent reaction of photosynthesis occurs in which part of the chloroplast?",
+        answers: [
+            "Stroma",
+            "Thylakoid membrane",
+            "Grana",
+            "Matrix"
+        ],
+        correct: 0
+    },
+
+    // Plant Reproduction
+    {
+        question: "What is the term for the transfer of pollen from an anther to a stigma?",
+        answers: [
+            "Fertilization",
+            "Pollination",
+            "Germination",
+            "Cross-pollination"
+        ],
+        correct: 1
+    },
+    {
+        question: "In a flowering plant, the part that develops into fruit is:",
+        answers: [
+            "Stigma",
+            "Ovary",
+            "Anther",
+            "Style"
+        ],
+        correct: 1
+    },
+
+    // Genetics and Evolution
+    {
+        question: "Which type of mutation is responsible for a change in a single base pair of DNA?",
+        answers: [
+            "Chromosomal mutation",
+            "Point mutation",
+            "Gene duplication",
+            "Inversion"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a mechanism of evolution that involves random changes in gene frequency?",
+        answers: [
+            "Natural selection",
+            "Genetic drift",
+            "Gene flow",
+            "Mutations"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which type of ecosystem has the highest biodiversity?",
+        answers: [
+            "Desert",
+            "Tundra",
+            "Tropical rainforest",
+            "Temperate forest"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which factor is an example of an abiotic factor in an ecosystem?",
+        answers: [
+            "Soil pH",
+            "Temperature",
+            "Light",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following is a characteristic of monocots?",
+        answers: [
+            "Two cotyledons",
+            "Parallel venation",
+            "Vascular bundles in a ring",
+            "Tap root system"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following plants is classified as a dicot?",
+        answers: [
+            "Rice",
+            "Wheat",
+            "Sunflower",
+            "Corn"
+        ],
+        correct: 2
+    },
+
+    // Plant Anatomy
+    {
+        question: "Which tissue in plants is responsible for the transport of food?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Cortex",
+            "Epidermis"
+        ],
+        correct: 0
+    },
+    {
+        question: "The vascular bundle of a plant is made up of which two tissues?",
+        answers: [
+            "Phloem and xylem",
+            "Xylem and cambium",
+            "Cortex and epidermis",
+            "Phloem and epidermis"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following diseases is caused by a fungus?",
+        answers: [
+            "Downy mildew",
+            "Tobacco mosaic",
+            "Leaf curl",
+            "Bacterial blight"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which disease is caused by a bacterium and affects the tomato plant?",
+        answers: [
+            "Leaf rust",
+            "Blight",
+            "Mosaic",
+            "Wilt"
+        ],
+        correct: 1
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following techniques is used to transfer foreign genes into plant cells?",
+        answers: [
+            "Gene splicing",
+            "Polymerase chain reaction",
+            "Biolistics",
+            "DNA sequencing"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of Bt crops?",
+        answers: [
+            "To increase photosynthesis",
+            "To reduce the use of chemical pesticides",
+            "To enhance seed germination",
+            "To improve water retention"
+        ],
+        correct: 1
+    },
+
+    // Water and Plant Relations
+    {
+        question: "In which part of the plant does most transpiration occur?",
+        answers: [
+            "Roots",
+            "Stem",
+            "Leaves",
+            "Flowers"
+        ],
+        correct: 2
+    },
+    {
+        question: "The opening and closing of stomata are regulated by which cells?",
+        answers: [
+            "Guard cells",
+            "Xylem cells",
+            "Phloem cells",
+            "Epidermal cells"
+        ],
+        correct: 0
+    },
+
+    // Plant Respiration
+    {
+        question: "Which process occurs in the mitochondria of plant cells?",
+        answers: [
+            "Photosynthesis",
+            "Glycolysis",
+            "Fermentation",
+            "Respiration"
+        ],
+        correct: 3
+    },
+    {
+        question: "What is produced during the anaerobic respiration in plants?",
+        answers: [
+            "Oxygen",
+            "Carbon dioxide",
+            "Glucose",
+            "Ethanol"
+        ],
+        correct: 3
+    },
+
+    // Plant Hormones
+    {
+        question: "Which hormone is responsible for the abscission of leaves?",
+        answers: [
+            "Ethylene",
+            "Cytokinin",
+            "Gibberellin",
+            "Abscisic acid"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which hormone is involved in the fruit ripening process?",
+        answers: [
+            "Auxin",
+            "Ethylene",
+            "Cytokinin",
+            "Abscisic acid"
+        ],
+        correct: 1
+    },
+
+    // Plant Morphology
+    {
+        question: "Which of the following plants have needle-like leaves?",
+        answers: [
+            "Cypress",
+            "Maple",
+            "Mango",
+            "Rose"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which plant modification is seen in a cactus?",
+        answers: [
+            "Spines",
+            "Tubers",
+            "Thorns",
+            "Cladodes"
+        ],
+        correct: 0
+    },
+
+    // Plant Evolution
+    {
+        question: "Which term refers to the gradual change in plant species over time?",
+        answers: [
+            "Adaptation",
+            "Succession",
+            "Evolution",
+            "Mutation"
+        ],
+        correct: 2
+    },
+    {
+        question: "The process through which plants evolve to better survive in their environment is known as:",
+        answers: [
+            "Natural selection",
+            "Gene flow",
+            "Mutation",
+            "Artificial selection"
+        ],
+        correct: 0
+    },
+
+    // Miscellaneous
+    {
+        question: "Which of the following plants is capable of nitrogen fixation?",
+        answers: [
+            "Clover",
+            "Wheat",
+            "Rice",
+            "Maize"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which plant structure is responsible for holding the plant upright?",
+        answers: [
+            "Root",
+            "Stem",
+            "Leaf",
+            "Flower"
+        ],
+        correct: 1
+    },
+
+    // Climate and Plants
+    {
+        question: "Which type of plants are most adapted to hot, dry climates?",
+        answers: [
+            "Mesophytes",
+            "Xerophytes",
+            "Hydrophytes",
+            "Halophytes"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which factor contributes to the rate of transpiration in plants?",
+        answers: [
+            "Temperature",
+            "Wind",
+            "Humidity",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following is an example of a keystone species in an ecosystem?",
+        answers: [
+            "Lions in grasslands",
+            "Bees in pollination",
+            "Elephants in forests",
+            "All of the above"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which biome has the least biodiversity?",
+        answers: [
+            "Desert",
+            "Tundra",
+            "Rainforest",
+            "Temperate forest"
+        ],
+        correct: 1
+    },// Plant Growth and Development
+    {
+        question: "Which hormone is responsible for the elongation of stems in plants?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Gibberellin",
+            "Ethylene"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following structures is responsible for the growth of roots in plants?",
+        answers: [
+            "Apical meristem",
+            "Lateral meristem",
+            "Root cap",
+            "Cambium"
+        ],
+        correct: 2
+    },
+
+    // Photosynthesis
+    {
+        question: "Which pigment absorbs light for photosynthesis in green plants?",
+        answers: [
+            "Carotene",
+            "Chlorophyll",
+            "Xanthophyll",
+            "Melanin"
+        ],
+        correct: 1
+    },
+    {
+        question: "The Calvin cycle occurs in which part of the plant cell?",
+        answers: [
+            "Mitochondria",
+            "Cytoplasm",
+            "Chloroplast stroma",
+            "Nucleus"
+        ],
+        correct: 2
+    },
+
+    // Plant Reproduction
+    {
+        question: "What is the term for the fusion of male and female gametes in plants?",
+        answers: [
+            "Fertilization",
+            "Pollination",
+            "Germination",
+            "Cross-pollination"
+        ],
+        correct: 0
+    },
+    {
+        question: "In plants, which part develops into seeds after fertilization?",
+        answers: [
+            "Ovary",
+            "Stigma",
+            "Anther",
+            "Style"
+        ],
+        correct: 0
+    },
+
+    // Genetics and Evolution
+    {
+        question: "Which of the following is responsible for the inheritance of traits in organisms?",
+        answers: [
+            "RNA",
+            "DNA",
+            "Proteins",
+            "Carbohydrates"
+        ],
+        correct: 1
+    },
+    {
+        question: "The process by which new species are formed from an existing species is called?",
+        answers: [
+            "Gene flow",
+            "Speciation",
+            "Hybridization",
+            "Mating"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following ecosystems has the highest rate of primary productivity?",
+        answers: [
+            "Tropical rainforests",
+            "Deserts",
+            "Temperate forests",
+            "Grasslands"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a biotic factor in an ecosystem?",
+        answers: [
+            "Soil",
+            "Temperature",
+            "Plants",
+            "Rainfall"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following characteristics is typical of dicot plants?",
+        answers: [
+            "Parallel venation",
+            "Single cotyledon",
+            "Vascular bundles scattered",
+            "Broad leaves with reticulate venation"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following is an example of a monocot plant?",
+        answers: [
+            "Sunflower",
+            "Tomato",
+            "Wheat",
+            "Bean"
+        ],
+        correct: 2
+    },
+
+    // Plant Anatomy
+    {
+        question: "Which tissue in plants is responsible for the transport of water?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Cortex",
+            "Epidermis"
+        ],
+        correct: 1
+    },
+    {
+        question: "In a dicot stem, vascular bundles are arranged in:",
+        answers: [
+            "A ring",
+            "A scattered pattern",
+            "A single central bundle",
+            "A linear pattern"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases
+    {
+        question: "Which plant disease is caused by a bacterium?",
+        answers: [
+            "Powdery mildew",
+            "Rust",
+            "Leaf curl",
+            "Bacterial wilt"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following diseases in plants is caused by a virus?",
+        answers: [
+            "Citrus canker",
+            "Tobacco mosaic disease",
+            "Late blight",
+            "Downy mildew"
+        ],
+        correct: 1
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which process involves the insertion of foreign genes into a plant?",
+        answers: [
+            "PCR",
+            "Gene cloning",
+            "Genetic transformation",
+            "RNA interference"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of genetically modified (GM) crops?",
+        answers: [
+            "Golden Rice",
+            "Sunflower",
+            "Maize",
+            "Wheat"
+        ],
+        correct: 0
+    },
+
+    // Water and Plant Relations
+    {
+        question: "Transpiration is the process by which plants:",
+        answers: [
+            "Absorb water",
+            "Lose water vapor",
+            "Produce food",
+            "Store water"
+        ],
+        correct: 1
+    },
+    {
+        question: "The opening and closing of stomata in plants is regulated by:",
+        answers: [
+            "Guard cells",
+            "Xylem vessels",
+            "Phloem vessels",
+            "Epidermal cells"
+        ],
+        correct: 0
+    },
+
+    // Plant Respiration
+    {
+        question: "Which process occurs in the cytoplasm of plant cells?",
+        answers: [
+            "Photosynthesis",
+            "Glycolysis",
+            "Fermentation",
+            "Krebs cycle"
+        ],
+        correct: 1
+    },
+    {
+        question: "During aerobic respiration, which molecule is broken down to release energy?",
+        answers: [
+            "Glucose",
+            "Oxygen",
+            "Water",
+            "Carbon dioxide"
+        ],
+        correct: 0
+    },
+
+    // Plant Hormones
+    {
+        question: "Which hormone promotes the growth of lateral roots in plants?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Gibberellin",
+            "Abscisic acid"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following plant hormones is involved in seed dormancy?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Gibberellin",
+            "Abscisic acid"
+        ],
+        correct: 3
+    },
+
+    // Plant Morphology
+    {
+        question: "Which of the following plants has modified leaves called tendrils?",
+        answers: [
+            "Pea",
+            "Cucumber",
+            "Tomato",
+            "Cabbage"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a modified root in plants?",
+        answers: [
+            "Tuber",
+            "Rhizome",
+            "Bulb",
+            "Nodules"
+        ],
+        correct: 3
+    },
+
+    // Plant Evolution
+    {
+        question: "Which of the following is a characteristic of the process of natural selection?",
+        answers: [
+            "Variation in traits",
+            "Inheritance of traits",
+            "Differential survival",
+            "All of the above"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following is an example of an adaptive trait in plants?",
+        answers: [
+            "Deep taproots in desert plants",
+            "Thick bark on trees in temperate forests",
+            "Large leaves in tropical plants",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Miscellaneous
+    {
+        question: "Which plant is commonly used for the production of rubber?",
+        answers: [
+            "Hevea brasiliensis",
+            "Ficus elastica",
+            "Gossypium",
+            "Ricinus communis"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following plants is a member of the legume family?",
+        answers: [
+            "Pea",
+            "Wheat",
+            "Rice",
+            "Corn"
+        ],
+        correct: 0
+    },
+
+    // Climate and Plants
+    {
+        question: "Which of the following is a plant adaptation to reduce water loss in arid environments?",
+        answers: [
+            "Large leaves",
+            "Thick cuticle",
+            "High transpiration rates",
+            "Deep roots"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which biome is characterized by permafrost and low plant diversity?",
+        answers: [
+            "Tropical rainforest",
+            "Tundra",
+            "Desert",
+            "Grassland"
+        ],
+        correct: 1
+    },
+
+    // Genetic Engineering
+    {
+        question: "What is the term for a plant that contains a gene from another organism?",
+        answers: [
+            "Genetically modified plant",
+            "Hybrid plant",
+            "Clonal plant",
+            "Wild-type plant"
+        ],
+        correct: 0
+    },
+
+    // Photosynthesis and Cellular Respiration
+    {
+        question: "The process of photosynthesis takes place in which part of the plant cell?",
+        answers: [
+            "Mitochondria",
+            "Chloroplast",
+            "Nucleus",
+            "Ribosome"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following molecules is produced during photosynthesis?",
+        answers: [
+            "Oxygen",
+            "Carbon dioxide",
+            "ATP",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Plant Growth Regulators (Phytohormones)
+    {
+        question: "Which of the following hormones promotes cell elongation in plants?",
+        answers: [
+            "Gibberellins",
+            "Auxins",
+            "Cytokinins",
+            "Ethylene"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which hormone is responsible for the regulation of fruit ripening?",
+        answers: [
+            "Ethylene",
+            "Cytokinin",
+            "Gibberellin",
+            "Auxin"
+        ],
+        correct: 0
+    },
+
+    // Plant Reproduction
+    {
+        question: "In plants, double fertilization results in the formation of:",
+        answers: [
+            "Seed and fruit",
+            "Embryo and endosperm",
+            "Sporophyte and gametophyte",
+            "Anther and stigma"
+        ],
+        correct: 1
+    },
+    {
+        question: "The part of the flower that contains the female gametophyte is called:",
+        answers: [
+            "Anther",
+            "Ovary",
+            "Filament",
+            "Style"
+        ],
+        correct: 1
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following diseases is caused by fungi?",
+        answers: [
+            "Rust",
+            "Blight",
+            "Mosaic",
+            "Yellowing"
+        ],
+        correct: 0
+    },
+    {
+        question: "Bacterial wilt in plants is caused by:",
+        answers: [
+            "Xanthomonas bacteria",
+            "Pseudomonas bacteria",
+            "Agrobacterium bacteria",
+            "Rhizobium bacteria"
+        ],
+        correct: 0
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following is NOT a characteristic of angiosperms?",
+        answers: [
+            "Flowers",
+            "Naked seeds",
+            "Vascular tissues",
+            "Double fertilization"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which plant group produces seeds without flowers?",
+        answers: [
+            "Angiosperms",
+            "Bryophytes",
+            "Gymnosperms",
+            "Ferns"
+        ],
+        correct: 2
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following plants is best adapted to live in wetland conditions?",
+        answers: [
+            "Cactus",
+            "Mangroves",
+            "Oak trees",
+            "Pine trees"
+        ],
+        correct: 1
+    },
+    {
+        question: "The relationship between nitrogen-fixing bacteria and leguminous plants is an example of:",
+        answers: [
+            "Commensalism",
+            "Symbiosis",
+            "Parasitism",
+            "Mutualism"
+        ],
+        correct: 3
+    },
+
+    // Plant Morphology
+    {
+        question: "Which part of the plant is responsible for the formation of new cells?",
+        answers: [
+            "Root cap",
+            "Apical meristem",
+            "Lateral root",
+            "Endodermis"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a characteristic of monocots?",
+        answers: [
+            "Parallel leaf venation",
+            "Reticulate leaf venation",
+            "Two cotyledons",
+            "Vascular bundles in a ring"
+        ],
+        correct: 0
+    },
+
+    // Biotechnology in Plants
+    {
+        question: "Which of the following is the technique used to clone plants?",
+        answers: [
+            "Tissue culture",
+            "Gene editing",
+            "Cross-breeding",
+            "Transformation"
+        ],
+        correct: 0
+    },
+    {
+        question: "Genetically modified plants are produced by:",
+        answers: [
+            "Hybridization",
+            "Transgenic methods",
+            "Artificial selection",
+            "Traditional breeding"
+        ],
+        correct: 1
+    },
+
+    // Plant Physiology
+    {
+        question: "What process is responsible for the movement of water and nutrients through the plant?",
+        answers: [
+            "Transpiration",
+            "Diffusion",
+            "Translocation",
+            "Photosynthesis"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the main function of phloem in plants?",
+        answers: [
+            "Transport of water",
+            "Transport of food",
+            "Transport of minerals",
+            "Transport of oxygen"
+        ],
+        correct: 1
+    },
+
+    // Plant Water Relations
+    {
+        question: "Which of the following helps plants to prevent excessive water loss?",
+        answers: [
+            "Stomata",
+            "Cuticle",
+            "Root hairs",
+            "Xylem"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following conditions will result in wilting of plants?",
+        answers: [
+            "Turgidity",
+            "Loss of water",
+            "Excess water",
+            "Low transpiration"
+        ],
+        correct: 1
+    },
+
+    // Plant Biochemistry
+    {
+        question: "Which molecule is the main source of energy for cellular processes in plants?",
+        answers: [
+            "ATP",
+            "Glucose",
+            "Sucrose",
+            "Fructose"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which pigment in plants absorbs light energy for photosynthesis?",
+        answers: [
+            "Chlorophyll",
+            "Carotenoid",
+            "Xanthophyll",
+            "Phycocyanin"
+        ],
+        correct: 0
+    }, {
+        question: "Which of the following is the primary pigment involved in photosynthesis?",
+        answers: [
+            "Chlorophyll a",
+            "Carotenoids",
+            "Chlorophyll b",
+            "Xanthophyll"
+        ],
+        correct: 0
+    },
+    {
+        question: "The light reaction of photosynthesis takes place in which part of the chloroplast?",
+        answers: [
+            "Stroma",
+            "Thylakoid membrane",
+            "Cytoplasm",
+            "Nucleus"
+        ],
+        correct: 1
+    },
+
+    // Plant Nutrition and Growth
+    {
+        question: "Which element is most directly involved in the formation of amino acids in plants?",
+        answers: [
+            "Nitrogen",
+            "Phosphorus",
+            "Magnesium",
+            "Iron"
+        ],
+        correct: 0
+    },
+    {
+        question: "The movement of water in plants occurs through which process?",
+        answers: [
+            "Transpiration",
+            "Osmosis",
+            "Phloem loading",
+            "Gibberellin movement"
+        ],
+        correct: 1
+    },
+
+    // Plant Growth Regulators (Phytohormones)
+    {
+        question: "Which of the following hormones is responsible for apical dominance?",
+        answers: [
+            "Auxins",
+            "Cytokinins",
+            "Gibberellins",
+            "Ethylene"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which plant hormone regulates leaf abscission and fruit ripening?",
+        answers: [
+            "Auxins",
+            "Gibberellins",
+            "Ethylene",
+            "Cytokinins"
+        ],
+        correct: 2
+    },
+
+    // Plant Reproduction
+    {
+        question: "In which part of the flower is the male gametophyte (pollen) produced?",
+        answers: [
+            "Anther",
+            "Ovary",
+            "Style",
+            "Stigma"
+        ],
+        correct: 0
+    },
+    {
+        question: "Double fertilization in plants leads to the formation of:",
+        answers: [
+            "Embryo and endosperm",
+            "Sporophyte and gametophyte",
+            "Seed and fruit",
+            "Embryo and seed coat"
+        ],
+        correct: 0
+    },
+
+    // Plant Classification
+    {
+        question: "The kingdom Plantae is divided into how many major groups?",
+        answers: [
+            "3",
+            "4",
+            "5",
+            "6"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is characteristic of dicot plants?",
+        answers: [
+            "Parallel leaf venation",
+            "Presence of vascular bundles in a ring",
+            "One cotyledon",
+            "Scattered vascular bundles"
+        ],
+        correct: 1
+    },
+
+    // Plant Diseases
+    {
+        question: "Which disease is caused by a virus in plants?",
+        answers: [
+            "Downy mildew",
+            "Tobacco mosaic",
+            "Rust",
+            "Late blight"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which fungus is responsible for wheat rust disease?",
+        answers: [
+            "Puccinia",
+            "Phytophthora",
+            "Trichoderma",
+            "Alternaria"
+        ],
+        correct: 0
+    },
+
+    // Plant Ecology
+    {
+        question: "Which plant adaptation helps it to survive in dry environments?",
+        answers: [
+            "Needle-like leaves",
+            "Large, broad leaves",
+            "Presence of stomata",
+            "Vascular bundles"
+        ],
+        correct: 0
+    },
+    {
+        question: "In a forest ecosystem, trees that shed their leaves during the winter are called:",
+        answers: [
+            "Evergreens",
+            "Deciduous",
+            "Tropicals",
+            "Conifers"
+        ],
+        correct: 1
+    },
+
+    // Plant Morphology
+    {
+        question: "Which structure in the plant roots is responsible for the absorption of water?",
+        answers: [
+            "Root cap",
+            "Root hair",
+            "Xylem",
+            "Phloem"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which part of the plant stores food in the form of starch?",
+        answers: [
+            "Leaves",
+            "Roots",
+            "Stems",
+            "Flowers"
+        ],
+        correct: 1
+    },
+
+    // Plant Water Relations
+    {
+        question: "The loss of water in the form of vapor through stomata is called:",
+        answers: [
+            "Transpiration",
+            "Evaporation",
+            "Respiration",
+            "Osmosis"
+        ],
+        correct: 0
+    },
+    {
+        question: "The phenomenon of movement of water from soil to roots is known as:",
+        answers: [
+            "Absorption",
+            "Transpiration",
+            "Osmosis",
+            "Diffusion"
+        ],
+        correct: 0
+    },
+
+    // Plant Biochemistry
+    {
+        question: "Which of the following processes produces oxygen as a byproduct?",
+        answers: [
+            "Photosynthesis",
+            "Respiration",
+            "Transpiration",
+            "Fermentation"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which pigment absorbs light energy for photosynthesis?",
+        answers: [
+            "Chlorophyll",
+            "Carotenoids",
+            "Phycocyanin",
+            "Xanthophyll"
+        ],
+        correct: 0
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following is a method of cloning plants?",
+        answers: [
+            "Gene splicing",
+            "Tissue culture",
+            "Cross-pollination",
+            "Grafting"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which technology is used to introduce foreign genes into plants?",
+        answers: [
+            "Polymerase chain reaction",
+            "Genetic engineering",
+            "Gel electrophoresis",
+            "Cell fusion"
+        ],
+        correct: 1
+    },
+
+    // Plant Physiology
+    {
+        question: "Which of the following is responsible for the transport of water in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Cytoplasm",
+            "Chloroplast"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following regulates the opening and closing of stomata?",
+        answers: [
+            "Xylem",
+            "Phloem",
+            "Guard cells",
+            "Chloroplasts"
+        ],
+        correct: 2
+    },
+
+    // Plant Genetics
+    {
+        question: "What is the chromosome number of a diploid plant cell?",
+        answers: [
+            "N",
+            "2N",
+            "4N",
+            "N/2"
+        ],
+        correct: 1
+    },
+    {
+        question: "In Mendelian inheritance, the dominant trait masks the expression of the recessive trait in which generation?",
+        answers: [
+            "F1 generation",
+            "F2 generation",
+            "Parental generation",
+            "All generations"
+        ],
+        correct: 0
+    },
+
+    // Plant Evolution
+    {
+        question: "Which of the following is the main driving force of plant evolution?",
+        answers: [
+            "Natural selection",
+            "Genetic drift",
+            "Mutation",
+            "Environmental changes"
+        ],
+        correct: 0
+    },
+    {
+        question: "The study of plant evolution is known as:",
+        answers: [
+            "Paleobotany",
+            "Botany",
+            "Ethnobotany",
+            "Plant ecology"
+        ],
+        correct: 0
+    }, {
+        question: "What is the main function of the phloem in plants?",
+        answers: [
+            "Transport of water",
+            "Transport of food",
+            "Photosynthesis",
+            "Transport of oxygen"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is responsible for the movement of water in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Cytoplasm",
+            "Chloroplast"
+        ],
+        correct: 1
+    },
+
+    // Photosynthesis
+    {
+        question: "Which is the correct equation for photosynthesis?",
+        answers: [
+            "6CO2 + 6H2O → C6H12O6 + 6O2",
+            "6CO2 + 12H2O → C6H12O6 + 6O2",
+            "C6H12O6 + 6O2 → 6CO2 + 6H2O",
+            "C6H12O6 + O2 → CO2 + H2O"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which pigment in plants absorbs light energy for photosynthesis?",
+        answers: [
+            "Chlorophyll a",
+            "Chlorophyll b",
+            "Carotenoids",
+            "Xanthophyll"
+        ],
+        correct: 0
+    },
+
+    // Plant Reproduction
+    {
+        question: "Which part of the flower is responsible for the production of male gametes?",
+        answers: [
+            "Stigma",
+            "Anther",
+            "Ovary",
+            "Style"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a characteristic of wind-pollinated flowers?",
+        answers: [
+            "Bright-colored petals",
+            "Large, fragrant flowers",
+            "Small, dull-colored flowers",
+            "Presence of nectar"
+        ],
+        correct: 2
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which hormone promotes cell elongation in plants?",
+        answers: [
+            "Auxins",
+            "Cytokinins",
+            "Gibberellins",
+            "Ethylene"
+        ],
+        correct: 0
+    },
+    {
+        question: "The primary function of the root is to:",
+        answers: [
+            "Absorb light",
+            "Absorb water and nutrients",
+            "Support the plant",
+            "Reproduce new plants"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which term refers to the ability of a plant to survive in low water availability conditions?",
+        answers: [
+            "Hydrophily",
+            "Xerophyte",
+            "Hydrophyte",
+            "Mesophyte"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a feature of plants in desert environments?",
+        answers: [
+            "Large leaves",
+            "Thick waxy cuticle",
+            "High transpiration rate",
+            "Short root system"
+        ],
+        correct: 1
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following groups of plants is known for having vascular tissue?",
+        answers: [
+            "Bryophytes",
+            "Pteridophytes",
+            "Algae",
+            "Mosses"
+        ],
+        correct: 1
+    },
+    {
+        question: "In which group of plants do you find the presence of seeds but not flowers?",
+        answers: [
+            "Ferns",
+            "Angiosperms",
+            "Gymnosperms",
+            "Bryophytes"
+        ],
+        correct: 2
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following techniques is used to produce genetically modified plants?",
+        answers: [
+            "Cell culture",
+            "Gene editing",
+            "Tissue culture",
+            "Cross-breeding"
+        ],
+        correct: 2
+    },
+    {
+        question: "What does the process of genetic engineering in plants involve?",
+        answers: [
+            "Introducing foreign genes",
+            "Natural selection",
+            "Cross-pollination",
+            "Photosynthesis"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following plant diseases is caused by bacteria?",
+        answers: [
+            "Citrus canker",
+            "Rust",
+            "Mildew",
+            "Blight"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which is the most common vector for plant virus diseases?",
+        answers: [
+            "Fungi",
+            "Insects",
+            "Bacteria",
+            "Water"
+        ],
+        correct: 1
+    },
+
+    // Plant Water Relations
+    {
+        question: "The process of water loss in the form of vapor through stomata is known as:",
+        answers: [
+            "Transpiration",
+            "Osmosis",
+            "Absorption",
+            "Evaporation"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following contributes to the upward movement of water in plants?",
+        answers: [
+            "Capillary action",
+            "Phloem",
+            "Active transport",
+            "Cytokinesis"
+        ],
+        correct: 0
+    },
+
+    // Plant Morphology
+    {
+        question: "Which of the following is an example of a modified stem?",
+        answers: [
+            "Rhizome",
+            "Taproot",
+            "Fibrous root",
+            "Leaf blade"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which structure in plants is responsible for the production of new cells?",
+        answers: [
+            "Meristem",
+            "Xylem",
+            "Phloem",
+            "Cuticle"
+        ],
+        correct: 0
+    },
+
+    // Plant Genetics
+    {
+        question: "What is the genotype of a plant with two different alleles for a trait?",
+        answers: [
+            "Homozygous",
+            "Heterozygous",
+            "Diploid",
+            "Polyploid"
+        ],
+        correct: 1
+    },
+    {
+        question: "In Mendelian genetics, the dominant allele is represented by a:",
+        answers: [
+            "Lowercase letter",
+            "Capital letter",
+            "Number",
+            "Symbol"
+        ],
+        correct: 1
+    },
+
+    // Plant Evolution
+    {
+        question: "Which process is responsible for the formation of new plant species?",
+        answers: [
+            "Gene flow",
+            "Natural selection",
+            "Mutations",
+            "All of the above"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following is the most important factor driving plant evolution?",
+        answers: [
+            "Climate change",
+            "Genetic drift",
+            "Competition",
+            "Natural selection"
+        ],
+        correct: 3
+    },
+
+    // Plant Physiology (continued)
+    {
+        question: "Which part of the chloroplast is responsible for the Calvin cycle?",
+        answers: [
+            "Thylakoid membrane",
+            "Stroma",
+            "Granum",
+            "Chlorophyll"
+        ],
+        correct: 1
+    },
+    {
+        question: "The process in which plants produce their own food using sunlight is known as:",
+        answers: [
+            "Respiration",
+            "Transpiration",
+            "Photosynthesis",
+            "Fermentation"
+        ],
+        correct: 2
+    },
+
+    // Plant Hormones
+    {
+        question: "Which plant hormone regulates fruit ripening?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Ethylene",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which plant hormone is responsible for promoting shoot elongation?",
+        answers: [
+            "Auxins",
+            "Cytokinins",
+            "Gibberellins",
+            "Ethylene"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification (continued)
+    {
+        question: "Which of the following plant groups lacks vascular tissue?",
+        answers: [
+            "Ferns",
+            "Bryophytes",
+            "Gymnosperms",
+            "Angiosperms"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which group of plants produce seeds enclosed within a fruit?",
+        answers: [
+            "Gymnosperms",
+            "Ferns",
+            "Angiosperms",
+            "Mosses"
+        ],
+        correct: 2
+    },
+
+    // Plant Anatomy
+    {
+        question: "Which of the following is a part of the plant's vascular tissue?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Both A and B",
+            "Epidermis"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which tissue is responsible for transporting sugars and other nutrients in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Meristem",
+            "Parenchyma"
+        ],
+        correct: 0
+    }, {
+        question: "Which nutrient is most important for the development of chlorophyll in plants?",
+        answers: [
+            "Nitrogen",
+            "Phosphorus",
+            "Magnesium",
+            "Calcium"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following is considered a macronutrient for plants?",
+        answers: [
+            "Iron",
+            "Zinc",
+            "Magnesium",
+            "Boron"
+        ],
+        correct: 2
+    },
+
+    // Photosynthesis
+    {
+        question: "What is the energy source for photosynthesis in plants?",
+        answers: [
+            "Oxygen",
+            "Water",
+            "Sunlight",
+            "Carbon dioxide"
+        ],
+        correct: 2
+    },
+    {
+        question: "Where does the Calvin cycle take place in the plant cell?",
+        answers: [
+            "Chloroplast",
+            "Mitochondria",
+            "Nucleus",
+            "Cytoplasm"
+        ],
+        correct: 0
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which hormone regulates the growth of roots?",
+        answers: [
+            "Cytokinins",
+            "Ethylene",
+            "Auxins",
+            "Gibberellins"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which process in plants helps in the absorption of nutrients from the soil?",
+        answers: [
+            "Transpiration",
+            "Photosynthesis",
+            "Osmosis",
+            "Respiration"
+        ],
+        correct: 2
+    },
+
+    // Plant Reproduction
+    {
+        question: "What is the female reproductive organ of a flower called?",
+        answers: [
+            "Stigma",
+            "Anther",
+            "Ovary",
+            "Filament"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following plants produces flowers?",
+        answers: [
+            "Bryophytes",
+            "Gymnosperms",
+            "Angiosperms",
+            "Ferns"
+        ],
+        correct: 2
+    },
+
+    // Genetics and Evolution
+    {
+        question: "What is the genetic material in the nucleus of plant cells?",
+        answers: [
+            "RNA",
+            "DNA",
+            "Proteins",
+            "Lipids"
+        ],
+        correct: 1
+    },
+    {
+        question: "In Mendelian inheritance, the law of segregation states that:",
+        answers: [
+            "Each gamete carries two alleles",
+            "Gametes carry one allele for each trait",
+            "Alleles are passed independently",
+            "Both A and B"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "What type of plant is adapted to low water environments?",
+        answers: [
+            "Hydrophytes",
+            "Xerophytes",
+            "Mesophytes",
+            "Epiphytes"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a parasitic plant?",
+        answers: [
+            "Mistletoe",
+            "Fern",
+            "Cactus",
+            "Bamboo"
+        ],
+        correct: 0
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following plant groups has seeds but no flowers?",
+        answers: [
+            "Gymnosperms",
+            "Angiosperms",
+            "Bryophytes",
+            "Ferns"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following plants has vascular tissue but no seeds?",
+        answers: [
+            "Ferns",
+            "Mosses",
+            "Bryophytes",
+            "Liverworts"
+        ],
+        correct: 0
+    },
+
+    // Plant Anatomy
+    {
+        question: "What is the function of the cuticle in plants?",
+        answers: [
+            "Protection from water loss",
+            "Production of food",
+            "Absorption of water",
+            "Transport of nutrients"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which tissue is responsible for the transport of water in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Parenchyma",
+            "Collenchyma"
+        ],
+        correct: 1
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following plant diseases is caused by a virus?",
+        answers: [
+            "Citrus canker",
+            "Tobacco mosaic disease",
+            "Rust",
+            "Powdery mildew"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the causative agent of downy mildew in plants?",
+        answers: [
+            "Bacteria",
+            "Virus",
+            "Fungus",
+            "Algae"
+        ],
+        correct: 2
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following is a major application of genetic engineering in plants?",
+        answers: [
+            "Increasing the size of plants",
+            "Creating genetically modified crops",
+            "Producing hybrid plants",
+            "Increasing plant lifespan"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which technique is used to clone plants in biotechnology?",
+        answers: [
+            "Polymerase chain reaction",
+            "Gene editing",
+            "Tissue culture",
+            "Grafting"
+        ],
+        correct: 2
+    },
+
+    // Water and Plant Relations
+    {
+        question: "What is the driving force behind water movement in plants?",
+        answers: [
+            "Root pressure",
+            "Transpiration",
+            "Capillary action",
+            "Cohesion and adhesion"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the function of stomata in plants?",
+        answers: [
+            "Exchange of gases",
+            "Absorption of water",
+            "Food production",
+            "Support of the plant"
+        ],
+        correct: 0
+    },
+
+    // Plant Respiration
+    {
+        question: "Which process in plants produces energy in the form of ATP?",
+        answers: [
+            "Photosynthesis",
+            "Respiration",
+            "Fermentation",
+            "Transpiration"
+        ],
+        correct: 1
+    },
+    {
+        question: "Where does cellular respiration occur in plant cells?",
+        answers: [
+            "Cytoplasm",
+            "Mitochondria",
+            "Nucleus",
+            "Chloroplast"
+        ],
+        correct: 1
+    },
+
+    // Plant Hormones
+    {
+        question: "Which hormone is responsible for leaf abscission and fruit ripening?",
+        answers: [
+            "Cytokinin",
+            "Auxin",
+            "Ethylene",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which hormone is involved in the control of cell division in plants?",
+        answers: [
+            "Auxins",
+            "Gibberellins",
+            "Cytokinins",
+            "Ethylene"
+        ],
+        correct: 2
+    },
+
+    // Plant Morphology
+    {
+        question: "Which part of the plant stores food in the form of starch?",
+        answers: [
+            "Roots",
+            "Stem",
+            "Leaves",
+            "Flowers"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which structure in plants carries out photosynthesis?",
+        answers: [
+            "Roots",
+            "Leaves",
+            "Stem",
+            "Flowers"
+        ],
+        correct: 1
+    },
+
+    // Plant Evolution
+    {
+        question: "The theory of natural selection was proposed by:",
+        answers: [
+            "Charles Darwin",
+            "Gregor Mendel",
+            "Jean-Baptiste Lamarck",
+            "Carl Linnaeus"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following evolutionary concepts explains the adaptation of plants to their environment?",
+        answers: [
+            "Artificial selection",
+            "Natural selection",
+            "Gene flow",
+            "Genetic drift"
+        ],
+        correct: 1
+    },
+
+    // Plant Water Relations
+    {
+        question: "What is the term used for the movement of water from roots to leaves in plants?",
+        answers: [
+            "Capillary action",
+            "Osmosis",
+            "Transpiration",
+            "Water potential"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which of the following describes the process of water loss through plant leaves?",
+        answers: [
+            "Evaporation",
+            "Transpiration",
+            "Photosynthesis",
+            "Absorption"
+        ],
+        correct: 1
+    },  // Plant Nutrition
+    {
+        question: "Which of the following elements is essential for nitrogen fixation in plants?",
+        answers: [
+            "Magnesium",
+            "Manganese",
+            "Iron",
+            "Molybdenum"
+        ],
+        correct: 3
+    },
+    {
+        question: "What is the role of phosphorus in plants?",
+        answers: [
+            "Promotes root growth",
+            "Stimulates flowering",
+            "Enhances chlorophyll production",
+            "Aids in photosynthesis"
+        ],
+        correct: 0
+    },
+
+    // Photosynthesis
+    {
+        question: "Which pigment is primarily responsible for absorbing light in plants?",
+        answers: [
+            "Carotenoids",
+            "Chlorophyll",
+            "Phycobilins",
+            "Anthocyanins"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following gases is released during photosynthesis?",
+        answers: [
+            "Carbon dioxide",
+            "Oxygen",
+            "Nitrogen",
+            "Sulfur dioxide"
+        ],
+        correct: 1
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which hormone is responsible for stem elongation in plants?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Ethylene",
+            "Gibberellins"
+        ],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a growth-promoting hormone in plants?",
+        answers: [
+            "Abscisic acid",
+            "Auxin",
+            "Ethylene",
+            "Cytokinin"
+        ],
+        correct: 1
+    },
+
+    // Plant Reproduction
+    {
+        question: "The male reproductive organ of a flower is called the:",
+        answers: [
+            "Stigma",
+            "Anther",
+            "Filament",
+            "Pistil"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following plants is dioecious?",
+        answers: [
+            "Cannabis",
+            "Tomato",
+            "Sunflower",
+            "Rice"
+        ],
+        correct: 0
+    },
+
+    // Genetics and Evolution
+    {
+        question: "In a heterozygous individual, the dominant allele:",
+        answers: [
+            "Is masked by the recessive allele",
+            "Is expressed in the phenotype",
+            "Does not affect the phenotype",
+            "Can never be inherited"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which term refers to the exchange of genes between homologous chromosomes during meiosis?",
+        answers: [
+            "Mutation",
+            "Crossing over",
+            "Segregation",
+            "Independent assortment"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following is a characteristic of xerophytes?",
+        answers: [
+            "They are adapted to high water availability",
+            "They have large leaves",
+            "They can store water in their tissues",
+            "They live in wet environments"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which plant is an example of a hydrophyte?",
+        answers: [
+            "Cactus",
+            "Mangrove",
+            "Water lily",
+            "Sunflower"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification
+    {
+        question: "The plant group that produces seeds but not flowers is called:",
+        answers: [
+            "Angiosperms",
+            "Gymnosperms",
+            "Ferns",
+            "Mosses"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which group of plants is considered the most primitive?",
+        answers: [
+            "Bryophytes",
+            "Ferns",
+            "Conifers",
+            "Angiosperms"
+        ],
+        correct: 0
+    },
+
+    // Plant Anatomy
+    {
+        question: "The tissue responsible for transporting water in plants is:",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Collenchyma",
+            "Parenchyma"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a characteristic feature of sclerenchyma tissue?",
+        answers: [
+            "Presence of thick walls with lignin",
+            "Presence of thin walls",
+            "Living cells",
+            "Presence of chloroplasts"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following diseases is caused by a bacterium?",
+        answers: [
+            "Rust",
+            "Blight",
+            "Citrus canker",
+            "Powdery mildew"
+        ],
+        correct: 2
+    },
+    {
+        question: "The common name for the disease caused by the fungus Fusarium is:",
+        answers: [
+            "Wheat rust",
+            "Early blight",
+            "Crown gall",
+            "Panama disease"
+        ],
+        correct: 3
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following is the main goal of genetic modification in plants?",
+        answers: [
+            "To increase the plant's resistance to diseases",
+            "To enhance the taste of the plant",
+            "To increase the size of the plant",
+            "To make the plant grow faster"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following methods is used to introduce foreign DNA into plant cells?",
+        answers: [
+            "Electroporation",
+            "Gene gun",
+            "Viral vectors",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Water and Plant Relations
+    {
+        question: "Which of the following is responsible for the upward movement of water in plants?",
+        answers: [
+            "Root pressure",
+            "Osmosis",
+            "Transpiration pull",
+            "Capillarity"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which structure in plants is primarily responsible for water absorption?",
+        answers: [
+            "Stem",
+            "Leaves",
+            "Roots",
+            "Flowers"
+        ],
+        correct: 2
+    },
+
+    // Plant Respiration
+    {
+        question: "What is the final product of cellular respiration in plants?",
+        answers: [
+            "Glucose",
+            "Water",
+            "Oxygen",
+            "Carbon dioxide"
+        ],
+        correct: 1
+    },
+    {
+        question: "The electron transport chain in cellular respiration takes place in the:",
+        answers: [
+            "Nucleus",
+            "Mitochondria",
+            "Chloroplasts",
+            "Cytoplasm"
+        ],
+        correct: 1
+    },
+
+    // Plant Hormones
+    {
+        question: "Which of the following is the plant hormone involved in fruit ripening?",
+        answers: [
+            "Cytokinins",
+            "Auxins",
+            "Ethylene",
+            "Gibberellins"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which hormone promotes the formation of lateral buds?",
+        answers: [
+            "Auxins",
+            "Cytokinins",
+            "Ethylene",
+            "Gibberellins"
+        ],
+        correct: 1
+    },
+
+    // Plant Morphology
+    {
+        question: "Which structure in plants is responsible for the production of flowers?",
+        answers: [
+            "Stem",
+            "Root",
+            "Leaf",
+            "Flower bud"
+        ],
+        correct: 3
+    },
+    {
+        question: "What type of leaf venation is found in dicot plants?",
+        answers: [
+            "Parallel venation",
+            "Reticulate venation",
+            "Dichotomous venation",
+            "None of the above"
+        ],
+        correct: 1
+    },
+
+    // Plant Evolution
+    {
+        question: "What is the primary factor that drives evolution in plants?",
+        answers: [
+            "Mutation",
+            "Natural selection",
+            "Gene flow",
+            "Genetic drift"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of convergent evolution in plants?",
+        answers: [
+            "Cacti and euphorbia",
+            "Ferns and mosses",
+            "Water lilies and lotus",
+            "Sunflowers and daisies"
+        ],
+        correct: 0
+    },
+
+    // Plant Water Relations
+    {
+        question: "The movement of water through a plant from root to leaf is known as:",
+        answers: [
+            "Transpiration",
+            "Osmosis",
+            "Cohesion",
+            "Capillary action"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following factors affect the rate of transpiration in plants?",
+        answers: [
+            "Light intensity",
+            "Humidity",
+            "Temperature",
+            "All of the above"
+        ],
+        correct: 3
+    },
+
+    // Miscellaneous
+    {
+        question: "Which of the following is a characteristic feature of monocot plants?",
+        answers: [
+            "Reticulate venation",
+            "Two cotyledons",
+            "Parallel venation",
+            "Vascular bundles in a ring"
+        ],
+        correct: 2
+    }, {
+        question: "Which is the most important macronutrient for plants?",
+        answers: [
+            "Nitrogen",
+            "Phosphorus",
+            "Magnesium",
+            "Sulfur"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is NOT a micronutrient for plants?",
+        answers: [
+            "Iron",
+            "Zinc",
+            "Copper",
+            "Potassium"
+        ],
+        correct: 3
+    },
+
+    // Photosynthesis
+    {
+        question: "What is the primary function of the light-dependent reactions of photosynthesis?",
+        answers: [
+            "To produce glucose",
+            "To produce oxygen",
+            "To convert solar energy into chemical energy",
+            "To convert carbon dioxide into oxygen"
+        ],
+        correct: 2
+    },
+    {
+        question: "The enzyme RuBisCO is involved in which process in plants?",
+        answers: [
+            "Glycolysis",
+            "Photosynthesis",
+            "Respiration",
+            "Nitrogen fixation"
+        ],
+        correct: 1
+    },
+
+    // Plant Growth and Development
+    {
+        question: "Which of the following hormones is primarily responsible for fruit ripening?",
+        answers: [
+            "Auxin",
+            "Ethylene",
+            "Cytokinin",
+            "Gibberellins"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which part of the plant is primarily responsible for sensing gravity?",
+        answers: [
+            "Roots",
+            "Leaves",
+            "Stem",
+            "Flowers"
+        ],
+        correct: 0
+    },
+
+    // Plant Reproduction
+    {
+        question: "In a flower, the female reproductive part is called the:",
+        answers: [
+            "Stamen",
+            "Carpel",
+            "Pistil",
+            "Anther"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following plants exhibits double fertilization?",
+        answers: [
+            "Moss",
+            "Ferns",
+            "Angiosperms",
+            "Gymnosperms"
+        ],
+        correct: 2
+    },
+
+    // Genetics and Evolution
+    {
+        question: "Which principle explains the independent inheritance of genes located on different chromosomes?",
+        answers: [
+            "Law of Dominance",
+            "Law of Segregation",
+            "Law of Independent Assortment",
+            "Law of Gene Linkage"
+        ],
+        correct: 2
+    },
+    {
+        question: "In a monohybrid cross, the phenotypic ratio in F2 generation is:",
+        answers: [
+            "1:1",
+            "3:1",
+            "1:2:1",
+            "2:1"
+        ],
+        correct: 1
+    },
+
+    // Plant Ecology
+    {
+        question: "Which of the following is NOT a characteristic of xerophytes?",
+        answers: [
+            "They are adapted to arid environments",
+            "They have thick, waxy cuticles",
+            "They have large leaves",
+            "They can store water"
+        ],
+        correct: 2
+    },
+    {
+        question: "What term describes the interaction between organisms of different species where one benefits and the other is harmed?",
+        answers: [
+            "Commensalism",
+            "Mutualism",
+            "Parasitism",
+            "Predation"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following plants has vascular tissue?",
+        answers: [
+            "Mosses",
+            "Ferns",
+            "Liverworts",
+            "Algae"
+        ],
+        correct: 1
+    },
+    {
+        question: "The reproductive organs of a gymnosperm are located in:",
+        answers: [
+            "Flowers",
+            "Cones",
+            "Fruits",
+            "Leaves"
+        ],
+        correct: 1
+    },
+
+    // Plant Anatomy
+    {
+        question: "What is the function of phloem in plants?",
+        answers: [
+            "Transport of water",
+            "Transport of food",
+            "Transport of minerals",
+            "Support"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following tissues is responsible for the photosynthesis process?",
+        answers: [
+            "Parenchyma",
+            "Collenchyma",
+            "Sclerenchyma",
+            "Xylem"
+        ],
+        correct: 0
+    },
+
+    // Plant Diseases
+    {
+        question: "Which of the following diseases is caused by fungi?",
+        answers: [
+            "Rust",
+            "Citrus canker",
+            "Crown gall",
+            "Powdery mildew"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which bacteria causes the disease known as 'blight' in plants?",
+        answers: [
+            "Xanthomonas",
+            "Escherichia coli",
+            "Bacillus subtilis",
+            "Pseudomonas"
+        ],
+        correct: 0
+    },
+
+    // Plant Biotechnology
+    {
+        question: "Which of the following techniques is used to introduce foreign genes into plants?",
+        answers: [
+            "Polymerase chain reaction",
+            "Gene gun",
+            "Gel electrophoresis",
+            "Southern blotting"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a transgenic plant?",
+        answers: [
+            "Bt cotton",
+            "Mango",
+            "Rice",
+            "Tomato"
+        ],
+        correct: 0
+    },
+
+    // Water and Plant Relations
+    {
+        question: "What is the process by which water moves from the soil to the plant roots?",
+        answers: [
+            "Transpiration",
+            "Capillary action",
+            "Osmosis",
+            "Diffusion"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which part of the plant primarily aids in water absorption?",
+        answers: [
+            "Leaf",
+            "Stem",
+            "Root",
+            "Flower"
+        ],
+        correct: 2
+    },
+
+    // Plant Respiration
+    {
+        question: "Which of the following processes occurs during both aerobic and anaerobic respiration?",
+        answers: [
+            "Glycolysis",
+            "Electron transport chain",
+            "Citric acid cycle",
+            "Fermentation"
+        ],
+        correct: 0
+    },
+    {
+        question: "In which part of the cell does the citric acid cycle take place?",
+        answers: [
+            "Nucleus",
+            "Mitochondria",
+            "Cytoplasm",
+            "Chloroplast"
+        ],
+        correct: 1
+    },
+
+    // Plant Hormones
+    {
+        question: "Which plant hormone is primarily involved in cell elongation?",
+        answers: [
+            "Auxins",
+            "Cytokinins",
+            "Gibberellins",
+            "Ethylene"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which hormone is involved in the inhibition of seed germination?",
+        answers: [
+            "Abscisic acid",
+            "Cytokinins",
+            "Auxins",
+            "Gibberellins"
+        ],
+        correct: 0
+    },
+
+    // Plant Morphology
+    {
+        question: "Which of the following is a feature of dicot leaves?",
+        answers: [
+            "Parallel venation",
+            "Reticulate venation",
+            "Needle-like leaves",
+            "Opposite phyllotaxy"
+        ],
+        correct: 1
+    },
+    {
+        question: "What type of stem modification is found in cacti?",
+        answers: [
+            "Tuber",
+            "Rhizome",
+            "Spine",
+            "Cladode"
+        ],
+        correct: 2
+    },
+
+    // Plant Evolution
+    {
+        question: "Which of the following is an example of adaptive radiation in plants?",
+        answers: [
+            "Different types of cactus in deserts",
+            "Larger trees in tropical rainforests",
+            "Smaller leaves in dry conditions",
+            "High altitude plants with thick leaves"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a key factor in the evolution of flowers?",
+        answers: [
+            "Pollination by insects",
+            "Wind dispersal of seeds",
+            "Root penetration depth",
+            "Growth of leaf size"
+        ],
+        correct: 0
+    },
+
+    // Plant Water Relations
+    {
+        question: "The process by which water vapor is lost from plant leaves is called:",
+        answers: [
+            "Guttation",
+            "Osmosis",
+            "Transpiration",
+            "Absorption"
+        ],
+        correct: 2
+    },
+    {
+        question: "The uptake of water in plants through root cells occurs via:",
+        answers: [
+            "Osmosis",
+            "Active transport",
+            "Transpiration",
+            "Diffusion"
+        ],
+        correct: 0
+    },
+
+    // Miscellaneous
+    {
+        question: "Which of the following is a feature of plants classified as angiosperms?",
+        answers: [
+            "Produce seeds in cones",
+            "Lack flowers",
+            "Produce seeds inside fruit",
+            "Have vascular bundles in a circle"
+        ],
+        correct: 2
+    }
+
+
+
+
+];
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

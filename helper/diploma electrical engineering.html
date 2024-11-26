@@ -1,0 +1,1726 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    const questions = [
+    // Electrical Fundamentals
+    {
+        question: "What is the SI unit of electrical resistance?",
+        answers: ["Ohm", "Volt", "Coulomb", "Ampere"],
+        correct: 0
+    },
+    {
+        question: "What does Kirchhoff's Current Law (KCL) state?",
+        answers: [
+            "The sum of all currents entering a junction equals the sum of currents leaving.",
+            "Voltage is proportional to current.",
+            "The product of voltage and current gives power.",
+            "The current in a circuit is inversely proportional to resistance."
+        ],
+        correct: 0
+    },
+
+    // Power Systems
+    {
+        question: "What is the purpose of a transformer?",
+        answers: [
+            "To convert AC to DC",
+            "To step up or step down AC voltage",
+            "To increase current",
+            "To store electrical energy"
+        ],
+        correct: 1
+    },
+    {
+        question: "What does a single-line diagram in power systems represent?",
+        answers: [
+            "A complete layout of power flow in a system",
+            "A simplified representation of a power system",
+            "Detailed transformer winding connections",
+            "Circuit diagram of electronic components"
+        ],
+        correct: 1
+    },
+
+    // Machines
+    {
+        question: "What is the working principle of a DC motor?",
+        answers: [
+            "Electromagnetic induction",
+            "Faraday's law",
+            "Fleming's left-hand rule",
+            "Coulomb's law"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which type of motor is commonly used in ceiling fans?",
+        answers: [
+            "DC motor",
+            "Synchronous motor",
+            "Universal motor",
+            "Induction motor"
+        ],
+        correct: 3
+    },
+
+    // Measurements and Instruments
+    {
+        question: "Which instrument is used to measure electrical power?",
+        answers: ["Ammeter", "Voltmeter", "Wattmeter", "Ohmmeter"],
+        correct: 2
+    },
+    {
+        question: "What is the main purpose of a Megger?",
+        answers: [
+            "Measuring resistance",
+            "Testing insulation resistance",
+            "Measuring current",
+            "Testing transformer efficiency"
+        ],
+        correct: 1
+    },
+
+    // Electronics
+    {
+        question: "What is the function of a diode in an electronic circuit?",
+        answers: [
+            "To store energy",
+            "To allow current flow in one direction only",
+            "To amplify signals",
+            "To filter noise"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the typical voltage drop across a silicon diode in forward bias?",
+        answers: ["0.3 V", "0.7 V", "1 V", "5 V"],
+        correct: 1
+    },
+
+    // Control Systems
+    {
+        question: "What is the primary function of a PID controller?",
+        answers: [
+            "To control the speed of a motor",
+            "To improve system stability",
+            "To reduce harmonics in a circuit",
+            "To regulate power supply"
+        ],
+        correct: 1
+    },
+    {
+        question: "What does the term 'open-loop system' mean?",
+        answers: [
+            "A system with feedback control",
+            "A system without feedback control",
+            "A system with proportional control only",
+            "A system with integral control only"
+        ],
+        correct: 1
+    },
+
+    // Transmission and Distribution
+    {
+        question: "What is the primary advantage of high-voltage transmission?",
+        answers: [
+            "Reduced transmission losses",
+            "Lower installation costs",
+            "Improved insulation",
+            "Increased power generation"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which device is used to protect electrical circuits from overloads?",
+        answers: ["Capacitor", "Circuit breaker", "Transformer", "Inductor"],
+        correct: 1
+    },
+
+    // Nepal-Specific Topics
+    {
+        question: "Which agency is responsible for electricity distribution in Nepal?",
+        answers: [
+            "Nepal Electricity Authority (NEA)",
+            "Ministry of Energy",
+            "Department of Energy and Hydropower",
+            "Rural Electrification Department"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the primary source of electricity generation in Nepal?",
+        answers: ["Thermal power", "Solar power", "Hydropower", "Wind power"],
+        correct: 2
+    },{
+        question: "What is the unit of capacitance?",
+        answers: ["Farad", "Henry", "Ohm", "Watt"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a resistor in a circuit?",
+        answers: [
+            "To reduce current",
+            "To store energy",
+            "To amplify signals",
+            "To convert AC to DC"
+        ],
+        correct: 0
+    },
+
+    // Power Systems
+    {
+        question: "What is the main purpose of a circuit breaker in a power system?",
+        answers: [
+            "To regulate voltage",
+            "To interrupt fault currents",
+            "To convert power",
+            "To monitor frequency"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the typical efficiency range of a power transformer?",
+        answers: ["50-60%", "60-70%", "90-99%", "70-80%"],
+        correct: 2
+    },
+
+    // Machines
+    {
+        question: "Which of the following is NOT a type of DC generator?",
+        answers: ["Shunt", "Series", "Compound", "Induction"],
+        correct: 3
+    },
+    {
+        question: "In an induction motor, slip is defined as:",
+        answers: [
+            "The difference between input and output power",
+            "The relative speed between rotor and stator magnetic fields",
+            "The voltage difference between phases",
+            "The loss in mechanical energy"
+        ],
+        correct: 1
+    },
+
+    // Measurements and Instruments
+    {
+        question: "Which instrument is used to measure very high resistance?",
+        answers: ["Ammeter", "Megger", "Voltmeter", "Potentiometer"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of a potentiometer in measurements?",
+        answers: [
+            "To measure electrical power",
+            "To measure resistance",
+            "To measure voltage by comparison",
+            "To measure magnetic flux"
+        ],
+        correct: 2
+    },
+
+    // Electronics
+    {
+        question: "Which type of transistor is commonly used in amplifiers?",
+        answers: ["BJT", "FET", "SCR", "IGBT"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of an operational amplifier (Op-Amp)?",
+        answers: [
+            "To amplify voltage signals",
+            "To store charge",
+            "To convert AC to DC",
+            "To generate sine waves"
+        ],
+        correct: 0
+    },
+
+    // Control Systems
+    {
+        question: "Which of the following is a type of feedback in control systems?",
+        answers: ["Positive feedback", "Negative feedback", "Both A and B", "None of the above"],
+        correct: 2
+    },
+    {
+        question: "In a Bode plot, the phase margin represents:",
+        answers: [
+            "System gain at unity frequency",
+            "System stability in degrees",
+            "Frequency response of the system",
+            "Gain at resonance"
+        ],
+        correct: 1
+    },
+
+    // Transmission and Distribution
+    {
+        question: "What is the typical voltage range of a high-voltage transmission line?",
+        answers: ["1-10 kV", "11-33 kV", "66-765 kV", "Above 1000 kV"],
+        correct: 2
+    },
+    {
+        question: "Which of the following reduces corona losses in transmission lines?",
+        answers: [
+            "Increasing line voltage",
+            "Using bundled conductors",
+            "Decreasing conductor size",
+            "Using DC transmission"
+        ],
+        correct: 1
+    },
+
+    // Renewable Energy
+    {
+        question: "What is the principle of solar photovoltaic (PV) systems?",
+        answers: [
+            "Electrochemical energy conversion",
+            "Photoelectric effect",
+            "Thermodynamic cycle",
+            "Nuclear fusion"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which renewable energy source is most widely used in Nepal?",
+        answers: ["Wind", "Solar", "Biogas", "Hydropower"],
+        correct: 3
+    },
+
+    // Nepal-Specific Topics
+    {
+        question: "When was the Nepal Electricity Authority (NEA) established?",
+        answers: ["1975", "1985", "1990", "2000"],
+        correct: 1
+    },
+    {
+        question: "What is the installed capacity of the Kaligandaki A Hydropower Plant?",
+        answers: ["144 MW", "192 MW", "400 MW", "500 MW"],
+        correct: 0
+    }, {
+        question: "What is the formula for electrical power in terms of voltage and current?",
+        answers: ["P = V/I", "P = V × I", "P = I²/R", "P = V²/R"],
+        correct: 1
+    },
+    {
+        question: "Which material is commonly used as a conductor in electrical wiring?",
+        answers: ["Copper", "Aluminum", "Iron", "Silver"],
+        correct: 0
+    },
+    {
+        question: "What is the primary purpose of an electrical fuse?",
+        answers: [
+            "To store energy",
+            "To regulate current",
+            "To protect circuits from overcurrent",
+            "To step down voltage"
+        ],
+        correct: 2
+    },
+
+    // Power Systems
+    {
+        question: "Which component is used to change AC voltage levels in a power system?",
+        answers: ["Transformer", "Rectifier", "Capacitor", "Inductor"],
+        correct: 0
+    },
+    {
+        question: "What is a bus in a power system?",
+        answers: [
+            "A node where power lines meet",
+            "A transmission line",
+            "A circuit breaker",
+            "A type of generator"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the primary cause of power loss in long-distance transmission lines?",
+        answers: ["Inductive reactance", "Resistive losses", "Harmonics", "Corona discharge"],
+        correct: 1
+    },
+
+    // Machines
+    {
+        question: "What is the primary function of a synchronous generator?",
+        answers: [
+            "To convert AC to DC",
+            "To generate AC power",
+            "To store electrical energy",
+            "To control circuit voltage"
+        ],
+        correct: 1
+    },
+    {
+        question: "Why are starters used in DC motors?",
+        answers: [
+            "To limit the starting current",
+            "To increase efficiency",
+            "To reduce speed",
+            "To improve torque"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the function of a commutator in a DC machine?",
+        answers: [
+            "To convert AC to DC",
+            "To ensure unidirectional current",
+            "To reduce speed",
+            "To increase voltage"
+        ],
+        correct: 1
+    },
+
+    // Measurements and Instruments
+    {
+        question: "Which instrument measures the electrical energy consumed?",
+        answers: ["Wattmeter", "Energy meter", "Voltmeter", "Ammeter"],
+        correct: 1
+    },
+    {
+        question: "What is the principle of operation of an induction-type energy meter?",
+        answers: [
+            "Faraday's law of electromagnetic induction",
+            "Ohm's law",
+            "Kirchhoff's voltage law",
+            "Thermionic emission"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which instrument is used to measure very high voltages?",
+        answers: ["Voltmeter", "Megger", "Potential transformer", "Oscilloscope"],
+        correct: 2
+    },
+
+    // Electronics
+    {
+        question: "Which type of diode is used for voltage regulation?",
+        answers: ["LED", "Zener diode", "Schottky diode", "PN diode"],
+        correct: 1
+    },
+    {
+        question: "What is the primary application of a transistor?",
+        answers: [
+            "Voltage amplification",
+            "Voltage regulation",
+            "AC to DC conversion",
+            "Noise filtering"
+        ],
+        correct: 0
+    },
+    {
+        question: "What does an SCR (Silicon Controlled Rectifier) do in a circuit?",
+        answers: [
+            "Controls the flow of current",
+            "Amplifies voltage",
+            "Stores charge",
+            "Reduces power loss"
+        ],
+        correct: 0
+    },
+
+    // Control Systems
+    {
+        question: "What is the main advantage of a closed-loop control system?",
+        answers: [
+            "Cheaper to implement",
+            "Higher accuracy and stability",
+            "Does not require feedback",
+            "Simpler design"
+        ],
+        correct: 1
+    },
+    {
+        question: "What does the term 'transfer function' in control systems represent?",
+        answers: [
+            "The relationship between output and input",
+            "The gain of a system",
+            "The noise level in a system",
+            "The delay in a system"
+        ],
+        correct: 0
+    },
+
+    // Renewable Energy
+    {
+        question: "What is the main disadvantage of solar energy systems?",
+        answers: [
+            "High operating cost",
+            "Weather dependency",
+            "Non-renewable",
+            "Limited to low power generation"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the principle of wind power generation?",
+        answers: [
+            "Electromagnetic induction",
+            "Mechanical energy to electrical energy",
+            "Photoelectric effect",
+            "Chemical reaction"
+        ],
+        correct: 1
+    },
+
+    // Nepal-Specific Questions
+    {
+        question: "Which is the largest hydropower plant in Nepal by installed capacity?",
+        answers: [
+            "Kulekhani",
+            "Upper Tamakoshi",
+            "Kaligandaki A",
+            "Marsyangdi"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the frequency of electricity generated in Nepal?",
+        answers: ["50 Hz", "60 Hz", "45 Hz", "55 Hz"],
+        correct: 0
+    },
+    {
+        question: "What does the Rural Electrification Program in Nepal aim to achieve?",
+        answers: [
+            "Increase urban power supply",
+            "Provide electricity to remote areas",
+            "Reduce the use of renewable energy",
+            "Promote thermal power plants"
+        ],
+        correct: 1
+    },{
+        question: "What is the SI unit of electric charge?",
+        answers: ["Coulomb", "Ampere", "Volt", "Ohm"],
+        correct: 0
+    },
+    {
+        question: "What is the primary principle behind Kirchhoff's Current Law (KCL)?",
+        answers: [
+            "The voltage across a circuit loop is constant",
+            "The total current entering a node equals the total current leaving",
+            "The resistance in a circuit remains constant",
+            "Power is conserved in all circuits"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following materials is commonly used as an insulator?",
+        answers: ["Copper", "Aluminum", "Silicon", "Rubber"],
+        correct: 3
+    },
+
+    // Power Systems
+    {
+        question: "Why are power lines typically three-phase instead of single-phase?",
+        answers: [
+            "Lower cost",
+            "Increased reliability and efficiency",
+            "Easier installation",
+            "Reduced voltage levels"
+        ],
+        correct: 1
+    },
+    {
+        question: "What does the term 'load shedding' mean in power systems?",
+        answers: [
+            "Adding more loads to the grid",
+            "Intentionally disconnecting power to balance supply and demand",
+            "Increasing the capacity of a transformer",
+            "Installing renewable energy sources"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which type of relay is commonly used for overcurrent protection?",
+        answers: ["Distance relay", "Differential relay", "Thermal relay", "Electromagnetic relay"],
+        correct: 3
+    },
+
+    // Machines
+    {
+        question: "What is the primary difference between a stepper motor and a DC motor?",
+        answers: [
+            "Stepper motors use brushes; DC motors do not",
+            "Stepper motors are used for precise positioning",
+            "DC motors can operate without a controller",
+            "DC motors require feedback for operation"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which type of transformer is used to measure high currents in power lines?",
+        answers: [
+            "Step-up transformer",
+            "Step-down transformer",
+            "Current transformer",
+            "Potential transformer"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the slip of an induction motor at synchronous speed?",
+        answers: ["1%", "100%", "0%", "Depends on load"],
+        correct: 2
+    },
+
+    // Measurements and Instruments
+    {
+        question: "What is the primary purpose of a wattmeter?",
+        answers: ["To measure power", "To measure resistance", "To measure current", "To measure voltage"],
+        correct: 0
+    },
+    {
+        question: "Which instrument is used to measure the phase angle between two voltages?",
+        answers: ["Ammeter", "Voltmeter", "Oscilloscope", "Phasor meter"],
+        correct: 3
+    },
+    {
+        question: "What is the range of resistance that can be measured by a Wheatstone bridge?",
+        answers: ["Low resistance only", "High resistance only", "Moderate resistance", "All resistance values"],
+        correct: 2
+    },
+
+    // Electronics
+    {
+        question: "Which logic gate is known as the 'universal gate'?",
+        answers: ["AND", "OR", "NAND", "XOR"],
+        correct: 2
+    },
+    {
+        question: "What does LED stand for?",
+        answers: [
+            "Light Emitting Diode",
+            "Linear Electric Device",
+            "Low Emission Diode",
+            "Light Energy Detector"
+        ],
+        correct: 0
+    },
+    {
+        question: "In a PN junction diode, what happens when forward-biased?",
+        answers: [
+            "The depletion region widens",
+            "The diode conducts current",
+            "The diode blocks current",
+            "The voltage across the diode increases indefinitely"
+        ],
+        correct: 1
+    },
+
+    // Control Systems
+    {
+        question: "What does PID stand for in control systems?",
+        answers: [
+            "Proportional-Integral-Derivative",
+            "Power-Input-Differentiation",
+            "Phase-Input-Distance",
+            "Pressure-Integral-Delay"
+        ],
+        correct: 0
+    },
+    {
+        question: "In a stable control system, the poles of the transfer function must be:",
+        answers: [
+            "On the right half of the s-plane",
+            "On the left half of the s-plane",
+            "On the imaginary axis",
+            "At the origin"
+        ],
+        correct: 1
+    },
+
+    // Transmission and Distribution
+    {
+        question: "Which of the following is used to reduce high voltage to low voltage in distribution systems?",
+        answers: ["Step-up transformer", "Step-down transformer", "Relay", "Rectifier"],
+        correct: 1
+    },
+    {
+        question: "What is the main disadvantage of underground cables compared to overhead lines?",
+        answers: [
+            "Lower efficiency",
+            "Higher cost",
+            "Higher resistance",
+            "Reduced safety"
+        ],
+        correct: 1
+    },
+
+    // Renewable Energy
+    {
+        question: "What is the main component of a solar PV cell?",
+        answers: ["Copper", "Silicon", "Graphite", "Glass"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a non-renewable energy source?",
+        answers: ["Coal", "Solar", "Wind", "Geothermal"],
+        correct: 0
+    },
+
+    // Nepal-Specific Topics
+    {
+        question: "What is the installed capacity of the Upper Tamakoshi Hydropower Plant?",
+        answers: ["456 MW", "500 MW", "300 MW", "700 MW"],
+        correct: 0
+    },
+    {
+        question: "Which government body manages electricity generation and distribution in Nepal?",
+        answers: [
+            "Ministry of Energy",
+            "Nepal Electricity Authority (NEA)",
+            "Alternative Energy Promotion Center (AEPC)",
+            "Independent Power Producers Association"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which region in Nepal has the highest potential for hydropower generation?",
+        answers: ["Terai", "Mid-hills", "Himalayan region", "Kathmandu valley"],
+        correct: 2
+    },{
+        question: "Which law relates the voltage, current, and resistance in an electric circuit?",
+        answers: ["Ohm's Law", "Kirchhoff's Voltage Law", "Faraday's Law", "Coulomb's Law"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a capacitor in an AC circuit?",
+        answers: [
+            "Stores electrical energy",
+            "Resists current flow",
+            "Generates electrical energy",
+            "Increases current"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which type of circuit allows current to flow in multiple paths?",
+        answers: ["Series circuit", "Parallel circuit", "Short circuit", "Closed circuit"],
+        correct: 1
+    },
+
+    // Power Systems
+    {
+        question: "What is the main function of a circuit breaker?",
+        answers: [
+            "Step-up voltage",
+            "Step-down voltage",
+            "Automatically interrupt high current flow",
+            "Measure electrical current"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the main advantage of HVDC transmission over HVAC?",
+        answers: [
+            "Higher efficiency for long distances",
+            "Easier to step-up voltage",
+            "Safer for residential use",
+            "Lower installation cost"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which device is used to maintain constant voltage in a power system?",
+        answers: [
+            "Transformer",
+            "Voltage regulator",
+            "Circuit breaker",
+            "Surge protector"
+        ],
+        correct: 1
+    },
+
+    // Machines
+    {
+        question: "What type of losses occur due to the alternating magnetic field in a transformer core?",
+        answers: [
+            "Copper losses",
+            "Hysteresis and eddy current losses",
+            "Mechanical losses",
+            "Friction losses"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the function of the commutator in a DC motor?",
+        answers: [
+            "Converts DC to AC",
+            "Converts AC to DC",
+            "Reverses current direction in the armature windings",
+            "Provides insulation"
+        ],
+        correct: 2
+    },
+    {
+        question: "What type of motor is commonly used in electric vehicles?",
+        answers: [
+            "Induction motor",
+            "Brushless DC motor",
+            "Synchronous motor",
+            "Universal motor"
+        ],
+        correct: 1
+    },
+
+    // Measurements and Instruments
+    {
+        question: "Which type of meter measures small currents in microamperes?",
+        answers: ["Voltmeter", "Ammeter", "Galvanometer", "Wattmeter"],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of a shunt resistor in an ammeter?",
+        answers: [
+            "To increase resistance",
+            "To measure high currents",
+            "To reduce current flow",
+            "To improve accuracy"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which device is used to measure the insulation resistance of a cable?",
+        answers: ["Multimeter", "Megger", "Ohmmeter", "Oscilloscope"],
+        correct: 1
+    },
+
+    // Electronics
+    {
+        question: "What is the function of a Zener diode?",
+        answers: [
+            "Conducts current in only one direction",
+            "Maintains a constant voltage",
+            "Amplifies signals",
+            "Switches electrical circuits"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which transistor configuration is commonly used for amplification?",
+        answers: [
+            "Common base",
+            "Common collector",
+            "Common emitter",
+            "Darlington pair"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the function of a rectifier in an electronic circuit?",
+        answers: [
+            "To convert AC to DC",
+            "To convert DC to AC",
+            "To store electrical energy",
+            "To amplify signals"
+        ],
+        correct: 0
+    },
+
+    // Control Systems
+    {
+        question: "What type of feedback is used to stabilize a control system?",
+        answers: ["Positive feedback", "Negative feedback", "Open-loop feedback", "Proportional feedback"],
+        correct: 1
+    },
+    {
+        question: "What is the transfer function of a system used for?",
+        answers: [
+            "To calculate system resistance",
+            "To relate the input and output of a system",
+            "To determine system temperature",
+            "To measure system losses"
+        ],
+        correct: 1
+    },
+
+    // Transmission and Distribution
+    {
+        question: "What is the primary purpose of a lightning arrester in a substation?",
+        answers: [
+            "To protect equipment from overvoltage",
+            "To measure voltage levels",
+            "To step-up voltage",
+            "To balance load on the system"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the typical frequency of AC power used in Nepal?",
+        answers: ["50 Hz", "60 Hz", "25 Hz", "100 Hz"],
+        correct: 0
+    },
+
+    // Renewable Energy
+    {
+        question: "Which renewable energy source is harnessed using a wind turbine?",
+        answers: ["Geothermal", "Wind", "Solar", "Hydropower"],
+        correct: 1
+    },
+    {
+        question: "What is the role of an inverter in a solar power system?",
+        answers: [
+            "To store energy",
+            "To convert DC to AC",
+            "To measure solar irradiance",
+            "To step-up voltage"
+        ],
+        correct: 1
+    },
+
+    // Nepal-Specific Topics
+    {
+        question: "Which organization is responsible for promoting alternative energy in Nepal?",
+        answers: [
+            "Nepal Electricity Authority (NEA)",
+            "Alternative Energy Promotion Center (AEPC)",
+            "Ministry of Energy",
+            "Independent Power Producers Association"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the approximate hydropower potential of Nepal?",
+        answers: [
+            "43,000 MW",
+            "83,000 MW",
+            "25,000 MW",
+            "60,000 MW"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which region in Nepal faces the highest challenges in electrification?",
+        answers: ["Terai", "Himalayan region", "Kathmandu valley", "Mid-hills"],
+        correct: 1
+    },
+    {
+        question: "What happens to the current in a conductor if the resistance is doubled while keeping the voltage constant?",
+        answers: [
+            "Current is halved",
+            "Current doubles",
+            "Current remains the same",
+            "Current becomes zero"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is the best conductor of electricity?",
+        answers: ["Copper", "Aluminum", "Iron", "Silver"],
+        correct: 3
+    },
+
+    // Power Systems
+    {
+        question: "What is the main purpose of using transformers in power systems?",
+        answers: [
+            "To generate electricity",
+            "To measure voltage levels",
+            "To change voltage levels",
+            "To prevent short circuits"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the typical efficiency range of a well-designed power transformer?",
+        answers: [
+            "50% - 60%",
+            "70% - 80%",
+            "90% - 98%",
+            "100%"
+        ],
+        correct: 2
+    },
+    {
+        question: "What does a load flow study in power systems determine?",
+        answers: [
+            "System losses and voltage levels",
+            "Short circuit levels",
+            "Relay settings",
+            "Insulation strength"
+        ],
+        correct: 0
+    },
+
+    // Machines
+    {
+        question: "What type of generator is typically used in a hydroelectric power plant?",
+        answers: [
+            "Synchronous generator",
+            "DC generator",
+            "Induction generator",
+            "Permanent magnet generator"
+        ],
+        correct: 0
+    },
+    {
+        question: "In a three-phase induction motor, what causes the rotor to rotate?",
+        answers: [
+            "The presence of a magnetic field",
+            "Interaction of the rotor current and stator flux",
+            "Direct contact between stator and rotor",
+            "Heat generated in the stator"
+        ],
+        correct: 1
+    },
+
+    // Electronics
+    {
+        question: "What is the primary purpose of an operational amplifier?",
+        answers: [
+            "To amplify voltage",
+            "To generate voltage",
+            "To store energy",
+            "To measure resistance"
+        ],
+        correct: 0
+    },
+    {
+        question: "Which logic gate produces a HIGH output only when all inputs are HIGH?",
+        answers: ["AND gate", "OR gate", "NAND gate", "XOR gate"],
+        correct: 0
+    },
+    {
+        question: "What is the term used for the maximum frequency at which a digital circuit operates reliably?",
+        answers: ["Cutoff frequency", "Resonant frequency", "Clock speed", "Switching frequency"],
+        correct: 2
+    },
+
+    // Transmission and Distribution
+    {
+        question: "What is the typical voltage level for distribution in Nepal?",
+        answers: ["400 V", "11 kV", "33 kV", "66 kV"],
+        correct: 1
+    },
+    {
+        question: "What is a common method used to reduce power losses in long-distance transmission lines?",
+        answers: [
+            "Using thicker cables",
+            "Increasing transmission voltage",
+            "Reducing transmission current",
+            "Both B and C"
+        ],
+        correct: 3
+    },
+    {
+        question: "What is the primary disadvantage of underground cables compared to overhead lines?",
+        answers: [
+            "Higher maintenance cost",
+            "Higher installation cost",
+            "Shorter lifespan",
+            "Lower capacity"
+        ],
+        correct: 1
+    },
+
+    // Control Systems
+    {
+        question: "What is the primary purpose of a Proportional-Integral-Derivative (PID) controller?",
+        answers: [
+            "To measure system output",
+            "To ensure stability and reduce error",
+            "To generate control signals",
+            "To amplify input signals"
+        ],
+        correct: 1
+    },
+    {
+        question: "In control system terminology, what is the 'setpoint'?",
+        answers: [
+            "The desired output level of the system",
+            "The actual output level of the system",
+            "The error between input and output",
+            "The input signal applied to the system"
+        ],
+        correct: 0
+    },
+
+    // Measurements and Instruments
+    {
+        question: "Which type of instrument is used to measure high voltages in substations?",
+        answers: ["Voltmeter", "Potential transformer", "Wattmeter", "Multimeter"],
+        correct: 1
+    },
+    {
+        question: "Which device is used to measure the power factor of a circuit?",
+        answers: ["Power factor meter", "Wattmeter", "Voltmeter", "Oscilloscope"],
+        correct: 0
+    },
+
+    // Renewable Energy
+    {
+        question: "What is the primary energy source used in geothermal power plants?",
+        answers: [
+            "Wind energy",
+            "Solar energy",
+            "Heat from the Earth's interior",
+            "Hydropower"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which type of solar cell is most commonly used in commercial applications?",
+        answers: [
+            "Monocrystalline",
+            "Polycrystalline",
+            "Thin-film",
+            "Amorphous silicon"
+        ],
+        correct: 0
+    },
+
+    // Nepal-Specific Topics
+    {
+        question: "Which hydropower project is the largest in Nepal?",
+        answers: [
+            "Kulekhani Hydropower Project",
+            "Upper Tamakoshi Hydropower Project",
+            "Middle Marsyangdi Hydropower Project",
+            "Chilime Hydropower Project"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the average electricity consumption per capita in Nepal as of recent statistics?",
+        answers: [
+            "150 kWh",
+            "250 kWh",
+            "500 kWh",
+            "1000 kWh"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the unit of electrical conductance?",
+        answers: ["Ohm", "Farad", "Siemens", "Henry"],
+        correct: 2
+    },
+    {
+        question: "What does Kirchhoff's Voltage Law (KVL) state?",
+        answers: [
+            "The sum of currents at a node is zero",
+            "The sum of voltage drops in a closed loop is zero",
+            "The voltage across a resistor is proportional to current",
+            "The power consumed is equal to the power supplied"
+        ],
+        correct: 1
+    },
+
+    // Power Systems
+    {
+        question: "What is the main advantage of using High Voltage Direct Current (HVDC) transmission systems?",
+        answers: [
+            "Lower installation cost",
+            "Better efficiency for long-distance transmission",
+            "Simpler design",
+            "Easier maintenance"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the typical voltage level used in Nepal's transmission system?",
+        answers: ["11 kV", "33 kV", "132 kV", "220 kV"],
+        correct: 2
+    },
+    {
+        question: "Which component is used to protect power systems from lightning surges?",
+        answers: ["Surge arrester", "Circuit breaker", "Relay", "Capacitor bank"],
+        correct: 0
+    },
+
+    // Machines
+    {
+        question: "What is the function of a commutator in a DC machine?",
+        answers: [
+            "To convert DC to AC",
+            "To reduce eddy currents",
+            "To ensure unidirectional current flow",
+            "To cool the machine"
+        ],
+        correct: 2
+    },
+    {
+        question: "Which type of motor is commonly used in electric vehicles?",
+        answers: [
+            "Synchronous motor",
+            "Induction motor",
+            "Stepper motor",
+            "Brushless DC motor"
+        ],
+        correct: 3
+    },
+
+    // Electronics
+    {
+        question: "Which diode is used for voltage regulation?",
+        answers: ["Zener diode", "Schottky diode", "Light Emitting Diode (LED)", "Tunnel diode"],
+        correct: 0
+    },
+    {
+        question: "In a transistor, which region operates as an amplifier?",
+        answers: ["Saturation region", "Cutoff region", "Active region", "Breakdown region"],
+        correct: 2
+    },
+
+    // Renewable Energy
+    {
+        question: "Which of the following is a non-renewable source of energy?",
+        answers: ["Solar energy", "Coal", "Wind energy", "Hydropower"],
+        correct: 1
+    },
+    {
+        question: "What is the most common type of turbine used in large-scale hydropower plants in Nepal?",
+        answers: ["Pelton turbine", "Francis turbine", "Kaplan turbine", "Impulse turbine"],
+        correct: 1
+    },
+
+    // Transmission and Distribution
+    {
+        question: "What is the main purpose of a capacitor bank in substations?",
+        answers: [
+            "To improve power factor",
+            "To provide backup power",
+            "To reduce voltage levels",
+            "To prevent surges"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the effect of high-frequency harmonics in power systems?",
+        answers: [
+            "Improved efficiency",
+            "Heating of equipment",
+            "Reduced losses",
+            "Better voltage regulation"
+        ],
+        correct: 1
+    },
+
+    // Nepal-Specific Topics
+    {
+        question: "Which hydropower project was the first in Nepal?",
+        answers: [
+            "Trishuli Hydropower Project",
+            "Chilime Hydropower Project",
+            "Pharping Hydropower Project",
+            "Upper Tamakoshi Hydropower Project"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the installed capacity of the Upper Tamakoshi Hydropower Project?",
+        answers: ["456 MW", "100 MW", "900 MW", "600 MW"],
+        correct: 0
+    },
+    {
+        question: "Which government entity is responsible for managing rural electrification in Nepal?",
+        answers: [
+            "Nepal Electricity Authority (NEA)",
+            "Alternative Energy Promotion Centre (AEPC)",
+            "Ministry of Energy",
+            "Energy Commission"
+        ],
+        correct: 1
+    },
+
+    // Control Systems
+    {
+        question: "What is the purpose of feedback in a control system?",
+        answers: [
+            "To increase input",
+            "To stabilize the system and reduce error",
+            "To reduce power consumption",
+            "To enhance the gain"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a time-domain analysis method for control systems?",
+        answers: [
+            "Root locus",
+            "Frequency response",
+            "Bode plot",
+            "Nyquist plot"
+        ],
+        correct: 0
+    },
+
+    // Measurements and Instruments
+    {
+        question: "Which instrument is used to measure very low resistance values?",
+        answers: ["Megger", "Ohmmeter", "Wheatstone bridge", "Potentiometer"],
+        correct: 2
+    },
+    {
+        question: "What is the accuracy of a digital multimeter typically expressed as?",
+        answers: ["Percentage", "Ohms", "Volts", "Amperes"],
+        correct: 0
+    }
+, {
+        question: "Which material is commonly used as an insulator in overhead transmission lines?",
+        answers: ["Copper", "Aluminum", "Porcelain", "Silicon"],
+        correct: 2
+    },
+    {
+        question: "What is the typical efficiency range of a transformer?",
+        answers: ["50-60%", "70-80%", "90-95%", "98-99%"],
+        correct: 3
+    },
+
+    // Power Systems
+    {
+        question: "Which type of fault is most severe in a power system?",
+        answers: [
+            "Single line-to-ground fault",
+            "Double line-to-ground fault",
+            "Three-phase fault",
+            "Open circuit fault"
+        ],
+        correct: 2
+    },
+
+    {
+        question: "Which government body regulates electricity tariffs in Nepal?",
+        answers: [
+            "Nepal Electricity Authority (NEA)",
+            "Energy Commission of Nepal",
+            "Electricity Tariff Fixation Commission",
+            "Ministry of Energy, Water Resources, and Irrigation"
+        ],
+        correct: 2
+    }
+];
+
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

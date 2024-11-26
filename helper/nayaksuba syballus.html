@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nayak suba</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #87CEFA, #fff); /* Sky blue to white */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Love Background Animation */
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 0, 0, 0.5);
+            border-radius: 50%;
+            animation: float 7s linear infinite;
+            bottom: -20px;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-700px);
+                opacity: 0;
+            }
+        }
+
+        .heart:nth-child(odd) {
+            left: 15%;
+            width: 30px;
+            height: 30px;
+            animation-duration: 9s;
+        }
+
+        .heart:nth-child(even) {
+            left: 85%;
+            width: 20px;
+            height: 20px;
+            animation-duration: 12s;
+        }
+
+        .heart:nth-child(3n+1) {
+            left: 50%;
+            width: 40px;
+            height: 40px;
+            animation-duration: 11s;
+        }
+
+        /* Neon Heading */
+        h1 {
+            font-size: 1.5rem;
+            color: #fff;
+            text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 20px #00FF00, 0 0 30px #00FF00, 0 0 40px #00FF00;
+            margin-bottom: 20px;
+        }
+
+        /* Iframe section */
+        iframe {
+            display: none;
+            width: 100%; /* Full width */
+            height: 90vh; /* Occupies almost full viewport height */
+            border: 3px solid #32CD32; /* Green border */
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(50, 205, 50, 0.8); /* Green shadow */
+            margin-bottom: 20px;
+        }
+
+        /* Scrollable Links container */
+        .links {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive grid */
+            gap: 10px;
+            text-align: center;
+            max-height: 400px; /* Set maximum height for scrolling */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 10px;
+            border: 2px solid #32CD32; /* Green border around the links */
+            border-radius: 8px;
+        }
+
+        /* Hover effect for links */
+        a {
+            font-size: 1rem;
+            text-decoration: none;
+            font-weight: 900; /* Set to black weight */
+            color: #000; /* Black text */
+            padding: 10px;
+            border: 2px solid #32CD32;
+            border-radius: 5px;
+            transition: 0.3s;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        a::after {
+            content: "❤ ";
+            position: absolute;
+            top: 50%;
+            right: -100px;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+            font-size: 1.2rem;
+            color: red; /* Red Love effect */
+        }
+
+        a:hover::after {
+            right: 10px;
+            opacity: 1;
+        }
+
+        a:hover {
+            background-color: #32CD32; /* Green background on hover */
+            color: #fff; /* White text on hover */
+            box-shadow: 0 0 10px #32CD32, 0 0 40px #32CD32, 0 0 80px #32CD32;
+            transform: scale(1.05);
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            iframe {
+                height: 85vh; /* Adjusted height for tablets */
+                width: 100%; /* Full width for smaller screens */
+            }
+
+            a {
+                font-size: 0.9rem;
+            }
+
+            h1 {
+                font-size: 1.2rem; /* Adjust heading size for smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            iframe {
+                height: 80vh; /* Adjusted height for mobile */
+                width: 100%; /* Full width for phones */
+            }
+
+            a {
+                font-size: 0.85rem;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1rem; /* Smaller heading on mobile */
+            }
+        }
+
+    </style>
+
+    <script>
+        function showIframe() {
+            var iframe = document.querySelector("iframe");
+            iframe.style.display = "block"; // Make iframe visible
+        }
+    </script>
+</head>
+<body>
+  <a href="" >Go Back</a>
+    <!-- Neon Heading -->
+     <br>
+    
+
+    <!-- Love Heart Background Animations -->
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+    <div class="heart"></div>
+
+    <!-- Full-screen Iframe -->
+    <iframe name="contentFrame"></iframe>
+
+    <!-- Scrollable Links -->
+    <div class="links">
+        
+
+        <a href="file4.pdf" target="contentFrame" onclick="showIframe()">First Paper
+        </a>
+      
+
+        <a href="file4.pdf" target="contentFrame" onclick="showIframe()">Second Paper</a>
+        <a href="file4.pdf" target="contentFrame" onclick="showIframe()">Third Paper</a>
+       
+        
+    </div>
+<div>
+    <div id="fb-root"></div>
+    <div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v21.0"></script>
+<div class="fb-comments" data-href="http://localhost/helper/nayaksuba syballus.html" data-width="" data-numposts="10"></div>
+</div>
+</body>
+</html>

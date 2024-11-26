@@ -1,0 +1,1064 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    const questions = [
+    
+   
+    {
+        question: "नेपालको पहिलो प्रमुख लेखक को हुन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "पारिजात", "भानु आचार्य", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "नेपालको राष्ट्रिय भाषा के हो?",
+        answers: ["नेपाली", "मैथिली", "बोजपुरी", "थारू"],
+        correct: 0
+    },
+    {
+        question: "कुन नेपाली लेखकले 'मुनामदान' लेखेका छन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "गोविन्द मल्ल", "प्रेमदास महतो", "भीमदत्त बिष्ट"],
+        correct: 0
+    },
+    {
+        question: "नेपालको समकालीन कविता आन्दोलनको शुरुवात कसले गरेका थिए?",
+        answers: ["भीमसेन ठाकुर", "शंकरलाल शर्मा", "लक्ष्मीप्रसाद देवकोटा", "महादेवी वर्मा"],
+        correct: 2
+    },
+    {
+        question: "नेपाली साहित्यमा 'यात्रा' शीर्षकको काव्य कस्तो प्रकारको हो?",
+        answers: ["गद्य", "कविता", "निबन्ध", "नाटक"],
+        correct: 1
+    },
+    {
+        question: "नेपालको प्रमुख साहित्यिक पत्रिका कुन हो?",
+        answers: ["सारिका", "आधुनिक साहित्य", "सन्देश", "नेपाली पुस्तक"],
+        correct: 0
+    },
+    {
+        question: "कसले 'शाकुन्तल' नाटक लेखेका छन्?",
+        answers: ["कालिदास", "भीष्म साहनी", "कबिता सिंह", "हर्षवर्धन"],
+        correct: 0
+    },
+    {
+        question: "नेपालको आदर्श साहित्यिक आन्दोलनको शरुआत केबाट भएको हो?",
+        answers: ["स्मृतिका", "काव्य रचनाबाट", "निबन्ध लेखनबाट", "सार्वजनिक भाषणबाट"],
+        correct: 1
+    },
+    {
+        question: "कुन लेखकले 'गोदान' उपन्यास लेखेका छन्?",
+        answers: ["मुंशी प्रेमचन्द", "उमेश राय", "रामानन्द यादव", "गोविन्दप्रसाद उपाध्याय"],
+        correct: 0
+    },
+    {
+        question: "कुन नेपाली लेखकले 'एकमासको बृद्धि' लेखेका छन्?",
+        answers: ["प्रेमचन्द", "उमेश राय", "सुरेश्वर डाँगी", "मणि माथेमा"],
+        correct: 3
+    },
+    {
+        question: "नेपालको संविधान २०७२ अनुसार मातृभाषामा शिक्षा कत्तिको प्राथमिकता दिइन्छ?",
+        answers: ["तपाईंलाई उपलब्ध मातृभाषामा", "अत्यधिक", "सम्पूर्ण शिक्षा", "धेरै कम"],
+        correct: 1
+    },
+    {
+        question: "नेपालको साहित्यिक मञ्च 'नक्साल' को स्थापना कहिले भएको हो?",
+        answers: ["१९५५", "१९६२", "१९७४", "१९८५"],
+        correct: 2
+    },
+    {
+        question: "नेपालको सर्वाधिक प्रतिष्ठित साहित्यिक पुरस्कार कुन हो?",
+        answers: ["माथेमा पुरस्कार", "भानु पुरस्कार", "प्रेमचन्द पुरस्कार", "मुक्तिबोध पुरस्कार"],
+        correct: 1
+    },
+    {
+        question: "कोले 'हिमालको हार' पुस्तक लेखेका छन्?",
+        answers: ["तारा राना", "त्रिवेणी अधिकारी", "लक्ष्मीप्रसाद देवकोटा", "दीननाथ गिरी"],
+        correct: 2
+    },
+    {
+        question: "नेपालको काठमाण्डौमा नेपाल साहित्य महोत्सव कुन वर्षमा सम्पन्न भएको हो?",
+        answers: ["२०२२", "२०२१", "२०२३", "२०२४"],
+        correct: 0
+    },
+    {
+        question: "हास्यव्यंग्य साहित्यमा कत्तिको योगदान रहेको लेखक को हुन्?",
+        answers: ["शंकरलाल शर्मा", "हरिवंश आचार्य", "पारिजात", "उमेश राय"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रसिद्ध कवि जो लेखकको 'मुक्ति' कविता पुस्तकलाई लक्षित गर्दै लेखिएको थियो, को हुन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "मणि माथेमा", "दर्शनशास्त्र", "विजयकुमार बोकिल"],
+        correct: 0
+    },
+    {
+        question: "नेपाली सन्देशको नेतृत्व कुन कवि गर्दैछन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "हरेक महापात्र", "उमेश राय", "गोविन्द मल्ल"],
+        correct: 2
+    },
+    {
+        question: "कुन लेखकले 'नक्कली जिवन' उपन्यास लेखेका छन्?",
+        answers: ["बाबुराम भट्टराई", "गोविन्दराज जोशी", "समीर हाम्रा", "तिलक थापा"],
+        correct: 1
+    },
+    {
+        question: "कुन लेखन शैलीका कारण नेपालका केही लेखारहरुलाई प्रसिद्धि प्राप्त भएको छ?",
+        answers: ["निबन्ध लेखन", "कविता लेखन", "रचनात्मक लेखन", "मूल्यांकन लेखन"],
+        correct: 1
+    },
+    {
+        question: "नेपालको साहित्यमा 'मुक्ति' नामक काव्य संग्रह लेखक को हुन्?",
+        answers: ["रामनाथ आचार्य", "प्रेमराज जोशी", "मणि माथेमा", "गोविन्दराज उपाध्याय"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यिक इन्कलाबका बारेमा उल्लेखित एक अग्रणी लेखक को हुन्?",
+        answers: ["रामकृष्ण राई", "सुरेश्वर डाँगी", "लक्ष्मीप्रसाद देवकोटा", "पारिजात"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख निबन्ध लेखक को हुन्?",
+        answers: ["गोविन्द मल्ल", "रामेश्वर काफ्ले", "गणेशमानसिंह", "राजेश्वर अधिकारी"],
+        correct: 1
+    },
+    {
+        question: "कसले 'समाजवाद' र 'धारा' काव्य पंक्तिहरू लेखेका छन्?",
+        answers: ["बुद्धिजीवी", "शंकरलाल शर्मा", "गोविन्द मल्ल", "हरेक महापात्र"],
+        correct: 3
+    },
+    {
+        question: "कसले 'यात्रा' कविता संग्रह लेखेका छन्?",
+        answers: ["रामकृष्ण राई", "मणि माथेमा", "प्रेमचन्द", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "नेपालका साहित्यकारले 'अद्भुत चमत्कारीक संसार' काव्य संग्रह लेखेका छन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "सुरेश्वर डाँगी", "प्रेमराज भट्टराई", "गोविन्द मल्ल"],
+        correct: 1
+    },
+    {
+        question: "नेपाली सन्देशमा पहिलो जनशक्ति आन्दोलित लेखनको आरम्भ कहिले भएको हो?",
+        answers: ["१९५५", "१९६०", "१९५२", "२००२"],
+        correct: 0
+    },
+    {
+        question: "कोले 'विचार र भावना' पुस्तक लेखेका छन्?",
+        answers: ["विजय कुमार बोकिल", "गोविन्द मल्ल", "समीर थापा", "धर्मनाथ पाण्डे"],
+        correct: 2
+    },
+    {
+        question: "नेपालको साहित्य क्षेत्रसँगको सम्बन्धमा चिउडो साहित्यको स्थान कस्तो रहेको छ?",
+        answers: ["पाँचौँ स्थान", "चौथो स्थान", "अर्को महत्वपूर्ण स्थान", "पहिलो स्थान"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकारहरूले लेखन क्रान्ति कस्तो किसिमको भव्यता पेश गरेका छन्?",
+        answers: ["भावना को प्रतिस्थापन", "काव्य लेखनमा भव्यता", "निबन्ध लेखन परिपाटी", "कविता लेखन"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख लेखकहरू सामूहिक कविता र लेखनमा के गर्दैछन्?",
+        answers: ["सार्वजनिक आलोचना", "सामाजिक हस्तक्षेप", "धार्मिक पत्रिका लेखन", "प्राकृतिक लेखन"],
+        correct: 0
+    },{
+        question: "नेपालका प्रसिद्ध कवि लक्ष्मीप्रसाद देवकोटाको जन्म कहिले भएको हो?",
+        answers: ["१९०९", "१९१०", "१९२१", "१९२५"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रसिद्ध उपन्यासकार प्रेमचन्दको असली नाम के हो?",
+        answers: ["धर्मवीर", "गोविन्दमल", "मुंशी प्रेमचन्द", "हरीराम"],
+        correct: 2
+    },
+    {
+        question: "कोले 'पारिजात' लेखेका छन्?",
+        answers: ["गोविन्द मल्ल", "शंकरलाल शर्मा", "भानु आचार्य", "महादेवी वर्मा"],
+        correct: 1
+    },
+    {
+        question: "कुन नेपाली साहित्यकारले 'मुनामदान' लेखेका छन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "कृष्णचन्द्र अधिकारी", "रामेश्वर यादव", "सुरेश्वर डाँगी"],
+        correct: 0
+    },
+    {
+        question: "कोले 'सपना' कविता लेखेका छन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "शंकरलाल शर्मा", "गोविन्द मल्ल", "पारिजात"],
+        correct: 3
+    },
+    {
+        question: "नेपालमा २०५२ सालमा कुन साहित्यिक पुरस्कार स्थापना गरिएको हो?",
+        answers: ["गोविन्द मल्ल पुरस्कार", "भानु पुरस्कार", "वाग्मि पुरस्कार", "आधुनिक साहित्य पुरस्कार"],
+        correct: 1
+    },
+    {
+        question: "नेपालका साहित्यकारहरू 'समाजवाद' र 'धारा' शीर्षक काव्य संग्रह लेखेका छन्?",
+        answers: ["उमेश राय", "हरिवंश आचार्य", "प्रेमचन्द", "शंकरलाल शर्मा"],
+        correct: 2
+    },
+    {
+        question: "नेपालको पहिलो महिला कवि को हुन्?",
+        answers: ["बाजुका रानी", "लक्ष्मीप्रसाद देवकोटा", "सिमा ताम्रकार", "शारदा उप्रेती"],
+        correct: 0
+    },
+    {
+        question: "नेपालको प्रमुख साहित्यिक मञ्चको स्थापना कहिले भएको हो?",
+        answers: ["१९५५", "१९५२", "१९६०", "१९४०"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार पारिजातको असली नाम के हो?",
+        answers: ["लक्ष्मीप्रसाद", "किरण शर्मा", "प्रेमचन्द", "शंकरलाल शर्मा"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख कवि गोविन्द मल्लको प्रमुख काव्यकृति कुन हो?",
+        answers: ["नवसमाज", "पराधीन", "सपना", "मुक्ति"],
+        correct: 1
+    },
+    {
+        question: "नेपाली साहित्यको ऐतिहासिक कालको प्रमुख काव्य रचनाको नाम के हो?",
+        answers: ["गाथा", "सन्देश", "भूमिका", "आधुनिक साहित्य"],
+        correct: 0
+    },
+    {
+        question: "कसले 'द्रव्य र शास्त्र' निबन्ध लेखेका छन्?",
+        answers: ["गोविन्द मल्ल", "रामनाथ यादव", "प्रेमचन्द", "उमेश राय"],
+        correct: 1
+    },
+    {
+        question: "कसको 'विचार र विचारधारा' पुस्तक प्रसिद्ध छ?",
+        answers: ["गोविन्द मल्ल", "भीष्म साहनी", "महादेवी वर्मा", "पारिजात"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख निबन्ध लेखकको नाम के हो?",
+        answers: ["भीष्म साहनी", "प्रेमचन्द", "हरिवंश आचार्य", "सुरेश्वर डाँगी"],
+        correct: 3
+    },
+    {
+        question: "कसले 'सपना' उपन्यास लेखेका छन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "धर्मनाथ पाण्डे", "शंकरलाल शर्मा", "प्रेमराज भट्टराई"],
+        correct: 2
+    },
+    {
+        question: "कोले 'फूल' कविता लेखेका छन्?",
+        answers: ["महादेवी वर्मा", "लक्ष्मीप्रसाद देवकोटा", "प्रेमराज भट्टराई", "पारिजात"],
+        correct: 1
+    },
+    {
+        question: "कसको काव्य 'समाजवादी विचारधारा'का बारेमा चर्चित छ?",
+        answers: ["गोविन्द मल्ल", "शंकरलाल शर्मा", "उमेश राय", "प्रेमचन्द"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रसिद्ध लेखक र कवि जसले 'फूल र बिछोड' लेखेका छन्, को हुन्?",
+        answers: ["विजय कुमार बोकिल", "प्रेमराज भट्टराई", "रामनाथ यादव", "शंकरलाल शर्मा"],
+        correct: 0
+    },
+    {
+        question: "कोले 'अर्थशास्त्र' पुस्तक लेखेका छन्?",
+        answers: ["प्रेमचन्द", "लक्ष्मीप्रसाद", "गोविन्द मल्ल", "भीष्म साहनी"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'मुक्ति' कविता संग्रह लेखेका छन्, को हुन्?",
+        answers: ["मणि माथेमा", "गोविन्द मल्ल", "रामकृष्ण राई", "प्रेमचन्द"],
+        correct: 0
+    },
+    {
+        question: "कसको 'दृष्टि र दृष्टिकोण' काव्य संग्रह प्रमुख साहित्यिक कृति हो?",
+        answers: ["गोविन्द मल्ल", "प्रेमचन्द", "उमेश राय", "महादेवी वर्मा"],
+        correct: 3
+    },
+    {
+        question: "नेपालको 'मुक्ति' काव्य संग्रहका लेखक को हुन्?",
+        answers: ["गोविन्द मल्ल", "प्रेमराज भट्टराई", "लक्ष्मीप्रसाद देवकोटा", "शंकरलाल शर्मा"],
+        correct: 2
+    },
+    {
+        question: "कोले 'कान्तार' काव्य रचनाको निर्माण गरेका छन्?",
+        answers: ["पारिजात", "सुरेश्वर डाँगी", "भानु आचार्य", "शंकरलाल शर्मा"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख निबन्ध लेखकहरूको रचनाका आधारमा साहित्य को नारा कुन हो?",
+        answers: ["अद्भुत छ", "आत्मकथा", "सत्य प्रवृत्ति", "मुक्ति"],
+        correct: 2
+    },
+    {
+        question: "कोले 'हिन्दू धर्म' विषयमा लेखेका छन्?",
+        answers: ["रामकृष्ण राई", "प्रेमचन्द", "लक्ष्मीप्रसाद देवकोटा", "शंकरलाल शर्मा"],
+        correct: 3
+    },
+    {
+        question: "कसले 'शान्ति र विज्ञान' पुस्तक लेखेका छन्?",
+        answers: ["प्रेमराज भट्टराई", "विजय कुमार बोकिल", "गोविन्द मल्ल", "राजेन्द्र काफ्ले"],
+        correct: 1
+    },
+    {
+        question: "कसको 'ब्रह्मा शक्ति' पुस्तक चर्चित छ?",
+        answers: ["रामकृष्ण राई", "प्रेमचन्द", "उमेश राय", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "कोले 'नैतिक शिक्षा' विषयमा लेखेका छन्?",
+        answers: ["उमेश राय", "प्रेमचन्द", "पारिजात", "गोविन्द मल्ल"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार को हुन् जसले 'दृष्टि' काव्य संग्रह लेखेका छन्?",
+        answers: ["प्रेमराज भट्टराई", "महादेवी वर्मा", "गोविन्द मल्ल", "शंकरलाल शर्मा"],
+        correct: 0
+    },
+    {
+        question: "नेपालको 'मुक्ति' काव्य संग्रहका लेखक को हुन्?",
+        answers: ["प्रेमचन्द", "विजय कुमार बोकिल", "लक्ष्मीप्रसाद देवकोटा", "गोविन्द मल्ल"],
+        correct: 2
+    },{
+        question: "नेपालको प्रसिद्ध कवि भानु आचार्यको जन्म कहिले भएको हो?",
+        answers: ["१९१०", "१९२०", "१९३०", "१९४०"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रसिद्ध लेखक कृष्णचन्द्र अधिकारीको प्रमुख काव्य रचना कुन हो?",
+        answers: ["सपना", "सप्तरंगी", "उत्थान", "आशा"],
+        correct: 3
+    },
+    {
+        question: "कोले 'हिमाल पर्वत' काव्य लेखेका छन्?",
+        answers: ["गोविन्द मल्ल", "लक्ष्मीप्रसाद देवकोटा", "हरिवंश आचार्य", "राजेन्द्र काफ्ले"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार रवीन्द्रनाथ ठाकुरको काव्य संग्रहको नाम के हो?",
+        answers: ["कवि", "सपना", "मुक्ति", "पारिजात"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'समाजवाद र साहित्य' लेखेका छन्, को हुन्?",
+        answers: ["कृष्णचन्द्र अधिकारी", "धर्मनाथ पाण्डे", "उमेश राय", "गोविन्द मल्ल"],
+        correct: 3
+    },
+    {
+        question: "कोले 'द्रव्य र शास्त्र' निबन्ध लेखेका छन्?",
+        answers: ["गोविन्द मल्ल", "रामनाथ यादव", "प्रेमचन्द", "उमेश राय"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार प्रेमचन्दको जन्म कहिले भएको हो?",
+        answers: ["१९००", "१९१५", "१८८०", "१८९५"],
+        correct: 2
+    },
+    {
+        question: "नेपालको प्रसिद्ध लेखक लक्ष्मीप्रसाद देवकोटाले कुन साहित्यिक पुरस्कार जितेका छन्?",
+        answers: ["गोविन्द मल्ल पुरस्कार", "नेपाल रत्न पुरस्कार", "महाकवि पुरस्कार", "कवि भानु पुरस्कार"],
+        correct: 2
+    },
+    {
+        question: "कोले 'वाग्मि काव्य' लेखेका छन्?",
+        answers: ["गोविन्द मल्ल", "राजेन्द्र काफ्ले", "प्रेमचन्द", "शंकरलाल शर्मा"],
+        correct: 3
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'शब्द' काव्य संग्रह लेखेका छन्, को हुन्?",
+        answers: ["भानु आचार्य", "उमेश राय", "महादेवी वर्मा", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार सन्तोष पोखरेलको प्रसिद्ध काव्य रचनाको नाम के हो?",
+        answers: ["नैतिकता", "उत्थान", "शब्द", "समाज"],
+        correct: 1
+    },
+    {
+        question: "कोले 'समाजवादी विचारधारा' काव्य लेखेका छन्?",
+        answers: ["धर्मनाथ पाण्डे", "शंकरलाल शर्मा", "प्रेमचन्द", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख लेखक प्रेमराज भट्टराईको काव्य संग्रहको नाम के हो?",
+        answers: ["पराधीन", "नैतिक शिक्षा", "कान्तार", "वाग्मि"],
+        correct: 1
+    },
+    {
+        question: "कोले 'समाज' काव्य लेखेका छन्?",
+        answers: ["प्रेमराज भट्टराई", "गोविन्द मल्ल", "राजेन्द्र काफ्ले", "शंकरलाल शर्मा"],
+        correct: 2
+    },
+    {
+        question: "कसको 'पारिजात' काव्य संग्रह प्रसिद्ध छ?",
+        answers: ["शंकरलाल शर्मा", "पारिजात", "लक्ष्मीप्रसाद देवकोटा", "महादेवी वर्मा"],
+        correct: 1
+    },
+    {
+        question: "कसको काव्य संग्रह 'समाजवादी संघर्ष' प्रसिद्ध छ?",
+        answers: ["प्रेमचन्द", "कृष्णचन्द्र अधिकारी", "विजय कुमार बोकिल", "गोविन्द मल्ल"],
+        correct: 3
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'कान्तार' लेखेका छन्, को हुन्?",
+        answers: ["प्रेमराज भट्टराई", "राजेन्द्र काफ्ले", "लक्ष्मीप्रसाद देवकोटा", "रामनाथ यादव"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख लेखक र कवि जसले 'शिक्षा' विषयमा लेखेका छन्, को हुन्?",
+        answers: ["उमेश राय", "धर्मनाथ पाण्डे", "गोविन्द मल्ल", "महादेवी वर्मा"],
+        correct: 3
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार भानु आचार्यले कुन काव्य लेखेका छन्?",
+        answers: ["शब्द", "मुक्ति", "वाग्मि", "दृष्टि"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'सपना' काव्य लेखेका छन्, को हुन्?",
+        answers: ["प्रेमचन्द", "राजेन्द्र काफ्ले", "शंकरलाल शर्मा", "गोविन्द मल्ल"],
+        correct: 1
+    },
+    {
+        question: "कसको 'प्राकृतिक सौंदर्य' काव्य संग्रह प्रसिद्ध छ?",
+        answers: ["महादेवी वर्मा", "लक्ष्मीप्रसाद देवकोटा", "सुरेश्वर डाँगी", "पारिजात"],
+        correct: 1
+    },
+    {
+        question: "कोले 'आध्यात्मिक मार्ग' काव्य लेखेका छन्?",
+        answers: ["पारिजात", "गोविन्द मल्ल", "शंकरलाल शर्मा", "धर्मनाथ पाण्डे"],
+        correct: 3
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार राजेन्द्र काफ्लेले कुन काव्य लेखेका छन्?",
+        answers: ["शब्द", "समाज", "वाग्मि", "धारा"],
+        correct: 0
+    },
+    {
+        question: "कोले 'नैतिक शिक्षा' विषयमा लेखेका छन्?",
+        answers: ["प्रेमचन्द", "गोविन्द मल्ल", "विजय कुमार बोकिल", "रामनाथ यादव"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'सपना' काव्य लेखेका छन्, को हुन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "सुरेश्वर डाँगी", "महादेवी वर्मा", "राजेन्द्र काफ्ले"],
+        correct: 0
+    },
+    {
+        question: "कोले 'भूतनाथ' लेखेका छन्?",
+        answers: ["शंकरलाल शर्मा", "महादेवी वर्मा", "गोविन्द मल्ल", "प्रेमचन्द"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार प्रेमचन्दको जन्मस्थल के हो?",
+        answers: ["बिहार", "उत्तर प्रदेश", "दिल्ली", "उज्जैन"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'गाथा' काव्य लेखेका छन्, को हुन्?",
+        answers: ["विजय कुमार बोकिल", "शंकरलाल शर्मा", "गोविन्द मल्ल", "राजेन्द्र काफ्ले"],
+        correct: 0
+    },
+    {
+        question: "कोले 'मुक्ति' काव्य लेखेका छन्?",
+        answers: ["प्रेमराज भट्टराई", "राजेन्द्र काफ्ले", "लक्ष्मीप्रसाद देवकोटा", "शंकरलाल शर्मा"],
+        correct: 2
+    },
+    {
+        question: "कोले 'गाथा' निबन्ध लेखेका छन्?",
+        answers: ["राजेन्द्र काफ्ले", "गोविन्द मल्ल", "पारिजात", "विजय कुमार बोकिल"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'सपना' काव्य लेखेका छन्, को हुन्?",
+        answers: ["गोविन्द मल्ल", "लक्ष्मीप्रसाद देवकोटा", "उमेश राय", "राजेन्द्र काफ्ले"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार गोविन्द मल्लको काव्य संग्रह के हो?",
+        answers: ["सपना", "सप्तरंगी", "मुक्ति", "प्राकृतिक सौंदर्य"],
+        correct: 0
+    },{
+        question: "कोले 'पद्मा काव्य' लेखेका छन्?",
+        answers: ["प्रेमचन्द", "राजेन्द्र काफ्ले", "उमेश राय", "गोविन्द मल्ल"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'सार्वभौम' लेखेका छन्, को हुन्?",
+        answers: ["महादेवी वर्मा", "लक्ष्मीप्रसाद देवकोटा", "प्रेमचन्द", "राजेन्द्र काफ्ले"],
+        correct: 1
+    },
+    {
+        question: "कोले 'नैतिक शिक्षा' काव्य लेखेका छन्?",
+        answers: ["प्रेमचन्द", "गोविन्द मल्ल", "विजय कुमार बोकिल", "रामनाथ यादव"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख लेखक र कवि जसले 'दृष्टि' लेखेका छन्, को हुन्?",
+        answers: ["गोविन्द मल्ल", "लक्ष्मीप्रसाद देवकोटा", "सुरेश्वर डाँगी", "धर्मनाथ पाण्डे"],
+        correct: 3
+    },
+    {
+        question: "कोले 'वाग्मि' काव्य लेखेका छन्?",
+        answers: ["कृष्णचन्द्र अधिकारी", "उमेश राय", "रामनाथ यादव", "सुरेश्वर डाँगी"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'मुक्ति' काव्य लेखेका छन्, को हुन्?",
+        answers: ["प्रेमचन्द", "लक्ष्मीप्रसाद देवकोटा", "सुरेश्वर डाँगी", "राजेन्द्र काफ्ले"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार लक्ष्मीप्रसाद देवकोटाले कुन काव्य लेखेका छन्?",
+        answers: ["सपना", "वाग्मि", "मुक्ति", "समाज"],
+        correct: 1
+    },
+    {
+        question: "कसको 'वाग्मि काव्य' प्रसिद्ध छ?",
+        answers: ["गोविन्द मल्ल", "शंकरलाल शर्मा", "प्रेमचन्द", "राजेन्द्र काफ्ले"],
+        correct: 0
+    },
+    {
+        question: "कोले 'आध्यात्मिक मार्ग' काव्य लेखेका छन्?",
+        answers: ["सुरेश्वर डाँगी", "रामनाथ यादव", "विजय कुमार बोकिल", "उमेश राय"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार गोविन्द मल्लको काव्य संग्रहको नाम के हो?",
+        answers: ["मुक्ति", "सपना", "वाग्मि", "समाज"],
+        correct: 1
+    },
+    {
+        question: "कोले 'समाज' काव्य लेखेका छन्?",
+        answers: ["लक्ष्मीप्रसाद देवकोटा", "गोविन्द मल्ल", "उमेश राय", "शंकरलाल शर्मा"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'समाजवादी विचार' काव्य लेखेका छन्, को हुन्?",
+        answers: ["कृष्णचन्द्र अधिकारी", "रामनाथ यादव", "गोविन्द मल्ल", "प्रेमचन्द"],
+        correct: 3
+    },
+    {
+        question: "कसको 'शब्द' काव्य संग्रह प्रसिद्ध छ?",
+        answers: ["राजेन्द्र काफ्ले", "शंकरलाल शर्मा", "गोविन्द मल्ल", "विजय कुमार बोकिल"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार लक्ष्मीप्रसाद देवकोटाको काव्य संग्रह कुन हो?",
+        answers: ["मुक्ति", "वाग्मि", "कान्तार", "उत्थान"],
+        correct: 3
+    },
+    {
+        question: "कोले 'शब्द' काव्य लेखेका छन्?",
+        answers: ["महादेवी वर्मा", "गोविन्द मल्ल", "प्रेमचन्द", "सुरेश्वर डाँगी"],
+        correct: 0
+    },
+    {
+        question: "कोले 'समाजवादी संघर्ष' काव्य लेखेका छन्?",
+        answers: ["धर्मनाथ पाण्डे", "राजेन्द्र काफ्ले", "विजय कुमार बोकिल", "शंकरलाल शर्मा"],
+        correct: 1
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'वाग्मि काव्य' लेखेका छन्, को हुन्?",
+        answers: ["राजेन्द्र काफ्ले", "उमेश राय", "प्रेमचन्द", "गोविन्द मल्ल"],
+        correct: 3
+    },
+    {
+        question: "कोले 'मुक्ति' काव्य लेखेका छन्?",
+        answers: ["प्रेमचन्द", "सुरेश्वर डाँगी", "राजेन्द्र काफ्ले", "विजय कुमार बोकिल"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार 'गोविन्द मल्ल'ले कुन काव्य लेखेका छन्?",
+        answers: ["सपना", "कान्तार", "मुक्ति", "धारा"],
+        correct: 2
+    },
+    {
+        question: "कसको काव्य संग्रह 'समाजवादी संघर्ष' प्रसिद्ध छ?",
+        answers: ["महादेवी वर्मा", "गोविन्द मल्ल", "राजेन्द्र काफ्ले", "उमेश राय"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार जसले 'गाथा' काव्य लेखेका छन्, को हुन्?",
+        answers: ["रामनाथ यादव", "शंकरलाल शर्मा", "गोविन्द मल्ल", "विजय कुमार बोकिल"],
+        correct: 3
+    },
+    {
+        question: "कोले 'उत्थान' काव्य लेखेका छन्?",
+        answers: ["प्रेमराज भट्टराई", "राजेन्द्र काफ्ले", "लक्ष्मीप्रसाद देवकोटा", "सुरेश्वर डाँगी"],
+        correct: 2
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'धारा' लेखेका छन्, को हुन्?",
+        answers: ["उमेश राय", "सुरेश्वर डाँगी", "राजेन्द्र काफ्ले", "महादेवी वर्मा"],
+        correct: 3
+    },
+    {
+        question: "कोले 'समाज' काव्य लेखेका छन्?",
+        answers: ["शंकरलाल शर्मा", "प्रेमचन्द", "राजेन्द्र काफ्ले", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख कवि जसले 'वाग्मि काव्य' लेखेका छन्, को हुन्?",
+        answers: ["प्रेमचन्द", "उमेश राय", "गोविन्द मल्ल", "सुरेश्वर डाँगी"],
+        correct: 3
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'कान्तार' लेखेका छन्, को हुन्?",
+        answers: ["राजेन्द्र काफ्ले", "गोविन्द मल्ल", "धर्मनाथ पाण्डे", "शंकरलाल शर्मा"],
+        correct: 2
+    },
+    {
+        question: "कोले 'मुक्ति' काव्य लेखेका छन्?",
+        answers: ["महादेवी वर्मा", "प्रेमचन्द", "गोविन्द मल्ल", "लक्ष्मीप्रसाद देवकोटा"],
+        correct: 3
+    },
+    {
+        question: "कोले 'सप्तरंगी' काव्य लेखेका छन्?",
+        answers: ["धर्मनाथ पाण्डे", "राजेन्द्र काफ्ले", "लक्ष्मीप्रसाद देवकोटा", "गोविन्द मल्ल"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख लेखक जसले 'शब्द' काव्य लेखेका छन्, को हुन्?",
+        answers: ["सुरेश्वर डाँगी", "लक्ष्मीप्रसाद देवकोटा", "राजेन्द्र काफ्ले", "महादेवी वर्मा"],
+        correct: 2
+    },
+    {
+        question: "कोले 'धारा' काव्य लेखेका छन्?",
+        answers: ["प्रेमचन्द", "राजेन्द्र काफ्ले", "लक्ष्मीप्रसाद देवकोटा", "शंकरलाल शर्मा"],
+        correct: 0
+    },
+    {
+        question: "नेपालका प्रमुख साहित्यकार जसले 'वाग्मि' काव्य लेखेका छन्, को हुन्?",
+        answers: ["प्रेमचन्द", "धर्मनाथ पाण्डे", "राजेन्द्र काफ्ले", "गोविन्द मल्ल"],
+        correct: 2
+    }
+
+
+  
+    
+   
+];
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

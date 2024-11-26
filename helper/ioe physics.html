@@ -1,0 +1,2217 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+   const questions = [
+    {
+        question: "A car accelerates from rest at a rate of 2 m/s². How far will the car travel in 10 seconds?",
+        answers: ["50 meters", "100 meters", "200 meters", "400 meters"],
+        correct: 1
+    },
+    {
+        question: "A ball is thrown vertically upwards with an initial velocity of 20 m/s. How high will it rise before coming to rest?",
+        answers: ["10 meters", "20 meters", "30 meters", "40 meters"],
+        correct: 1
+    },
+    {
+        question: "A force of 10 N is applied to an object of mass 2 kg. What will be the acceleration of the object?",
+        answers: ["2 m/s²", "5 m/s²", "10 m/s²", "20 m/s²"],
+        correct: 1
+    },
+    {
+        question: "A body is moving with a uniform velocity of 20 m/s. How much distance will it cover in 5 minutes?",
+        answers: ["600 meters", "1200 meters", "1000 meters", "3000 meters"],
+        correct: 1
+    },
+    {
+        question: "An object falls freely from rest. What is the speed of the object after 3 seconds?",
+        answers: ["9.8 m/s", "19.6 m/s", "29.4 m/s", "39.2 m/s"],
+        correct: 1
+    },
+    {
+        question: "A body is lifted to a height of 10 meters. If the mass of the body is 5 kg, what is the potential energy of the body at that height? (Take g = 9.8 m/s²)",
+        answers: ["20 J", "50 J", "100 J", "200 J"],
+        correct: 1
+    },
+    {
+        question: "A 2 kg object moves with a speed of 4 m/s. What is its kinetic energy?",
+        answers: ["4 J", "8 J", "16 J", "32 J"],
+        correct: 2
+    },
+    {
+        question: "A car moves with a speed of 20 m/s along a circular path with a radius of 100 meters. What is the centripetal acceleration of the car?",
+        answers: ["4 m/s²", "2 m/s²", "6 m/s²", "8 m/s²"],
+        correct: 0
+    },
+    {
+        question: "A satellite orbits the Earth at a height of 400 km above the surface. What is the velocity of the satellite? (Radius of Earth = 6400 km, g = 9.8 m/s²)",
+        answers: ["7.5 km/s", "5.5 km/s", "8.5 km/s", "10.5 km/s"],
+        correct: 0
+    },
+    {
+        question: "The gravitational force between two bodies is 100 N. If the distance between them is doubled, what will be the new force between them?",
+        answers: ["50 N", "25 N", "100 N", "200 N"],
+        correct: 1
+    },
+    {
+        question: "The value of acceleration due to gravity at the surface of the Earth is approximately 9.8 m/s². What will be the value of gravity at a height equal to the radius of the Earth?",
+        answers: ["9.8 m/s²", "4.9 m/s²", "0 m/s²", "19.6 m/s²"],
+        correct: 1
+    },
+    {
+        question: "The amount of heat required to change the temperature of 1 kg of a substance by 1°C is known as:",
+        answers: ["Specific heat capacity", "Latent heat", "Thermal conductivity", "Heat capacity"],
+        correct: 0
+    },
+    {
+        question: "What is the value of the absolute zero temperature?",
+        answers: ["0°C", "0 K", "-273°C", "-273 K"],
+        correct: 1
+    },
+    {
+        question: "The refractive index of a medium is the ratio of:",
+        answers: ["Speed of light in vacuum to speed of light in the medium", "Speed of sound in vacuum to speed of sound in the medium", "Speed of light in the medium to the speed of sound in the medium", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following phenomena is not explained by the wave theory of light?",
+        answers: ["Interference", "Diffraction", "Polarization", "Photoelectric effect"],
+        correct: 3
+    },
+    {
+        question: "The electric field due to a point charge is proportional to:",
+        answers: ["r", "1/r²", "1/r", "r²"],
+        correct: 1
+    },
+    {
+        question: "The unit of electric charge is:",
+        answers: ["Ampere", "Coulomb", "Volt", "Ohm"],
+        correct: 1
+    },
+    {
+        question: "Ohm’s law states that the current through a conductor is directly proportional to:",
+        answers: ["Voltage", "Resistance", "Power", "Capacitance"],
+        correct: 0
+    },
+    {
+        question: "A 10 Ω resistor has a current of 2 A flowing through it. What is the voltage across the resistor?",
+        answers: ["5 V", "20 V", "10 V", "2 V"],
+        correct: 1
+    },
+    {
+        question: "The equivalent resistance of two resistors, R₁ and R₂, in parallel is given by:",
+        answers: ["R = R₁ + R₂", "R = R₁ R₂ / (R₁ + R₂)", "R = (R₁ + R₂) / R₁", "R = (R₁ + R₂) / 2"],
+        correct: 1
+    },{
+        question: "What is the SI unit of power?",
+        answers: ["Watt", "Joule", "Newton", "Pascal"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a non-renewable energy source?",
+        answers: ["Solar", "Wind", "Coal", "Hydropower"],
+        correct: 2
+    },
+    {
+        question: "The momentum of an object is the product of its mass and:",
+        answers: ["Speed", "Velocity", "Acceleration", "Force"],
+        correct: 1
+    },
+    {
+        question: "A person is standing in an elevator moving upwards. What is the apparent weight?",
+        answers: ["Less than actual weight", "Equal to actual weight", "Greater than actual weight", "Zero"],
+        correct: 2
+    },
+    {
+        question: "The magnetic field produced by a current-carrying wire can be detected using:",
+        answers: ["A galvanometer", "An ammeter", "A compass", "A voltmeter"],
+        correct: 2
+    },
+    {
+        question: "The SI unit of electric current is:",
+        answers: ["Volt", "Ampere", "Ohm", "Watt"],
+        correct: 1
+    },
+    {
+        question: "What is the primary purpose of a transformer?",
+        answers: ["To store electrical energy", "To increase or decrease voltage", "To convert DC to AC", "To generate electricity"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is true about the speed of sound in air?",
+        answers: ["It increases with temperature", "It decreases with temperature", "It remains constant", "It is independent of air pressure"],
+        correct: 0
+    },
+    {
+        question: "The speed of light in a vacuum is approximately:",
+        answers: ["3 × 10⁶ m/s", "3 × 10⁸ m/s", "3 × 10⁹ m/s", "3 × 10¹⁰ m/s"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is not an electromagnetic wave?",
+        answers: ["X-rays", "Gamma rays", "Ultrasound", "Microwaves"],
+        correct: 2
+    },
+    {
+        question: "The wavelength of a wave is the distance between:",
+        answers: ["Two consecutive crests", "Two consecutive troughs", "A crest and a trough", "A crest and a compression"],
+        correct: 0
+    },
+    {
+        question: "What is the SI unit of energy?",
+        answers: ["Joule", "Watt", "Newton", "Meter"],
+        correct: 0
+    },
+    {
+        question: "Which law explains why a plane flies?",
+        answers: ["Newton's First Law", "Bernoulli's Principle", "Hooke's Law", "Ohm's Law"],
+        correct: 1
+    },
+    {
+        question: "The period of a simple pendulum depends on which of the following?",
+        answers: ["Mass of the bob", "Length of the string", "Amplitude of oscillation", "All of the above"],
+        correct: 1
+    },
+    {
+        question: "The force of attraction between two bodies is inversely proportional to:",
+        answers: ["The square of the distance between them", "The mass of the bodies", "The temperature", "The volume of the bodies"],
+        correct: 0
+    },
+    {
+        question: "What type of lens is used to correct hypermetropia?",
+        answers: ["Concave lens", "Convex lens", "Biconvex lens", "Planoconvex lens"],
+        correct: 1
+    },
+    {
+        question: "Which phenomenon is explained by the wave theory of light?",
+        answers: ["Photoelectric effect", "Interference", "Compton scattering", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "The law of reflection states that the angle of incidence is equal to:",
+        answers: ["Angle of refraction", "Angle of reflection", "Angle of diffraction", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the fastest?",
+        answers: ["Sound in air", "Sound in water", "Light in vacuum", "Light in air"],
+        correct: 2
+    },
+    {
+        question: "The energy of a photon is directly proportional to:",
+        answers: ["Its wavelength", "Its frequency", "Its speed", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "The unit of electric potential is the:",
+        answers: ["Ampere", "Volt", "Ohm", "Coulomb"],
+        correct: 1
+    },
+    {
+        question: "The power dissipated by a resistor is given by the formula P = I²R. This equation represents:",
+        answers: ["Joule's law", "Ohm's law", "Faraday's law", "Kirchhoff's law"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the electric potential difference?",
+        answers: ["Ammeter", "Voltmeter", "Thermometer", "Barometer"],
+        correct: 1
+    },
+    {
+        question: "What is the effect of increasing the frequency of light on the wavelength?",
+        answers: ["Wavelength increases", "Wavelength decreases", "Wavelength remains the same", "Wavelength doubles"],
+        correct: 1
+    },
+    {
+        question: "Which of the following materials is a good conductor of electricity?",
+        answers: ["Plastic", "Glass", "Copper", "Rubber"],
+        correct: 2
+    },
+    {
+        question: "The equation E = mc² was formulated by:",
+        answers: ["Isaac Newton", "Albert Einstein", "James Clerk Maxwell", "Michael Faraday"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a non-contact force?",
+        answers: ["Frictional force", "Tension", "Gravitational force", "Normal force"],
+        correct: 2
+    },
+    {
+        question: "The refractive index of a medium is the ratio of the speed of light in:",
+        answers: ["Vacuum to the medium", "Medium to vacuum", "Medium to air", "Air to the medium"],
+        correct: 0
+    },
+    {
+        question: "The principle of conservation of energy states that energy cannot be:",
+        answers: ["Created", "Destroyed", "Transformed", "Created or destroyed"],
+        correct: 1
+    },
+    {
+        question: "The magnetic field around a current-carrying conductor forms a:",
+        answers: ["Straight line", "Circle", "Spiral", "Ellipse"],
+        correct: 1
+    },
+    {
+        question: "What happens to the resistance of a conductor when its temperature increases?",
+        answers: ["It decreases", "It increases", "It remains the same", "It depends on the material"],
+        correct: 1
+    },
+    {
+        question: "A bar magnet has a magnetic field. The magnetic field lines emerge from:",
+        answers: ["The north pole", "The south pole", "Both poles", "The center of the magnet"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is not a form of mechanical wave?",
+        answers: ["Sound wave", "Water wave", "Light wave", "Seismic wave"],
+        correct: 2
+    },
+    {
+        question: "The frequency of a wave is the number of wave cycles that pass a point in:",
+        answers: ["One second", "One minute", "One hour", "One day"],
+        correct: 0
+    },
+    {
+        question: "Which of the following types of radiation has the highest energy?",
+        answers: ["Gamma rays", "X-rays", "Ultraviolet rays", "Infrared rays"],
+        correct: 0
+    },
+    {
+        question: "What is the unit of electric resistance?",
+        answers: ["Ohm", "Volt", "Ampere", "Watt"],
+        correct: 0
+    },
+    {
+        question: "The capacitance of a capacitor depends on:",
+        answers: ["Area of plates", "Distance between plates", "Dielectric constant", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "In a series circuit, the current is:",
+        answers: ["Same across all components", "Different across all components", "Zero", "Infinite"],
+        correct: 0
+    },
+    {
+        question: "In an alternating current (AC) circuit, the current changes its direction:",
+        answers: ["Continuously", "At a fixed rate", "Only when the switch is off", "At random intervals"],
+        correct: 0
+    },
+    {
+        question: "The focal length of a concave lens is always:",
+        answers: ["Positive", "Negative", "Zero", "Infinite"],
+        correct: 1
+    },
+    {
+        question: "The direction of the magnetic field around a current-carrying conductor can be determined using:",
+        answers: ["Right-hand thumb rule", "Left-hand rule", "Coulomb's law", "Faraday's law"],
+        correct: 0
+    },{
+        question: "What is the SI unit of work?",
+        answers: ["Joule", "Newton", "Watt", "Pascal"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a vector quantity?",
+        answers: ["Speed", "Mass", "Velocity", "Time"],
+        correct: 2
+    },
+    {
+        question: "What does Ohm’s Law relate?",
+        answers: ["Voltage, Current, and Resistance", "Power, Voltage, and Current", "Force, Mass, and Acceleration", "Energy, Time, and Work"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the SI unit of frequency?",
+        answers: ["Hertz", "Meter", "Second", "Watt"],
+        correct: 0
+    },
+    {
+        question: "The refractive index of a medium is defined as the ratio of the speed of light in:",
+        answers: ["Vacuum to the medium", "Medium to vacuum", "Air to vacuum", "Vacuum to air"],
+        correct: 0
+    },
+    {
+        question: "What type of wave is light?",
+        answers: ["Transverse", "Longitudinal", "Mechanical", "Both longitudinal and transverse"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of a fuse in an electrical circuit?",
+        answers: ["To increase current flow", "To protect the circuit from overcurrent", "To reduce voltage", "To store energy"],
+        correct: 1
+    },
+    {
+        question: "The law of reflection states that the angle of incidence is equal to:",
+        answers: ["Angle of refraction", "Angle of reflection", "Angle of diffraction", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "In a simple harmonic motion, the acceleration is directly proportional to:",
+        answers: ["Amplitude", "Velocity", "Displacement", "Time"],
+        correct: 2
+    },
+    {
+        question: "What is the magnetic field around a current-carrying conductor shaped like?",
+        answers: ["Straight line", "Circular loop", "Spiral", "Elliptical"],
+        correct: 1
+    },
+    {
+        question: "The center of mass of a body is the point at which:",
+        answers: ["All the mass is concentrated", "The forces on the body balance", "The body's velocity is zero", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to convert mechanical energy into electrical energy?",
+        answers: ["Generator", "Battery", "Motor", "Capacitor"],
+        correct: 0
+    },
+    {
+        question: "The total mechanical energy of an object is the sum of:",
+        answers: ["Kinetic energy and heat", "Potential energy and kinetic energy", "Kinetic energy and sound", "Potential energy and sound"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is true for the acceleration due to gravity on the Earth?",
+        answers: ["It is constant at all points on Earth", "It decreases as altitude increases", "It increases at higher latitudes", "It is zero at the equator"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of a capacitor in an electrical circuit?",
+        answers: ["To store electrical energy", "To regulate current", "To generate voltage", "To measure resistance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following best describes an electric field?",
+        answers: ["A region where magnetic forces are felt", "A region where electrical forces are felt", "A region where light is refracted", "A region where heat is transferred"],
+        correct: 1
+    },
+    {
+        question: "The phenomenon of electromagnetic induction is the principle behind the working of:",
+        answers: ["Microwave ovens", "Electric fans", "Transformers", "Solar panels"],
+        correct: 2
+    },
+    {
+        question: "The motion of an object under the influence of only gravity is called:",
+        answers: ["Projectile motion", "Circular motion", "Free fall", "Uniform motion"],
+        correct: 2
+    },
+    {
+        question: "Which of the following statements is true for the electric potential energy?",
+        answers: ["It is zero when two charges are infinitely far apart", "It is always positive", "It increases as the distance between the charges increases", "It decreases as the charges become closer"],
+        correct: 0
+    },
+    {
+        question: "What happens to the pressure of a gas when its volume decreases at constant temperature?",
+        answers: ["Pressure decreases", "Pressure increases", "Pressure remains constant", "Pressure fluctuates"],
+        correct: 1
+    },
+    {
+        question: "In which of the following cases does the total mechanical energy remain constant?",
+        answers: ["In the case of a freely falling object", "In a projectile motion", "In a pendulum motion", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "In a standing wave, the points of zero displacement are called:",
+        answers: ["Nodes", "Antinodes", "Crests", "Troughs"],
+        correct: 0
+    },
+    {
+        question: "The rate of change of momentum of a body is:",
+        answers: ["Force", "Energy", "Velocity", "Acceleration"],
+        correct: 0
+    },
+    {
+        question: "The law of conservation of energy states that energy cannot be:",
+        answers: ["Created", "Destroyed", "Transformed", "Created or destroyed"],
+        correct: 1
+    },
+    {
+        question: "What type of energy is stored in a battery?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Electrical energy"],
+        correct: 2
+    },
+    {
+        question: "The SI unit of pressure is:",
+        answers: ["Pa (Pascal)", "N/m²", "Joule", "Newton"],
+        correct: 0
+    },
+    {
+        question: "In the formula F = ma, 'F' stands for:",
+        answers: ["Frequency", "Force", "Friction", "Momentum"],
+        correct: 1
+    },
+    {
+        question: "A body moving in a circular path experiences a force directed towards the center. This force is called:",
+        answers: ["Centripetal force", "Gravitational force", "Frictional force", "Tension force"],
+        correct: 0
+    },
+    {
+        question: "The frequency of the wave is the number of oscillations per unit:",
+        answers: ["Time", "Length", "Mass", "Force"],
+        correct: 0
+    },
+    {
+        question: "The energy possessed by a body due to its motion is called:",
+        answers: ["Kinetic energy", "Potential energy", "Internal energy", "Thermal energy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following does not affect the resistance of a conductor?",
+        answers: ["Length of the conductor", "Material of the conductor", "Temperature of the conductor", "Color of the conductor"],
+        correct: 3
+    },
+    {
+        question: "In a simple harmonic oscillator, the restoring force is always directed towards:",
+        answers: ["The maximum displacement", "The equilibrium position", "The amplitude", "The point of release"],
+        correct: 1
+    },
+    {
+        question: "The motion of a planet around the sun is an example of:",
+        answers: ["Uniform motion", "Circular motion", "Projectile motion", "None of the above"],
+        correct: 1
+    },{
+        question: "What is the SI unit of work?",
+        answers: ["Joule", "Newton", "Watt", "Pascal"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a vector quantity?",
+        answers: ["Speed", "Mass", "Velocity", "Time"],
+        correct: 2
+    },
+    {
+        question: "What does Ohm’s Law relate?",
+        answers: ["Voltage, Current, and Resistance", "Power, Voltage, and Current", "Force, Mass, and Acceleration", "Energy, Time, and Work"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the SI unit of frequency?",
+        answers: ["Hertz", "Meter", "Second", "Watt"],
+        correct: 0
+    },
+    {
+        question: "The refractive index of a medium is defined as the ratio of the speed of light in:",
+        answers: ["Vacuum to the medium", "Medium to vacuum", "Air to vacuum", "Vacuum to air"],
+        correct: 0
+    },
+    {
+        question: "What type of wave is light?",
+        answers: ["Transverse", "Longitudinal", "Mechanical", "Both longitudinal and transverse"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of a fuse in an electrical circuit?",
+        answers: ["To increase current flow", "To protect the circuit from overcurrent", "To reduce voltage", "To store energy"],
+        correct: 1
+    },
+    {
+        question: "The law of reflection states that the angle of incidence is equal to:",
+        answers: ["Angle of refraction", "Angle of reflection", "Angle of diffraction", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "In a simple harmonic motion, the acceleration is directly proportional to:",
+        answers: ["Amplitude", "Velocity", "Displacement", "Time"],
+        correct: 2
+    },
+    {
+        question: "What is the magnetic field around a current-carrying conductor shaped like?",
+        answers: ["Straight line", "Circular loop", "Spiral", "Elliptical"],
+        correct: 1
+    },
+    {
+        question: "The center of mass of a body is the point at which:",
+        answers: ["All the mass is concentrated", "The forces on the body balance", "The body's velocity is zero", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to convert mechanical energy into electrical energy?",
+        answers: ["Generator", "Battery", "Motor", "Capacitor"],
+        correct: 0
+    },
+    {
+        question: "The total mechanical energy of an object is the sum of:",
+        answers: ["Kinetic energy and heat", "Potential energy and kinetic energy", "Kinetic energy and sound", "Potential energy and sound"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is true for the acceleration due to gravity on the Earth?",
+        answers: ["It is constant at all points on Earth", "It decreases as altitude increases", "It increases at higher latitudes", "It is zero at the equator"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of a capacitor in an electrical circuit?",
+        answers: ["To store electrical energy", "To regulate current", "To generate voltage", "To measure resistance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following best describes an electric field?",
+        answers: ["A region where magnetic forces are felt", "A region where electrical forces are felt", "A region where light is refracted", "A region where heat is transferred"],
+        correct: 1
+    },
+    {
+        question: "The phenomenon of electromagnetic induction is the principle behind the working of:",
+        answers: ["Microwave ovens", "Electric fans", "Transformers", "Solar panels"],
+        correct: 2
+    },
+    {
+        question: "The motion of an object under the influence of only gravity is called:",
+        answers: ["Projectile motion", "Circular motion", "Free fall", "Uniform motion"],
+        correct: 2
+    },
+    {
+        question: "Which of the following statements is true for the electric potential energy?",
+        answers: ["It is zero when two charges are infinitely far apart", "It is always positive", "It increases as the distance between the charges increases", "It decreases as the charges become closer"],
+        correct: 0
+    },
+    {
+        question: "What happens to the pressure of a gas when its volume decreases at constant temperature?",
+        answers: ["Pressure decreases", "Pressure increases", "Pressure remains constant", "Pressure fluctuates"],
+        correct: 1
+    },
+    {
+        question: "In which of the following cases does the total mechanical energy remain constant?",
+        answers: ["In the case of a freely falling object", "In a projectile motion", "In a pendulum motion", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "In a standing wave, the points of zero displacement are called:",
+        answers: ["Nodes", "Antinodes", "Crests", "Troughs"],
+        correct: 0
+    },
+    {
+        question: "The rate of change of momentum of a body is:",
+        answers: ["Force", "Energy", "Velocity", "Acceleration"],
+        correct: 0
+    },
+    {
+        question: "The law of conservation of energy states that energy cannot be:",
+        answers: ["Created", "Destroyed", "Transformed", "Created or destroyed"],
+        correct: 1
+    },
+    {
+        question: "What type of energy is stored in a battery?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Electrical energy"],
+        correct: 2
+    },
+    {
+        question: "The SI unit of pressure is:",
+        answers: ["Pa (Pascal)", "N/m²", "Joule", "Newton"],
+        correct: 0
+    },
+    {
+        question: "In the formula F = ma, 'F' stands for:",
+        answers: ["Frequency", "Force", "Friction", "Momentum"],
+        correct: 1
+    },
+    {
+        question: "A body moving in a circular path experiences a force directed towards the center. This force is called:",
+        answers: ["Centripetal force", "Gravitational force", "Frictional force", "Tension force"],
+        correct: 0
+    },
+    {
+        question: "The frequency of the wave is the number of oscillations per unit:",
+        answers: ["Time", "Length", "Mass", "Force"],
+        correct: 0
+    },
+    {
+        question: "The energy possessed by a body due to its motion is called:",
+        answers: ["Kinetic energy", "Potential energy", "Internal energy", "Thermal energy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following does not affect the resistance of a conductor?",
+        answers: ["Length of the conductor", "Material of the conductor", "Temperature of the conductor", "Color of the conductor"],
+        correct: 3
+    },
+    {
+        question: "In a simple harmonic oscillator, the restoring force is always directed towards:",
+        answers: ["The maximum displacement", "The equilibrium position", "The amplitude", "The point of release"],
+        correct: 1
+    },
+    {
+        question: "The motion of a planet around the sun is an example of:",
+        answers: ["Uniform motion", "Circular motion", "Projectile motion", "None of the above"],
+        correct: 1
+    }, {
+        question: "A body of mass 10 kg is moving with a velocity of 4 m/s. What is its kinetic energy?",
+        answers: ["80 J", "40 J", "20 J", "10 J"],
+        correct: 0
+    },
+    {
+        question: "An object of mass 2 kg is dropped from a height of 20 meters. What is the velocity of the object just before it hits the ground? (Take g = 9.8 m/s²)",
+        answers: ["18.8 m/s", "20 m/s", "25 m/s", "30 m/s"],
+        correct: 0
+    },
+    {
+        question: "A force of 60 N is applied to a body of mass 15 kg. Calculate the acceleration of the body.",
+        answers: ["2 m/s²", "4 m/s²", "6 m/s²", "8 m/s²"],
+        correct: 1
+    },
+    {
+        question: "A 100 kg object is lifted 10 meters. Calculate the work done in lifting the object. (Take g = 9.8 m/s²)",
+        answers: ["1000 J", "2000 J", "3000 J", "4000 J"],
+        correct: 1
+    },
+    {
+        question: "A car travels a distance of 200 m in 10 seconds. What is its average speed?",
+        answers: ["15 m/s", "20 m/s", "25 m/s", "30 m/s"],
+        correct: 1
+    },
+    {
+        question: "A body of mass 10 kg is moving with a velocity of 5 m/s. What is the momentum of the body?",
+        answers: ["50 kg m/s", "10 kg m/s", "25 kg m/s", "15 kg m/s"],
+        correct: 0
+    },
+    {
+        question: "What is the power of a machine that does 2000 J of work in 4 seconds?",
+        answers: ["400 W", "500 W", "600 W", "700 W"],
+        correct: 1
+    },
+    {
+        question: "A 10 Ω resistor carries a current of 2 A. Calculate the power dissipated in the resistor.",
+        answers: ["20 W", "40 W", "60 W", "80 W"],
+        correct: 1
+    },
+    {
+        question: "A 3 μF capacitor is charged to 10 V. What is the charge on the capacitor?",
+        answers: ["30 μC", "40 μC", "50 μC", "60 μC"],
+        correct: 2
+    },
+    {
+        question: "A spring with a spring constant of 200 N/m is stretched by 0.5 meters. What is the force applied?",
+        answers: ["50 N", "100 N", "150 N", "200 N"],
+        correct: 1
+    },
+    {
+        question: "An object moves in a circular path of radius 5 m. If the object completes 2 revolutions per second, calculate the speed of the object.",
+        answers: ["10 m/s", "20 m/s", "30 m/s", "40 m/s"],
+        correct: 1
+    },
+    {
+        question: "The current flowing through a 12 Ω resistor is 3 A. Calculate the power consumed by the resistor.",
+        answers: ["72 W", "36 W", "108 W", "144 W"],
+        correct: 0
+    },
+    {
+        question: "A car travels a distance of 500 m in 20 seconds. What is its average velocity?",
+        answers: ["20 m/s", "25 m/s", "30 m/s", "35 m/s"],
+        correct: 1
+    },
+    {
+        question: "A particle moves in a straight line with a velocity of 10 m/s. After 5 seconds, the velocity becomes 30 m/s. Calculate the acceleration.",
+        answers: ["4 m/s²", "5 m/s²", "6 m/s²", "7 m/s²"],
+        correct: 1
+    },
+    {
+        question: "The resistance of a wire is 6 Ω. What is the current flowing through the wire if a potential difference of 12 V is applied?",
+        answers: ["2 A", "3 A", "4 A", "5 A"],
+        correct: 1
+    },
+    {
+        question: "A force of 20 N is applied to a body of mass 4 kg. What will be the velocity of the body after 5 seconds?",
+        answers: ["1 m/s", "2 m/s", "3 m/s", "4 m/s"],
+        correct: 2
+    },
+    {
+        question: "What is the frequency of a wave whose speed is 200 m/s and wavelength is 4 m?",
+        answers: ["50 Hz", "60 Hz", "70 Hz", "80 Hz"],
+        correct: 0
+    },
+    {
+        question: "A 2 kg object is moving with a velocity of 5 m/s. Calculate the work done to stop the object.",
+        answers: ["25 J", "50 J", "75 J", "100 J"],
+        correct: 1
+    },
+    {
+        question: "A 100 W bulb is used for 5 hours. How much energy is consumed in kilowatt-hours?",
+        answers: ["0.5 kWh", "1 kWh", "2 kWh", "5 kWh"],
+        correct: 0
+    },
+    {
+        question: "A body of mass 5 kg is subjected to a force of 10 N. What is the acceleration of the body?",
+        answers: ["2 m/s²", "3 m/s²", "4 m/s²", "5 m/s²"],
+        correct: 0
+    },{
+        question: "What is the charge of an electron?",
+        answers: ["+1.6 × 10^-19 C", "-1.6 × 10^-19 C", "0 C", "1.6 × 10^-19 C"],
+        correct: 1
+    },
+    {
+        question: "The speed of an electron moving in an electric field is 2 × 10^6 m/s. What is the de Broglie wavelength of the electron? (m = 9.11 × 10^-31 kg)",
+        answers: ["1.24 × 10^-10 m", "2.47 × 10^-10 m", "3.18 × 10^-11 m", "5.50 × 10^-12 m"],
+        correct: 0
+    },
+    {
+        question: "An electron moves from the anode to the cathode in an X-ray tube. Which of the following is true about the energy of the electron?",
+        answers: ["It is always converted into heat", "It is always converted into X-rays", "It can be converted into both heat and X-rays", "It is never converted into X-rays"],
+        correct: 2
+    },
+    {
+        question: "A photon of light has energy 3.2 × 10^-19 J. What is its frequency? (h = 6.63 × 10^-34 J·s)",
+        answers: ["4.8 × 10^14 Hz", "5.8 × 10^15 Hz", "6.2 × 10^13 Hz", "2.1 × 10^14 Hz"],
+        correct: 0
+    },
+    {
+        question: "What is the wavelength of a photon with a frequency of 5 × 10^14 Hz? (c = 3 × 10^8 m/s)",
+        answers: ["1.5 × 10^-1 m", "6 × 10^-7 m", "3 × 10^9 m", "5 × 10^-15 m"],
+        correct: 1
+    },
+    {
+        question: "What is the total energy of an electron in the ground state of a hydrogen atom?",
+        answers: ["-13.6 eV", "0 eV", "13.6 eV", "-1.6 eV"],
+        correct: 0
+    },
+    {
+        question: "What is the energy of a photon emitted when an electron in a hydrogen atom transitions from n=3 to n=2?",
+        answers: ["1.89 eV", "2.10 eV", "3.2 eV", "4.5 eV"],
+        correct: 0
+    },
+    {
+        question: "What happens to the energy of a photon when the frequency of the photon increases?",
+        answers: ["Energy decreases", "Energy remains the same", "Energy increases", "Energy fluctuates"],
+        correct: 2
+    },
+    {
+        question: "What is the wavelength of an electron with a kinetic energy of 2.0 × 10^-19 J? (m = 9.11 × 10^-31 kg, h = 6.63 × 10^-34 J·s)",
+        answers: ["1.2 × 10^-10 m", "4.5 × 10^-12 m", "2.8 × 10^-11 m", "7.9 × 10^-10 m"],
+        correct: 0
+    },
+    {
+        question: "What is the energy of a photon with a wavelength of 4 × 10^-7 m? (h = 6.63 × 10^-34 J·s, c = 3 × 10^8 m/s)",
+        answers: ["5.0 × 10^-19 J", "4.5 × 10^-18 J", "6.8 × 10^-19 J", "7.2 × 10^-18 J"],
+        correct: 0
+    },
+    {
+        question: "An electron is accelerated through a potential difference of 100 V. What is the kinetic energy gained by the electron?",
+        answers: ["1.6 × 10^-17 J", "3.2 × 10^-18 J", "1.6 × 10^-19 J", "3.2 × 10^-20 J"],
+        correct: 1
+    },
+    {
+        question: "A photon has energy 2.5 × 10^-19 J. What is its wavelength? (h = 6.63 × 10^-34 J·s, c = 3 × 10^8 m/s)",
+        answers: ["4 × 10^-7 m", "2 × 10^-9 m", "1 × 10^-6 m", "5 × 10^-8 m"],
+        correct: 0
+    },
+    {
+        question: "What is the wavelength of a photon with a frequency of 1.5 × 10^15 Hz? (h = 6.63 × 10^-34 J·s, c = 3 × 10^8 m/s)",
+        answers: ["2 × 10^-7 m", "1.5 × 10^-9 m", "3 × 10^-10 m", "6 × 10^-7 m"],
+        correct: 0
+    },
+    {
+        question: "Which particle has a charge of -1.6 × 10^-19 C?",
+        answers: ["Electron", "Proton", "Neutron", "Photon"],
+        correct: 0
+    },
+    {
+        question: "What is the energy of a photon with a frequency of 7.5 × 10^14 Hz?",
+        answers: ["5.63 × 10^-19 J", "6.50 × 10^-18 J", "4.98 × 10^-18 J", "8.4 × 10^-19 J"],
+        correct: 0
+    },
+    {
+        question: "What happens when a photon of light is absorbed by an electron in an atom?",
+        answers: ["The electron moves to a higher energy level", "The electron moves to a lower energy level", "The electron is ejected from the atom", "The electron's speed decreases"],
+        correct: 0
+    },
+    {
+        question: "The frequency of a photon is 3 × 10^14 Hz. What is its wavelength? (c = 3 × 10^8 m/s)",
+        answers: ["1 × 10^7 m", "1 × 10^-5 m", "3 × 10^-4 m", "1 × 10^-6 m"],
+        correct: 2
+    },
+    {
+        question: "What is the work function of a material if the threshold frequency for photoelectric emission is 5 × 10^14 Hz?",
+        answers: ["3.3 × 10^-19 J", "4.5 × 10^-18 J", "6.6 × 10^-19 J", "1.2 × 10^-18 J"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is NOT a characteristic of photons?",
+        answers: ["They have mass", "They travel at the speed of light", "They can be absorbed by atoms", "They carry energy"],
+        correct: 0
+    }, {
+        question: "What is the de Broglie wavelength of an electron, and how is it related to the momentum of the electron?",
+        answers: ["λ = h/p", "λ = p/h", "λ = m*v", "λ = c/f"],
+        correct: 0
+    },
+    // Question 2 (Numerical)
+    {
+        question: "An electron is accelerated through a potential difference of 100 V. What is the kinetic energy gained by the electron? (e = 1.6 × 10^-19 C)",
+        answers: ["1.6 × 10^-17 J", "3.2 × 10^-18 J", "1.6 × 10^-19 J", "3.2 × 10^-20 J"],
+        correct: 1
+    },
+    // Question 3 (Reasoning)
+    {
+        question: "Why does the frequency of a photon increase when its energy increases?",
+        answers: ["Because the speed of light is constant and energy is directly proportional to frequency", "Because energy and frequency are inversely proportional", "Because frequency does not depend on energy", "Because the wavelength decreases as the energy increases"],
+        correct: 0
+    },
+    // Question 4 (Theory)
+    {
+        question: "What is the photoelectric effect, and what is its significance in understanding the nature of light?",
+        answers: ["The emission of electrons from a metal surface when illuminated by light", "The emission of light from a metal when it is heated", "The absorption of light by a material", "The reflection of light from a surface"],
+        correct: 0
+    },
+    // Question 5 (Numerical)
+    {
+        question: "What is the wavelength of a photon of light with a frequency of 5 × 10^14 Hz? (c = 3 × 10^8 m/s)",
+        answers: ["6 × 10^-7 m", "5 × 10^-7 m", "4 × 10^-7 m", "3 × 10^-6 m"],
+        correct: 0
+    },
+    // Question 6 (Reasoning)
+    {
+        question: "If an electron absorbs a photon, what happens to the electron's energy level in the atom?",
+        answers: ["It moves to a higher energy level", "It moves to a lower energy level", "It remains the same", "It gets ejected from the atom"],
+        correct: 0
+    },
+    // Question 7 (Numerical)
+    {
+        question: "A photon has an energy of 2 × 10^-19 J. What is its frequency? (h = 6.63 × 10^-34 J·s)",
+        answers: ["3 × 10^14 Hz", "5 × 10^14 Hz", "1.5 × 10^15 Hz", "2.2 × 10^16 Hz"],
+        correct: 0
+    },
+    // Question 8 (Theory)
+    {
+        question: "What is the relationship between the energy of a photon and its wavelength?",
+        answers: ["Energy is inversely proportional to wavelength", "Energy is directly proportional to wavelength", "Energy is independent of wavelength", "Energy is proportional to the square of wavelength"],
+        correct: 0
+    },
+    // Question 9 (Reasoning)
+    {
+        question: "Why do electrons exhibit wave-like properties?",
+        answers: ["Because they have both particle and wave properties according to de Broglie's hypothesis", "Because they only behave like waves", "Because they have no mass", "Because they are always at rest"],
+        correct: 0
+    },
+    // Question 10 (Numerical)
+    {
+        question: "An electron is moving at a velocity of 1.5 × 10^6 m/s. What is its de Broglie wavelength? (m = 9.11 × 10^-31 kg, h = 6.63 × 10^-34 J·s)",
+        answers: ["4.4 × 10^-10 m", "1.2 × 10^-10 m", "3.2 × 10^-11 m", "7.5 × 10^-12 m"],
+        correct: 1
+    },
+    // Question 11 (Theory)
+    {
+        question: "What is the significance of the Heisenberg uncertainty principle in quantum mechanics?",
+        answers: ["It states that it is impossible to know both the exact position and momentum of a particle simultaneously", "It states that all particles have uncertain energy", "It states that waves are only present in electrons", "It states that photons cannot be observed directly"],
+        correct: 0
+    },
+    // Question 12 (Numerical)
+    {
+        question: "What is the energy of a photon of light with a wavelength of 5 × 10^-7 m? (h = 6.63 × 10^-34 J·s, c = 3 × 10^8 m/s)",
+        answers: ["3.98 × 10^-19 J", "4.5 × 10^-18 J", "2.5 × 10^-20 J", "1.3 × 10^-21 J"],
+        correct: 0
+    },
+    // Question 13 (Reasoning)
+    {
+        question: "Why is the energy of a photon related to its frequency and not its amplitude?",
+        answers: ["Because frequency determines the energy carried by the photon, while amplitude determines the intensity of the light", "Because amplitude is irrelevant to energy", "Because energy depends on the wavelength, not frequency", "Because amplitude increases as the frequency decreases"],
+        correct: 0
+    },
+    // Question 14 (Numerical)
+    {
+        question: "What is the wavelength of an electron moving with a velocity of 2 × 10^6 m/s? (m = 9.11 × 10^-31 kg, h = 6.63 × 10^-34 J·s)",
+        answers: ["2.2 × 10^-10 m", "1.1 × 10^-10 m", "3.4 × 10^-11 m", "5.6 × 10^-12 m"],
+        correct: 0
+    },
+    // Question 15 (Theory)
+    {
+        question: "What is the photoelectric threshold frequency and how does it relate to the work function of a material?",
+        answers: ["The threshold frequency is the minimum frequency required to emit electrons from a material, and it is related to the work function by f₀ = W₀/h", "The threshold frequency is the frequency above which electrons are emitted", "The threshold frequency depends only on the intensity of the light", "The work function is unrelated to the threshold frequency"],
+        correct: 0
+    },{
+        question: "State Newton's laws of motion and explain their significance in understanding motion.",
+        answers: [
+            "First Law: An object will remain at rest or in uniform motion unless acted upon by an external force.",
+            "Second Law: The force on an object is directly proportional to its mass and acceleration (F = ma).",
+            "Third Law: For every action, there is an equal and opposite reaction.",
+            "These laws explain the fundamental principles behind how objects move and interact."
+        ],
+        correct: 0
+    },
+    // Work, Energy, and Power
+    {
+        question: "What is the law of conservation of energy? Explain with an example.",
+        answers: [
+            "The law states that energy cannot be created or destroyed, only converted from one form to another.",
+            "Example: A pendulum swinging back and forth converts potential energy to kinetic energy and vice versa."
+        ],
+        correct: 0
+    },
+    // Thermodynamics
+    {
+        question: "State the first law of thermodynamics and explain its application.",
+        answers: [
+            "The first law of thermodynamics states that energy cannot be created or destroyed, only transferred or converted.",
+            "It is applied in processes like heat engines, where heat energy is converted to work."
+        ],
+        correct: 0
+    },
+    // Optics
+    {
+        question: "Explain the phenomenon of diffraction of light.",
+        answers: [
+            "Diffraction is the bending of light around obstacles or through narrow openings.",
+            "It occurs when the size of the obstacle or opening is comparable to the wavelength of light."
+        ],
+        correct: 0
+    },
+    // Electrostatics
+    {
+        question: "What is Coulomb's Law? State its mathematical expression.",
+        answers: [
+            "Coulomb's Law describes the force between two point charges.",
+            "It states that the force is directly proportional to the product of the charges and inversely proportional to the square of the distance between them. F = k(q1q2/r²)."
+        ],
+        correct: 0
+    }, {
+        question: "A body of mass 2 kg is moving with a velocity of 3 m/s. What is the kinetic energy of the body?",
+        answers: [
+            "Kinetic Energy (KE) = (1/2)mv²",
+            "KE = (1/2)(2)(3)² = 9 Joules",
+            "So, the kinetic energy of the body is 9 Joules."
+        ],
+        correct: 0
+    },
+    // Work, Energy, and Power
+    {
+        question: "A 100 N force is applied to move an object of mass 20 kg over a distance of 5 meters. Calculate the work done and the power if the work is done in 10 seconds.",
+        answers: [
+            "Work done (W) = Force × Distance = 100 N × 5 m = 500 Joules.",
+            "Power (P) = Work done / Time = 500 J / 10 s = 50 Watts."
+        ],
+        correct: 0
+    },
+    // Rotational Motion
+    {
+        question: "A wheel of moment of inertia 0.5 kg·m² rotates with an angular velocity of 10 rad/s. Calculate the rotational kinetic energy.",
+        answers: [
+            "Rotational Kinetic Energy (K) = (1/2)Iω²",
+            "K = (1/2)(0.5)(10)² = 25 Joules."
+        ],
+        correct: 0
+    },
+    // Thermodynamics
+    {
+        question: "State the first law of thermodynamics. If 200 J of heat is supplied to a system and the system does 100 J of work, what is the change in internal energy?",
+        answers: [
+            "The first law of thermodynamics states that ΔU = Q - W, where ΔU is the change in internal energy, Q is the heat supplied, and W is the work done.",
+            "ΔU = 200 J - 100 J = 100 J. So, the change in internal energy is 100 J."
+        ],
+        correct: 0
+    },
+    // Optics
+    {
+        question: "An object is placed 30 cm in front of a concave mirror with a focal length of 15 cm. Use the mirror formula to find the image distance.",
+        answers: [
+            "The mirror formula is 1/f = 1/v - 1/u, where f is the focal length, v is the image distance, and u is the object distance.",
+            "1/15 = 1/v - 1/(-30), solving for v gives v = -10 cm. The image is formed 10 cm in front of the mirror."
+        ],
+        correct: 0
+    },
+    // Electrostatics
+    {
+        question: "Two point charges, each of charge 2 μC, are placed 0.1 m apart. Calculate the electrostatic force between them. (Use Coulomb's Law)",
+        answers: [
+            "Coulomb's law: F = k(q₁q₂/r²), where k = 9 × 10⁹ N·m²/C², q₁ = q₂ = 2 μC = 2 × 10⁻⁶ C, r = 0.1 m.",
+            "F = (9 × 10⁹)(2 × 10⁻⁶)(2 × 10⁻⁶) / (0.1)² = 3.6 N."
+        ],
+        correct: 0
+    },
+    // Magnetism
+    {
+        question: "A current of 3 A flows through a straight conductor of length 2 m placed in a magnetic field of 0.5 T. Calculate the force on the conductor.",
+        answers: [
+            "The formula for the magnetic force on a current-carrying conductor is F = BIL sinθ, where B is the magnetic field, I is the current, L is the length of the conductor, and θ is the angle between the field and current.",
+            "Assuming θ = 90° (perpendicular), F = 0.5 × 3 × 2 = 3 N."
+        ],
+        correct: 0
+    },
+    // Waves and Oscillations
+    {
+        question: "A wave has a frequency of 50 Hz and a wavelength of 10 m. Calculate the speed of the wave.",
+        answers: [
+            "The wave speed (v) is given by v = fλ, where f is the frequency and λ is the wavelength.",
+            "v = 50 Hz × 10 m = 500 m/s."
+        ],
+        correct: 0
+    },
+    // Modern Physics
+    {
+        question: "In the photoelectric effect, the work function of a metal is 2.5 eV. If light of frequency 8 × 10¹⁴ Hz is incident on the metal, calculate the kinetic energy of the emitted electrons. (h = 6.63 × 10⁻³⁴ J·s)",
+        answers: [
+            "Energy of the incident photon = h × frequency = (6.63 × 10⁻³⁴)(8 × 10¹⁴) = 5.304 × 10⁻¹⁹ J.",
+            "Work function = 2.5 eV = 2.5 × 1.602 × 10⁻¹⁹ J = 4.005 × 10⁻¹⁹ J.",
+            "Kinetic energy of emitted electron = Energy of photon - Work function = 5.304 × 10⁻¹⁹ - 4.005 × 10⁻¹⁹ = 1.299 × 10⁻¹⁹ J."
+        ],
+        correct: 0
+    },
+    // Fluid Mechanics
+    {
+        question: "A water pipe has a cross-sectional area of 0.05 m² at one point and 0.02 m² at another point. If the velocity of water at the first point is 2 m/s, calculate the velocity at the second point (Use the continuity equation).",
+        answers: [
+            "According to the continuity equation, A₁v₁ = A₂v₂.",
+            "Substitute values: (0.05)(2) = (0.02)(v₂), solving for v₂ gives v₂ = 5 m/s."
+        ],
+        correct: 0
+    },
+    // Thermal Expansion
+    {
+        question: "A metal rod of length 2 m expands by 0.004 m when heated. If the coefficient of linear expansion is 2 × 10⁻⁵ /°C, calculate the change in temperature.",
+        answers: [
+            "The formula for linear expansion is ΔL = αL₀ΔT, where α is the coefficient of linear expansion, L₀ is the initial length, and ΔT is the change in temperature.",
+            "0.004 = (2 × 10⁻⁵)(2)(ΔT), solving for ΔT gives ΔT = 100°C."
+        ],
+        correct: 0
+    },{
+        question: "A 5 kg block is sliding on a frictionless surface with a velocity of 10 m/s. What is the momentum of the block?",
+        answers: [
+            "Momentum (p) = mass × velocity",
+            "p = 5 × 10 = 50 kg·m/s."
+        ],
+        correct: 0
+    },
+    {
+        question: "A stone is thrown vertically upward with a velocity of 20 m/s. How high will the stone rise?",
+        answers: [
+            "Using the equation v² = u² + 2as, where v = 0, u = 20 m/s, and a = -10 m/s² (acceleration due to gravity),",
+            "0 = 20² + 2(-10)s, solving for s gives s = 20 m."
+        ],
+        correct: 0
+    },
+    {
+        question: "Two cars are traveling towards each other with velocities of 20 m/s and 30 m/s. What is their relative velocity?",
+        answers: [
+            "Relative velocity = v₁ + v₂, since they are moving towards each other.",
+            "Relative velocity = 20 + 30 = 50 m/s."
+        ],
+        correct: 0
+    },
+    // Work, Energy, and Power
+    {
+        question: "A 100 kg person is lifted to a height of 10 m. Calculate the work done.",
+        answers: [
+            "Work done = mgh, where m = 100 kg, g = 9.8 m/s², h = 10 m.",
+            "Work done = 100 × 9.8 × 10 = 9800 J."
+        ],
+        correct: 0
+    },
+    {
+        question: "A car engine performs 500 J of work every second. What is the power of the engine?",
+        answers: [
+            "Power (P) = Work done / Time",
+            "P = 500 J / 1 s = 500 W."
+        ],
+        correct: 0
+    },
+    // Rotational Motion
+    {
+        question: "A disc of radius 0.5 m and moment of inertia 0.2 kg·m² is rotating with an angular velocity of 10 rad/s. What is the rotational kinetic energy?",
+        answers: [
+            "Rotational Kinetic Energy (K) = (1/2)Iω²",
+            "K = (1/2)(0.2)(10)² = 10 Joules."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the angular momentum of a body of mass 2 kg moving with a velocity of 4 m/s in a circular path of radius 3 m?",
+        answers: [
+            "Angular momentum (L) = mvr",
+            "L = 2 × 4 × 3 = 24 kg·m²/s."
+        ],
+        correct: 0
+    },
+    // Thermodynamics
+    {
+        question: "If 1000 J of heat is supplied to a system and the system performs 300 J of work, what is the change in internal energy?",
+        answers: [
+            "According to the first law of thermodynamics, ΔU = Q - W.",
+            "ΔU = 1000 J - 300 J = 700 J."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the efficiency of a heat engine that absorbs 500 J of heat and performs 200 J of work?",
+        answers: [
+            "Efficiency (η) = Work done / Heat absorbed",
+            "η = 200 J / 500 J = 0.4 or 40%."
+        ],
+        correct: 0
+    },
+    // Optics
+    {
+        question: "What is the focal length of a lens with power 5 diopters?",
+        answers: [
+            "Power (P) = 1/f, where f is the focal length in meters.",
+            "f = 1/P = 1/5 = 0.2 meters or 20 cm."
+        ],
+        correct: 0
+    },
+    {
+        question: "An object is placed 25 cm in front of a convex lens of focal length 20 cm. Where is the image formed?",
+        answers: [
+            "Using the lens formula 1/f = 1/v - 1/u, where f = 20 cm, u = -25 cm.",
+            "1/20 = 1/v + 1/25, solving for v gives v = 100 cm."
+        ],
+        correct: 0
+    },
+    {
+        question: "A ray of light passes from air (refractive index 1) to water (refractive index 1.33) at an angle of 30°. What is the angle of refraction?",
+        answers: [
+            "Using Snell's law, n₁ sinθ₁ = n₂ sinθ₂.",
+            "1 × sin(30°) = 1.33 × sinθ₂, solving for θ₂ gives θ₂ = 22.6°."
+        ],
+        correct: 0
+    },
+    // Electrostatics
+    {
+        question: "Two point charges of 3 μC and 6 μC are separated by a distance of 2 m. Calculate the electrostatic force between them.",
+        answers: [
+            "Using Coulomb's Law, F = k(q₁q₂/r²), where k = 9 × 10⁹ N·m²/C², q₁ = 3 × 10⁻⁶ C, q₂ = 6 × 10⁻⁶ C, r = 2 m.",
+            "F = (9 × 10⁹)(3 × 10⁻⁶)(6 × 10⁻⁶) / (2)² = 4.05 N."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the electric field at a point 10 cm away from a point charge of 5 μC?",
+        answers: [
+            "Electric field (E) = kq/r², where k = 9 × 10⁹ N·m²/C², q = 5 × 10⁻⁶ C, r = 0.1 m.",
+            "E = (9 × 10⁹)(5 × 10⁻⁶) / (0.1)² = 4500 N/C."
+        ],
+        correct: 0
+    },
+    // Magnetism
+    {
+        question: "A current of 2 A flows through a wire of length 1 m placed in a magnetic field of 0.5 T. What is the force on the wire?",
+        answers: [
+            "The force on the wire is given by F = BIL sinθ, where θ = 90°.",
+            "F = 0.5 × 2 × 1 = 1 N."
+        ],
+        correct: 0
+    },
+    {
+        question: "If the magnetic field strength at a point is 2 T and the area of the loop at that point is 0.3 m², calculate the magnetic flux.",
+        answers: [
+            "Magnetic flux (Φ) = B × A, where B = 2 T, A = 0.3 m².",
+            "Φ = 2 × 0.3 = 0.6 Wb."
+        ],
+        correct: 0
+    },
+    // Waves and Oscillations
+    {
+        question: "The frequency of a wave is 50 Hz and its wavelength is 10 m. What is the speed of the wave?",
+        answers: [
+            "Wave speed (v) = frequency × wavelength.",
+            "v = 50 × 10 = 500 m/s."
+        ],
+        correct: 0
+    },
+    {
+        question: "A sound wave travels through air with a velocity of 340 m/s and has a frequency of 1700 Hz. What is its wavelength?",
+        answers: [
+            "Wavelength (λ) = speed / frequency.",
+            "λ = 340 / 1700 = 0.2 m."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the time period of a pendulum if its length is 1 m?",
+        answers: [
+            "The time period T of a simple pendulum is given by T = 2π√(L/g), where g = 9.8 m/s².",
+            "T = 2π√(1/9.8) ≈ 2.01 s."
+        ],
+        correct: 0
+    },
+    // Modern Physics
+    {
+        question: "What is the energy of a photon of light with a frequency of 5 × 10¹⁴ Hz?",
+        answers: [
+            "Energy of a photon (E) = h × frequency, where h = 6.63 × 10⁻³⁴ J·s.",
+            "E = (6.63 × 10⁻³⁴)(5 × 10¹⁴) = 3.315 × 10⁻¹⁹ J."
+        ],
+        correct: 0
+    }, {
+        question: "What is the de Broglie wavelength of an electron with a velocity of 1.5 × 10⁶ m/s? (Mass of electron = 9.1 × 10⁻³¹ kg)",
+        answers: [
+            "The de Broglie wavelength λ = h / (mv), where h = 6.63 × 10⁻³⁴ J·s.",
+            "λ = 6.63 × 10⁻³⁴ / (9.1 × 10⁻³¹ × 1.5 × 10⁶) ≈ 4.9 × 10⁻¹² m."
+        ],
+        correct: 0
+    },
+    {
+        question: "The half-life of a radioactive element is 2 hours. How much of a 100 g sample remains after 6 hours?",
+        answers: [
+            "After 6 hours, which is 3 half-lives, the remaining quantity = 100 × (1/2)³ = 100 × 1/8 = 12.5 g."
+        ],
+        correct: 0
+    },
+    // Nuclear Physics
+    {
+        question: "What is the energy released when 1 kg of uranium undergoes complete fission? (Energy released per fission = 200 MeV)",
+        answers: [
+            "Energy released = mass × energy per fission, converting mass into energy using E = mc².",
+            "E = 1 kg × (200 × 10⁶ eV) = 200 × 10⁶ × 1.6 × 10⁻¹⁹ J = 3.2 × 10⁻¹³ J."
+        ],
+        correct: 0
+    },
+    {
+        question: "Calculate the binding energy of a nucleus if the mass defect is 1.2 × 10⁻²⁷ kg.",
+        answers: [
+            "Binding energy = mass defect × c², where c = 3 × 10⁸ m/s.",
+            "Binding energy = 1.2 × 10⁻²⁷ × (3 × 10⁸)² = 1.08 × 10⁻¹⁰ J."
+        ],
+        correct: 0
+    },
+    // Fluid Mechanics
+    {
+        question: "A pipe carries water at a velocity of 2 m/s. If the radius of the pipe is doubled, what will be the new velocity assuming the flow is incompressible?",
+        answers: [
+            "Using the equation of continuity, A₁v₁ = A₂v₂. If radius is doubled, area will increase by a factor of 4, and velocity will decrease by a factor of 4.",
+            "New velocity = 2 m/s / 4 = 0.5 m/s."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the pressure at a depth of 50 m in water? (Density of water = 1000 kg/m³, g = 9.8 m/s²)",
+        answers: [
+            "Pressure = ρgh, where ρ = 1000 kg/m³, g = 9.8 m/s², h = 50 m.",
+            "Pressure = 1000 × 9.8 × 50 = 490,000 Pa."
+        ],
+        correct: 0
+    },
+    // Electromagnetism
+    {
+        question: "A current of 3 A is flowing through a conductor of length 2 m placed in a magnetic field of 0.4 T. What is the force acting on the conductor?",
+        answers: [
+            "Force = BIL sinθ, where B = 0.4 T, I = 3 A, L = 2 m, θ = 90°.",
+            "Force = 0.4 × 3 × 2 = 2.4 N."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the induced EMF in a coil of 100 turns, if the magnetic flux changes from 0.1 Wb to 0.5 Wb in 2 seconds?",
+        answers: [
+            "Using Faraday's law of induction, EMF = -N (ΔΦ/Δt), where N = 100 turns, ΔΦ = 0.5 - 0.1 = 0.4 Wb, Δt = 2 s.",
+            "EMF = -100 × (0.4 / 2) = -20 V."
+        ],
+        correct: 0
+    },
+    // Semiconductor Physics
+    {
+        question: "What is the energy band gap of a material if the frequency of emitted radiation from a forward biased LED is 5 × 10¹⁴ Hz?",
+        answers: [
+            "Energy = h × frequency, where h = 6.63 × 10⁻³⁴ J·s.",
+            "Energy = (6.63 × 10⁻³⁴) × (5 × 10¹⁴) = 3.315 × 10⁻¹⁹ J."
+        ],
+        correct: 0
+    },
+    {
+        question: "A p-n junction diode has a forward voltage of 0.7 V. What is the current through the diode if the resistance is 10 Ω?",
+        answers: [
+            "Using Ohm's law, I = V/R, where V = 0.7 V, R = 10 Ω.",
+            "I = 0.7 / 10 = 0.07 A."
+        ],
+        correct: 0
+    },
+    // Waves and Oscillations
+    {
+        question: "A string vibrates with a frequency of 100 Hz and has a wavelength of 0.5 m. What is the speed of the wave?",
+        answers: [
+            "Wave speed = frequency × wavelength.",
+            "Speed = 100 × 0.5 = 50 m/s."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the time period of a simple harmonic oscillator with a frequency of 10 Hz?",
+        answers: [
+            "Time period (T) = 1 / frequency.",
+            "T = 1 / 10 = 0.1 s."
+        ],
+        correct: 0
+    },
+    // General Physics Concepts
+    {
+        question: "What is the main difference between a scalar and a vector quantity?",
+        answers: [
+            "Scalar quantities have only magnitude, while vector quantities have both magnitude and direction."
+        ],
+        correct: 0
+    },
+    {
+        question: "Explain the concept of work-energy theorem.",
+        answers: [
+            "The work-energy theorem states that the work done by the net force on an object is equal to the change in its kinetic energy."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the significance of the law of conservation of momentum?",
+        answers: [
+            "The law of conservation of momentum states that the total momentum of a system of particles remains constant if no external forces act on the system."
+        ],
+        correct: 0
+    }, {
+        question: "A body of mass 5 kg is moving with a velocity of 20 m/s. What is its kinetic energy?",
+        answers: [
+            "Kinetic energy (KE) = 1/2 × m × v², where m = 5 kg and v = 20 m/s.",
+            "KE = 1/2 × 5 × (20)² = 1/2 × 5 × 400 = 1000 J."
+        ],
+        correct: 0
+    },
+    {
+        question: "A car accelerates from rest to 30 m/s in 10 seconds. What is its acceleration?",
+        answers: [
+            "Using the equation v = u + at, where u = 0, v = 30 m/s, and t = 10 s.",
+            "Acceleration (a) = (v - u) / t = (30 - 0) / 10 = 3 m/s²."
+        ],
+        correct: 0
+    },
+    // Thermodynamics
+    {
+        question: "A gas is contained in a cylinder with a movable piston. If the pressure is 5 × 10⁵ Pa and the volume is 2 m³, calculate the work done if the volume is doubled isothermally.",
+        answers: [
+            "Work done (W) in an isothermal process is W = PΔV, where P = 5 × 10⁵ Pa and ΔV = V₂ - V₁ = 2 m³.",
+            "W = 5 × 10⁵ × (4 - 2) = 5 × 10⁵ × 2 = 1 × 10⁶ J."
+        ],
+        correct: 0
+    },
+    {
+        question: "If the temperature of a gas increases from 300 K to 600 K, what is the percentage change in the average kinetic energy of the molecules?",
+        answers: [
+            "The average kinetic energy of molecules is directly proportional to temperature (KE ∝ T).",
+            "Percentage change = [(600 - 300) / 300] × 100 = 100%."
+        ],
+        correct: 0
+    },
+    // Electrostatics
+    {
+        question: "Two charges of +5 μC and -5 μC are placed 0.1 m apart in a vacuum. What is the electrostatic force between them?",
+        answers: [
+            "Using Coulomb's law: F = k × |q₁q₂| / r², where k = 9 × 10⁹ N·m²/C², q₁ = 5 μC = 5 × 10⁻⁶ C, q₂ = -5 μC, and r = 0.1 m.",
+            "F = 9 × 10⁹ × (5 × 10⁻⁶ × 5 × 10⁻⁶) / (0.1)² = 2.25 N."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the potential energy of a system of two charges +5 μC and -5 μC placed 10 cm apart in vacuum?",
+        answers: [
+            "The potential energy U = k × q₁q₂ / r, where k = 9 × 10⁹ N·m²/C², q₁ = 5 μC, q₂ = -5 μC, and r = 0.1 m.",
+            "U = 9 × 10⁹ × (5 × 10⁻⁶ × -5 × 10⁻⁶) / 0.1 = -2.25 J."
+        ],
+        correct: 0
+    },
+    // Magnetism
+    {
+        question: "What is the magnetic field at the center of a circular loop of wire with a radius of 0.1 m carrying a current of 2 A?",
+        answers: [
+            "Using the formula B = (μ₀ × I) / (2 × R), where μ₀ = 4π × 10⁻⁷ T·m/A, I = 2 A, and R = 0.1 m.",
+            "B = (4π × 10⁻⁷ × 2) / (2 × 0.1) = 1.26 × 10⁻⁶ T."
+        ],
+        correct: 0
+    },
+    {
+        question: "A moving charge of 2 μC enters a magnetic field of 0.3 T with a velocity of 5 m/s at an angle of 30°. What is the magnetic force on the charge?",
+        answers: [
+            "Using the formula F = qvB sinθ, where q = 2 × 10⁻⁶ C, v = 5 m/s, B = 0.3 T, and θ = 30°.",
+            "F = (2 × 10⁻⁶) × 5 × 0.3 × sin(30°) = 1.5 × 10⁻⁶ N."
+        ],
+        correct: 0
+    },
+    // Optics
+    {
+        question: "A concave mirror has a focal length of 20 cm. An object is placed 30 cm in front of the mirror. What is the image distance?",
+        answers: [
+            "Using the mirror formula: 1/f = 1/v - 1/u, where f = -20 cm, u = -30 cm.",
+            "1/v = 1/f + 1/u = 1/(-20) + 1/(-30) = -1/12.",
+            "v = -12 cm."
+        ],
+        correct: 0
+    },
+    {
+        question: "In an experiment with a double-slit, the distance between slits is 0.2 mm, and the distance between the slits and the screen is 1.5 m. If the first-order fringe is observed 5 mm from the center, what is the wavelength of the light used?",
+        answers: [
+            "Using the formula for fringe separation: λ = (y × d) / L, where y = 5 mm, d = 0.2 mm, and L = 1.5 m.",
+            "λ = (5 × 10⁻³ × 0.2 × 10⁻³) / 1.5 = 6.67 × 10⁻⁷ m."
+        ],
+        correct: 0
+    },
+    // Waves and Oscillations
+    {
+        question: "A spring with a force constant of 100 N/m is stretched by 0.1 m. What is the potential energy stored in the spring?",
+        answers: [
+            "Using the formula: PE = 1/2 × k × x², where k = 100 N/m and x = 0.1 m.",
+            "PE = 1/2 × 100 × (0.1)² = 0.5 J."
+        ],
+        correct: 0
+    },
+    {
+        question: "A tuning fork vibrates with a frequency of 512 Hz. What is the time period of vibration?",
+        answers: [
+            "Time period (T) = 1 / frequency.",
+            "T = 1 / 512 = 0.00195 s."
+        ],
+        correct: 0
+    },
+    // General Concepts
+    {
+        question: "What is the principle of conservation of angular momentum?",
+        answers: [
+            "The principle states that if no external torque acts on a system, the total angular momentum of the system remains constant."
+        ],
+        correct: 0
+    },
+    {
+        question: "Explain the significance of the Einstein's mass-energy equivalence.",
+        answers: [
+            "Einstein's equation E = mc² shows that mass can be converted into energy and vice versa."
+        ],
+        correct: 0
+    },
+    {
+        question: "A car accelerates from rest to a speed of 20 m/s in 10 seconds. What is its acceleration?",
+        answers: [
+            "Using the formula: a = (v - u) / t",
+            "a = (20 - 0) / 10 = 2 m/s²"
+        ],
+        correct: 0
+    },
+    {
+        question: "A body of mass 4 kg is placed on a frictionless surface. If a force of 16 N is applied to it, what is the acceleration of the body?",
+        answers: [
+            "Using Newton's second law: F = ma",
+            "a = F / m = 16 / 4 = 4 m/s²"
+        ],
+        correct: 0
+    },
+    {
+        question: "A 5 kg block is sliding on a horizontal surface with an initial velocity of 10 m/s. After 2 seconds, its velocity becomes 6 m/s. What is the acceleration of the block?",
+        answers: [
+            "Using the formula: a = (v - u) / t",
+            "a = (6 - 10) / 2 = -2 m/s²"
+        ],
+        correct: 0
+    },
+
+    // Work, Energy, and Power
+    {
+        question: "A 1000 kg car is moving at 20 m/s. What is its kinetic energy?",
+        answers: [
+            "Kinetic energy (KE) = 1/2 × m × v²",
+            "KE = 1/2 × 1000 × 20² = 200,000 J"
+        ],
+        correct: 0
+    },
+    {
+        question: "A motor lifts a 10 kg object to a height of 5 m. What is the work done by the motor?",
+        answers: [
+            "Work done (W) = m × g × h",
+            "W = 10 × 9.8 × 5 = 490 J"
+        ],
+        correct: 0
+    },
+
+    // Electrostatics
+    {
+        question: "Two point charges of 2 μC and 3 μC are placed 10 cm apart. Find the electrostatic force between them. (k = 9 × 10⁹ N·m²/C²)",
+        answers: [
+            "Using Coulomb's law: F = k × |q₁q₂| / r²",
+            "F = (9 × 10⁹) × (2 × 10⁻⁶ × 3 × 10⁻⁶) / (0.1)² = 540 N"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the potential at a point 2 m away from a charge of 4 μC?",
+        answers: [
+            "Using the formula: V = k × q / r",
+            "V = (9 × 10⁹) × (4 × 10⁻⁶) / 2 = 18,000 V"
+        ],
+        correct: 0
+    },
+
+    // Magnetism
+    {
+        question: "A current of 5 A flows through a wire of length 2 m placed perpendicular to a magnetic field of 0.4 T. What is the force on the wire?",
+        answers: [
+            "Force (F) = B × I × L",
+            "F = 0.4 × 5 × 2 = 4 N"
+        ],
+        correct: 0
+    },
+    {
+        question: "A proton moves in a magnetic field of 0.2 T with a speed of 1 × 10⁶ m/s at an angle of 90° to the field. What is the radius of its path? (Charge of proton = 1.6 × 10⁻¹⁹ C, mass of proton = 1.67 × 10⁻²⁷ kg)",
+        answers: [
+            "Using the formula: r = mv / (qB)",
+            "r = (1.67 × 10⁻²⁷ × 1 × 10⁶) / (1.6 × 10⁻¹⁹ × 0.2) = 5.22 m"
+        ],
+        correct: 0
+    },
+
+    // Optics
+    {
+        question: "What is the focal length of a lens that forms an image at a distance of 25 cm, and the object is placed at 50 cm? (Use the lens formula)",
+        answers: [
+            "Using the lens formula: 1/f = 1/v - 1/u",
+            "1/f = 1/25 - 1/(-50), solving for f gives f = 50 cm"
+        ],
+        correct: 0
+    },
+    {
+        question: "A beam of light passes through a glass slab of thickness 10 cm and refractive index 1.5. Find the lateral displacement of the beam. (Angle of incidence = 30°)",
+        answers: [
+            "Using the formula for lateral displacement: d = t × sin(θ) / cos(θ)",
+            "d = 10 × sin(30°) / cos(30°) = 5 / 0.866 = 5.77 cm"
+        ],
+        correct: 0
+    },
+
+    // Waves and Oscillations
+    {
+        question: "A wave has a frequency of 100 Hz and a wavelength of 2 m. What is the speed of the wave?",
+        answers: [
+            "Using the formula: v = f × λ",
+            "v = 100 × 2 = 200 m/s"
+        ],
+        correct: 0
+    },
+    {
+        question: "A sound wave travels through air with a speed of 343 m/s. If the frequency of the sound wave is 512 Hz, what is the wavelength of the sound?",
+        answers: [
+            "Using the formula: λ = v / f",
+            "λ = 343 / 512 = 0.669 m"
+        ],
+        correct: 0
+    },
+
+    // Thermodynamics
+    {
+        question: "What is the second law of thermodynamics?",
+        answers: [
+            "The second law of thermodynamics states that the total entropy of an isolated system always increases over time."
+        ],
+        correct: 0
+    },
+    {
+        question: "A gas undergoes an isochoric process. What is the work done during this process?",
+        answers: [
+            "In an isochoric process, the volume remains constant, so no work is done by the gas."
+        ],
+        correct: 0
+    },
+
+    // General Questions
+    {
+        question: "What is the unit of electric potential?",
+        answers: [
+            "The unit of electric potential is the Volt (V)."
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the significance of the wavelength of a wave?",
+        answers: [
+            "The wavelength of a wave is the distance between two successive crests or troughs, which determines its color in the visible spectrum or its pitch in sound waves."
+        ],
+        correct: 0
+    },
+    {
+        question: "A ball is thrown vertically upwards with a velocity of 10 m/s. What is the maximum height reached by the ball?",
+        answers: [
+            "Using the formula: h = u² / 2g",
+            "h = (10)² / (2 × 9.8) = 5.1 m"
+        ],
+        correct: 0
+    },
+    {
+        question: "A block of mass 5 kg is at rest on a frictionless surface. A force of 20 N is applied. What is the acceleration of the block?",
+        answers: [
+            "Using Newton's second law: F = ma",
+            "a = F / m = 20 / 5 = 4 m/s²"
+        ],
+        correct: 0
+    },
+    {
+        question: "A force of 10 N acts on a body of mass 2 kg. What will be the acceleration of the body?",
+        answers: [
+            "Using the formula: a = F / m",
+            "a = 10 / 2 = 5 m/s²"
+        ],
+        correct: 0
+    },
+    {
+        question: "A car accelerates from 0 to 30 m/s in 10 seconds. What is the acceleration of the car?",
+        answers: [
+            "Using the formula: a = (v - u) / t",
+            "a = (30 - 0) / 10 = 3 m/s²"
+        ],
+        correct: 0
+    },
+    
+    // Work, Energy, and Power
+    {
+        question: "What is the work done by a force of 10 N that displaces an object by 5 meters in the direction of the force?",
+        answers: [
+            "Work = Force × Displacement",
+            "Work = 10 × 5 = 50 J"
+        ],
+        correct: 0
+    },
+    {
+        question: "A body has a kinetic energy of 100 J. If its velocity is doubled, what will be its new kinetic energy?",
+        answers: [
+            "Kinetic energy is proportional to the square of velocity, so the new kinetic energy will be 4 times the original.",
+            "New KE = 4 × 100 = 400 J"
+        ],
+        correct: 0
+    },
+    {
+        question: "A 1000 kg car moves at a speed of 20 m/s. What is its kinetic energy?",
+        answers: [
+            "Using the formula: KE = 1/2 × m × v²",
+            "KE = 1/2 × 1000 × 20² = 200,000 J"
+        ],
+        correct: 0
+    },
+
+    // Electrostatics
+    {
+        question: "Two point charges of 3 μC and 4 μC are placed 5 cm apart. Find the electrostatic force between them. (k = 9 × 10⁹ N·m²/C²)",
+        answers: [
+            "Using Coulomb's law: F = k × |q₁q₂| / r²",
+            "F = (9 × 10⁹) × (3 × 10⁻⁶ × 4 × 10⁻⁶) / (0.05)² = 432 N"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the potential at a point 3 meters away from a charge of 6 μC?",
+        answers: [
+            "Using the formula: V = k × q / r",
+            "V = (9 × 10⁹) × (6 × 10⁻⁶) / 3 = 18,000 V"
+        ],
+        correct: 0
+    },
+    {
+        question: "A charge of 5 μC is placed at a point. What is the electric field at a distance of 2 m from the charge? (k = 9 × 10⁹ N·m²/C²)",
+        answers: [
+            "Using the formula: E = k × q / r²",
+            "E = (9 × 10⁹) × (5 × 10⁻⁶) / 2² = 1125 N/C"
+        ],
+        correct: 0
+    },
+
+    // Magnetism
+    {
+        question: "A current of 3 A flows through a conductor of length 1.5 m placed in a magnetic field of 0.4 T. What is the force on the conductor?",
+        answers: [
+            "Using the formula: F = B × I × L",
+            "F = 0.4 × 3 × 1.5 = 1.8 N"
+        ],
+        correct: 0
+    },
+    {
+        question: "A charged particle moves with a velocity of 5 × 10⁶ m/s in a magnetic field of 0.2 T at an angle of 90° to the field. What is the radius of its path?",
+        answers: [
+            "Using the formula: r = mv / (qB)",
+            "r = (1.67 × 10⁻²⁷ × 5 × 10⁶) / (1.6 × 10⁻¹⁹ × 0.2) = 5.22 m"
+        ],
+        correct: 0
+    },
+    {
+        question: "A solenoid has 100 turns and a current of 0.5 A. What is the magnetic field at the center of the solenoid? (μ₀ = 4π × 10⁻⁷ T·m/A, L = 2 m)",
+        answers: [
+            "Using the formula: B = μ₀ × N × I / L",
+            "B = (4π × 10⁻⁷) × 100 × 0.5 / 2 = 3.14 × 10⁻⁵ T"
+        ],
+        correct: 0
+    },
+
+    // Optics
+    {
+        question: "What is the focal length of a lens that forms an image at 30 cm and the object is placed at 60 cm? (Use the lens formula)",
+        answers: [
+            "Using the lens formula: 1/f = 1/v - 1/u",
+            "1/f = 1/30 - 1/(-60), solving for f gives f = 45 cm"
+        ],
+        correct: 0
+    },
+    {
+        question: "A beam of light passes through a glass prism with an angle of 60°. What is the refractive index of the material if the angle of deviation is 30°?",
+        answers: [
+            "Using the formula for deviation: n = sin((A + D) / 2) / sin(A / 2)",
+            "n = sin((60 + 30) / 2) / sin(60 / 2) = 1.5"
+        ],
+        correct: 0
+    },
+
+    // Waves and Oscillations
+    {
+        question: "A wave travels with a frequency of 50 Hz and a wavelength of 3 m. What is the speed of the wave?",
+        answers: [
+            "Using the formula: v = f × λ",
+            "v = 50 × 3 = 150 m/s"
+        ],
+        correct: 0
+    },
+    {
+        question: "A tuning fork of frequency 256 Hz is used to produce sound in air. What is the wavelength of the sound in air? (Speed of sound = 330 m/s)",
+        answers: [
+            "Using the formula: λ = v / f",
+            "λ = 330 / 256 = 1.29 m"
+        ],
+        correct: 0
+    },
+
+    // Thermodynamics
+    {
+        question: "A gas undergoes an isothermal expansion. What is the change in internal energy during this process?",
+        answers: [
+            "In an isothermal process, the change in internal energy is zero."
+        ],
+        correct: 0
+    },
+    {
+        question: "In a Carnot engine, if the temperature of the hot reservoir is 500 K and that of the cold reservoir is 300 K, what is the efficiency of the engine?",
+        answers: [
+            "Using the formula for efficiency: η = 1 - (T_c / T_h)",
+            "η = 1 - (300 / 500) = 0.4 or 40%"
+        ],
+        correct: 0
+    },
+
+    // Fluid Mechanics
+    {
+        question: "A pipe carries water with a velocity of 3 m/s. If the diameter of the pipe is reduced to half, what will be the velocity of the water in the smaller pipe?",
+        answers: [
+            "Using the principle of continuity: A₁v₁ = A₂v₂",
+            "v₂ = 4 × 3 = 12 m/s"
+        ],
+        correct: 0
+    }
+
+];
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

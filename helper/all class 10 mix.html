@@ -1,0 +1,1438 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    const questions=
+    [
+    {
+        question: "Which of the following sentences is in passive voice?",
+        answers: ["The cake was baked by her.", "She bakes the cake.", "She is baking the cake.", "She baked the cake."],
+        correct: 0
+    },
+    {
+        question: "What is the area of a triangle with a base of 10 cm and height of 5 cm?",
+        answers: ["25 cm²", "50 cm²", "15 cm²", "30 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for water?",
+        answers: ["H2O", "CO2", "O2", "H2SO4"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a synonym of 'important'?",
+        answers: ["Significant", "Unimportant", "Trivial", "Irrelevant"],
+        correct: 0
+    },
+    {
+        question: "What is the value of 'x' in the equation 2x + 3 = 7?",
+        answers: ["2", "4", "3", "5"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a natural satellite of Earth?",
+        answers: ["The Moon", "Mars", "Venus", "The Sun"],
+        correct: 0
+    },
+    {
+        question: "Which of the following sentences is in future tense?",
+        answers: ["I will read the book tomorrow.", "I read the book yesterday.", "I am reading the book.", "I have read the book."],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a rectangle with a length of 8 cm and a width of 5 cm?",
+        answers: ["26 cm", "40 cm", "30 cm", "18 cm"],
+        correct: 0
+    },
+    {
+        question: "Which gas is most abundant in Earth's atmosphere?",
+        answers: ["Nitrogen", "Oxygen", "Carbon dioxide", "Argon"],
+        correct: 0
+    },
+    {
+        question: "What is the antonym of 'generous'?",
+        answers: ["Selfish", "Kind", "Helpful", "Warm"],
+        correct: 0
+    },
+    {
+        question: "What is the volume of a cube with side length 4 cm?",
+        answers: ["64 cm³", "16 cm³", "32 cm³", "8 cm³"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a chemical change?",
+        answers: ["Burning paper", "Melting ice", "Cutting a tree", "Shaping clay"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences contains a preposition?",
+        answers: ["The cat is under the table.", "She is reading the book.", "He eats lunch.", "They run fast."],
+        correct: 0
+    },
+    {
+        question: "What is the square root of 81?",
+        answers: ["9", "8", "10", "7"],
+        correct: 0
+    },
+    {
+        question: "What is the process by which plants make their own food?",
+        answers: ["Photosynthesis", "Respiration", "Fermentation", "Transpiration"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'expensive'?",
+        answers: ["Cheap", "Pricey", "Costly", "Valuable"],
+        correct: 0
+    },
+    {
+        question: "What is the volume of a cylinder with a radius of 3 cm and height of 5 cm? (Use π = 3.14)",
+        answers: ["141.3 cm³", "150 cm³", "135 cm³", "120 cm³"],
+        correct: 0
+    },
+    {
+        question: "What is the main source of energy for the Earth?",
+        answers: ["The Sun", "The Moon", "Water", "Wind"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adjective?",
+        answers: ["Beautiful", "Quickly", "Run", "Carefully"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a square with side length 6 cm?",
+        answers: ["24 cm", "36 cm", "30 cm", "12 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the main component of the air we breathe?",
+        answers: ["Nitrogen", "Oxygen", "Carbon Dioxide", "Hydrogen"],
+        correct: 0
+    },
+    {
+        question: "What is the past form of 'go'?",
+        answers: ["Went", "Gone", "Going", "Goed"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a physical change?",
+        answers: ["Boiling water", "Burning wood", "Rusting iron", "Baking a cake"],
+        correct: 0
+    },{
+        question: "Which of the following is a synonym for 'fast'?",
+        answers: ["Slow", "Quick", "Large", "Heavy"],
+        correct: 1
+    },
+    {
+        question: "What is the value of 7x - 3 = 18?",
+        answers: ["3", "5", "7", "2"],
+        correct: 1
+    },
+    {
+        question: "Which part of the plant is responsible for photosynthesis?",
+        answers: ["Leaf", "Root", "Stem", "Flower"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a compound word?",
+        answers: ["Notebook", "Car", "Rain", "House"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a triangle with sides of length 5 cm, 7 cm, and 9 cm?",
+        answers: ["21 cm", "22 cm", "19 cm", "20 cm"],
+        correct: 0
+    },
+    {
+        question: "Which of the following elements is a noble gas?",
+        answers: ["Helium", "Oxygen", "Hydrogen", "Nitrogen"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adverb?",
+        answers: ["Quickly", "Quick", "Slower", "Fast"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a circle with radius 4 cm? (Use π = 3.14)",
+        answers: ["50.24 cm²", "60.48 cm²", "40.96 cm²", "48.72 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the process of converting a solid directly into a gas called?",
+        answers: ["Sublimation", "Condensation", "Evaporation", "Melting"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a preposition?",
+        answers: ["In", "Run", "Slow", "Quickly"],
+        correct: 0
+    },
+    {
+        question: "What is the value of x in the equation 3x + 5 = 14?",
+        answers: ["2", "3", "4", "5"],
+        correct: 0
+    },
+    {
+        question: "Which gas do plants absorb during photosynthesis?",
+        answers: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Hydrogen"],
+        correct: 0
+    },
+    {
+        question: "Which of the following sentences is in past tense?",
+        answers: ["She played tennis yesterday.", "She plays tennis every day.", "She is playing tennis.", "She will play tennis tomorrow."],
+        correct: 0
+    },
+    {
+        question: "What is the volume of a rectangular prism with length 4 cm, width 3 cm, and height 5 cm?",
+        answers: ["60 cm³", "45 cm³", "55 cm³", "40 cm³"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of an ecosystem?",
+        answers: ["Forest", "Stone", "Mountain", "Sand"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'happy'?",
+        answers: ["Sad", "Joyful", "Angry", "Excited"],
+        correct: 0
+    },
+    {
+        question: "What is the surface area of a cube with side length 6 cm?",
+        answers: ["216 cm²", "144 cm²", "36 cm²", "72 cm²"],
+        correct: 0
+    },
+    {
+        question: "What type of energy is stored in food?",
+        answers: ["Chemical energy", "Mechanical energy", "Kinetic energy", "Nuclear energy"],
+        correct: 0
+    },
+    {
+        question: "What is the plural form of 'child'?",
+        answers: ["Children", "Childs", "Childer", "Chilren"],
+        correct: 0
+    },
+    {
+        question: "What is the value of 4²?",
+        answers: ["16", "8", "12", "4"],
+        correct: 0
+    },
+    {
+        question: "What is the boiling point of water in Celsius?",
+        answers: ["100°C", "90°C", "120°C", "80°C"],
+        correct: 0
+    },
+    {
+        question: "What is the synonym for 'happy'?",
+        answers: ["Sad", "Joyful", "Angry", "Bored"],
+        correct: 1
+    },
+    {
+        question: "What is the area of a rectangle with length 7 cm and width 3 cm?",
+        answers: ["21 cm²", "20 cm²", "22 cm²", "25 cm²"],
+        correct: 0
+    },{
+        question: "Which of the following is an example of a simile?",
+        answers: ["The sky is blue.", "He runs like the wind.", "She is beautiful.", "The tree is tall."],
+        correct: 1
+    },
+    {
+        question: "What is the value of x in the equation 5x - 3 = 17?",
+        answers: ["4", "5", "6", "7"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a renewable energy source?",
+        answers: ["Coal", "Wind", "Natural gas", "Oil"],
+        correct: 1
+    },
+    {
+        question: "Which of these is the correct plural form of 'mouse'?",
+        answers: ["Mices", "Mice", "Mouses", "Miceses"],
+        correct: 1
+    },
+    {
+        question: "What is the perimeter of a square with side length 5 cm?",
+        answers: ["15 cm", "20 cm", "25 cm", "30 cm"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for Oxygen?",
+        answers: ["O", "Ox", "O2", "Oy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of an adjective?",
+        answers: ["Run", "Quickly", "Red", "Talk"],
+        correct: 2
+    },
+    {
+        question: "What is the area of a triangle with base 6 cm and height 4 cm?",
+        answers: ["12 cm²", "24 cm²", "16 cm²", "20 cm²"],
+        correct: 0
+    },
+    {
+        question: "Which part of the plant absorbs water and minerals?",
+        answers: ["Leaf", "Flower", "Stem", "Root"],
+        correct: 3
+    },
+    {
+        question: "What is the past tense of 'go'?",
+        answers: ["Goes", "Gone", "Went", "Going"],
+        correct: 2
+    },
+    {
+        question: "What is the perimeter of a rectangle with length 10 cm and width 4 cm?",
+        answers: ["28 cm", "32 cm", "36 cm", "40 cm"],
+        correct: 1
+    },
+    {
+        question: "What is the freezing point of water in Fahrenheit?",
+        answers: ["32°F", "0°F", "100°F", "212°F"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a verb?",
+        answers: ["Beautiful", "Quickly", "Run", "Happiness"],
+        correct: 2
+    },
+    {
+        question: "What is the volume of a cube with side length 4 cm?",
+        answers: ["16 cm³", "64 cm³", "12 cm³", "32 cm³"],
+        correct: 1
+    },
+    {
+        question: "Which gas is most commonly used in balloons?",
+        answers: ["Oxygen", "Hydrogen", "Helium", "Carbon Dioxide"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a conjunction?",
+        answers: ["But", "Run", "Quick", "Quickly"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a circle with radius 5 cm? (Use π = 3.14)",
+        answers: ["78.5 cm²", "75 cm²", "62.8 cm²", "85 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the speed of light in a vacuum?",
+        answers: ["3 x 10^8 m/s", "2 x 10^8 m/s", "3 x 10^6 m/s", "2 x 10^6 m/s"],
+        correct: 0
+    },
+    {
+        question: "Which of these is an example of a noun?",
+        answers: ["Happiness", "Quickly", "Run", "Fast"],
+        correct: 0
+    },
+    {
+        question: "What is the sum of angles in a triangle?",
+        answers: ["180°", "360°", "90°", "270°"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical symbol for Sodium?",
+        answers: ["Na", "S", "O", "Cl"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a type of chemical bond?",
+        answers: ["Ionic bond", "Radial bond", "Electric bond", "Magnetic bond"],
+        correct: 0
+    },
+    {
+        question: "What is the past tense of 'eat'?",
+        answers: ["Eats", "Eaten", "Ate", "Eating"],
+        correct: 2
+    },
+    {
+        question: "What is the formula for the area of a rectangle?",
+        answers: ["Area = l + w", "Area = l × w", "Area = l ÷ w", "Area = l × h"],
+        correct: 1
+    },{
+        question: "Which of the following is a synonym of 'happy'?",
+        answers: ["Sad", "Joyful", "Angry", "Tired"],
+        correct: 1
+    },
+    {
+        question: "What is the solution to the equation 3x + 5 = 20?",
+        answers: ["x = 5", "x = 7", "x = 15", "x = 10"],
+        correct: 0
+    },
+    {
+        question: "What is the boiling point of water in Celsius?",
+        answers: ["50°C", "100°C", "212°C", "0°C"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a preposition?",
+        answers: ["At", "Quick", "Beautiful", "Happiness"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a square with side length 8 cm?",
+        answers: ["32 cm", "24 cm", "16 cm", "64 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for the area of a circle?",
+        answers: ["A = 2πr", "A = πr²", "A = πr", "A = 2r"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for Gold?",
+        answers: ["Au", "Ag", "Pb", "Fe"],
+        correct: 0
+    },
+    {
+        question: "Which of these is the largest planet in our solar system?",
+        answers: ["Mars", "Earth", "Jupiter", "Saturn"],
+        correct: 2
+    },
+    {
+        question: "Which is the correct plural form of 'child'?",
+        answers: ["Children", "Childs", "Childes", "Childern"],
+        correct: 0
+    },
+    {
+        question: "What is the square root of 49?",
+        answers: ["5", "6", "7", "8"],
+        correct: 2
+    },
+    {
+        question: "Which gas is produced during photosynthesis?",
+        answers: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'increase'?",
+        answers: ["Decrease", "Rise", "Grow", "Ascend"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a rectangle with length 12 cm and width 5 cm?",
+        answers: ["34 cm", "24 cm", "30 cm", "40 cm"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a non-renewable resource?",
+        answers: ["Wind", "Solar", "Coal", "Hydropower"],
+        correct: 2
+    },
+    {
+        question: "Which part of the plant conducts photosynthesis?",
+        answers: ["Root", "Stem", "Leaf", "Flower"],
+        correct: 2
+    },
+    {
+        question: "What is the past tense of 'run'?",
+        answers: ["Ran", "Run", "Runned", "Running"],
+        correct: 0
+    },
+    {
+        question: "What is the sum of the interior angles of a quadrilateral?",
+        answers: ["180°", "360°", "270°", "90°"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a solid at room temperature?",
+        answers: ["Oxygen", "Mercury", "Iron", "Water"],
+        correct: 2
+    },
+    {
+        question: "What is the formula for calculating the volume of a rectangular prism?",
+        answers: ["V = l × w × h", "V = l × w", "V = 2 × h", "V = l + w + h"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for water?",
+        answers: ["H2O", "CO2", "O2", "H2O2"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a form of energy?",
+        answers: ["Heat", "Wood", "Iron", "Plastic"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'hot'?",
+        answers: ["Cold", "Warm", "Bright", "Cool"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a square with side length 3 cm?",
+        answers: ["9 cm²", "12 cm²", "6 cm²", "15 cm²"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a renewable energy source?",
+        answers: ["Oil", "Natural Gas", "Solar", "Coal"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical formula for methane?",
+        answers: ["CH4", "C2H6", "C3H8", "CO2"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a compound?",
+        answers: ["Oxygen", "Water", "Iron", "Gold"],
+        correct: 1
+    },
+    {
+        question: "What is the square of 8?",
+        answers: ["16", "64", "32", "24"],
+        correct: 1
+    },
+    {
+        question: "Which of these is a color of the visible spectrum of light?",
+        answers: ["Ultraviolet", "Infrared", "Blue", "X-ray"],
+        correct: 2
+    },
+    {
+        question: "What is the plural form of 'man'?",
+        answers: ["Men", "Mans", "Manes", "Man"],
+        correct: 0
+    },
+    {
+        question: "What is the capital of France?",
+        answers: ["Berlin", "Madrid", "Paris", "Rome"],
+        correct: 2
+    },
+    {
+        question: "What is the perimeter of a circle called?",
+        answers: ["Area", "Diameter", "Circumference", "Radius"],
+        correct: 2
+    },
+    {
+        question: "What is the formula for the area of a triangle?",
+        answers: ["A = b × h", "A = ½ × b × h", "A = b + h", "A = 2b"],
+        correct: 1
+    },
+    {
+        question: "What is the square of 12?",
+        answers: ["144", "121", "100", "144"],
+        correct: 0
+    },
+    {
+        question: "What is the main source of energy for the Earth?",
+        answers: ["Wind", "The Sun", "Water", "The Moon"],
+        correct: 1
+    },
+    {
+        question: "What is the freezing point of water in Fahrenheit?",
+        answers: ["32°F", "0°F", "212°F", "100°F"],
+        correct: 0
+    },
+    {
+        question: "Which gas makes up most of the Earth's atmosphere?",
+        answers: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical symbol for Iron?",
+        answers: ["Fe", "Ir", "I", "In"],
+        correct: 0
+    },
+    {
+        question: "What is the volume of a sphere with radius 3 cm? (Use π = 3.14)",
+        answers: ["113.04 cm³", "113 cm³", "27 cm³", "90 cm³"],
+        correct: 0
+    },
+    {
+        question: "What is the square of 5?",
+        answers: ["25", "20", "30", "15"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a verb?",
+        answers: ["Happy", "Quick", "Run", "Sad"],
+        correct: 2
+    },
+    {
+        question: "What is the perimeter of a triangle with sides 5 cm, 6 cm, and 7 cm?",
+        answers: ["18 cm", "20 cm", "22 cm", "24 cm"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a primary color?",
+        answers: ["Purple", "Yellow", "Orange", "Green"],
+        correct: 1
+    },
+    {
+        question: "What is the total number of planets in our solar system?",
+        answers: ["8", "9", "7", "10"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for speed?",
+        answers: ["Speed = Distance × Time", "Speed = Distance ÷ Time", "Speed = Time ÷ Distance", "Speed = Time × Distance"],
+        correct: 1
+    },
+    {
+        question: "Which is the largest organ in the human body?",
+        answers: ["Heart", "Liver", "Skin", "Brain"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical symbol for Sodium?",
+        answers: ["Na", "S", "Cl", "K"],
+        correct: 0
+    }, {
+        question: "Which of the following is the correct spelling?",
+        answers: ["Recieve", "Receive", "Recive", "Reiceve"],
+        correct: 1
+    },
+    {
+        question: "Solve for x: 4x + 3 = 15",
+        answers: ["x = 3", "x = 2", "x = 4", "x = 1"],
+        correct: 1
+    },
+    {
+        question: "Which is the chemical symbol for Oxygen?",
+        answers: ["O", "O2", "O3", "O₄"],
+        correct: 0
+    },
+    {
+        question: "Which part of the plant absorbs water?",
+        answers: ["Leaf", "Stem", "Root", "Flower"],
+        correct: 2
+    },
+    {
+        question: "What is the formula for the area of a rectangle?",
+        answers: ["A = l × w", "A = l + w", "A = 2l × 2w", "A = lw²"],
+        correct: 0
+    },
+    {
+        question: "What is the past tense of 'go'?",
+        answers: ["Gone", "Went", "Going", "Go"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a non-renewable resource?",
+        answers: ["Wind", "Coal", "Solar", "Hydropower"],
+        correct: 1
+    },
+    {
+        question: "What is the speed of light?",
+        answers: ["3 × 10^8 m/s", "3 × 10^6 m/s", "1 × 10^8 m/s", "1 × 10^6 m/s"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a synonym for 'beautiful'?",
+        answers: ["Ugly", "Handsome", "Attractive", "Plain"],
+        correct: 2
+    },
+    {
+        question: "What is the perimeter of a triangle with side lengths 3 cm, 4 cm, and 5 cm?",
+        answers: ["12 cm", "10 cm", "9 cm", "8 cm"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of simple machine?",
+        answers: ["Lever", "Motor", "Battery", "Wrench"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the capital of the United States?",
+        answers: ["New York", "Los Angeles", "Washington D.C.", "Chicago"],
+        correct: 2
+    },
+    {
+        question: "Which is the correct formula for density?",
+        answers: ["Density = Mass / Volume", "Density = Volume / Mass", "Density = Mass × Volume", "Density = Volume + Mass"],
+        correct: 0
+    },
+    {
+        question: "What is the boiling point of water in Fahrenheit?",
+        answers: ["100°F", "212°F", "32°F", "0°F"],
+        correct: 1
+    },
+    {
+        question: "What is the square root of 16?",
+        answers: ["4", "2", "8", "6"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a mammal?",
+        answers: ["Frog", "Shark", "Lion", "Bird"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the largest organ in the human body?",
+        answers: ["Brain", "Heart", "Skin", "Lungs"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a compound?",
+        answers: ["Oxygen", "Water", "Hydrogen", "Nitrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the perimeter of a square with side length 5 cm?",
+        answers: ["20 cm", "25 cm", "30 cm", "15 cm"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a renewable resource?",
+        answers: ["Natural gas", "Coal", "Solar energy", "Oil"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical symbol for Sodium?",
+        answers: ["Na", "So", "S", "N"],
+        correct: 0
+    },
+    {
+        question: "What is the product of 8 × 7?",
+        answers: ["50", "54", "56", "60"],
+        correct: 2
+    },
+    {
+        question: "What is the formula for the area of a circle?",
+        answers: ["A = 2πr", "A = πr²", "A = r²", "A = 4πr"],
+        correct: 1
+    },
+    {
+        question: "What is the boiling point of water in Celsius?",
+        answers: ["100°C", "200°C", "50°C", "150°C"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a type of sedimentary rock?",
+        answers: ["Granite", "Marble", "Sandstone", "Basalt"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a conductor of electricity?",
+        answers: ["Wood", "Glass", "Copper", "Plastic"],
+        correct: 2
+    },
+    {
+        question: "What is the opposite of 'start'?",
+        answers: ["Stop", "Go", "Run", "Move"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is not a gas at room temperature?",
+        answers: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Water"],
+        correct: 3
+    },
+    {
+        question: "Which of these is a type of cloud?",
+        answers: ["Cumulus", "Oxygen", "Hydrogen", "Nitrogen"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a synonym for 'quick'?",
+        answers: ["Slow", "Fast", "Late", "Tardy"],
+        correct: 1
+    },
+    {
+        question: "What is the product of 6 × 9?",
+        answers: ["54", "50", "56", "60"],
+        correct: 0
+    },
+    {
+        question: "What is the main gas responsible for global warming?",
+        answers: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Methane"],
+        correct: 1
+    },
+    {
+        question: "Which of these is a chemical element?",
+        answers: ["Water", "Oxygen", "Carbon Dioxide", "Salt"],
+        correct: 1
+    },
+    {
+        question: "What is the value of π (Pi) to two decimal places?",
+        answers: ["3.14", "3.16", "3.00", "3.1415"],
+        correct: 0
+    }, {
+        question: "What is the boiling point of water in Celsius?",
+        answers: ["0°C", "100°C", "212°C", "50°C"],
+        correct: 1
+    },
+    {
+        question: "What is the most common element in the Earth's crust?",
+        answers: ["Iron", "Aluminum", "Oxygen", "Silicon"],
+        correct: 2
+    },
+    {
+        question: "What is the primary source of energy for Earth?",
+        answers: ["Moon", "Wind", "Sun", "Fossil Fuels"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a chemical change?",
+        answers: ["Boiling water", "Melting ice", "Rusting of iron", "Dissolving sugar in water"],
+        correct: 2
+    },
+    {
+        question: "Which is the main source of energy for the Earth?",
+        answers: ["The Moon", "The Sun", "The Earth’s core", "Wind energy"],
+        correct: 1
+    },
+    {
+        question: "What is the SI unit of force?",
+        answers: ["Newton", "Joule", "Pascal", "Watt"],
+        correct: 0
+    },
+    {
+        question: "What is the process by which plants make their food?",
+        answers: ["Respiration", "Digestion", "Photosynthesis", "Transpiration"],
+        correct: 2
+    },
+    {
+        question: "Which gas do plants absorb from the atmosphere for photosynthesis?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for water?",
+        answers: ["H2O", "O2", "CO2", "H2"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for calculating the force exerted on an object?",
+        answers: ["F = mv", "F = m/g", "F = ma", "F = mV²"],
+        correct: 2
+    },{
+        question: "Which of the following is the formula for the volume of a cylinder?",
+        answers: ["πr²h", "2πr", "πr²", "4/3πr³"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a right-angled triangle with base 6 cm and height 8 cm.",
+        answers: ["24 cm²", "48 cm²", "12 cm²", "36 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(90°)?",
+        answers: ["1", "0", "√2", "∞"],
+        correct: 0
+    },
+    {
+        question: "The sum of the first 10 natural numbers is",
+        answers: ["55", "45", "50", "60"],
+        correct: 0
+    },
+    {
+        question: "Solve for x: 2x² + 3x - 5 = 0.",
+        answers: ["x = 1, -5/2", "x = 2, -1", "x = 5, -3", "x = 1, -2"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a property of an arithmetic progression (AP)?",
+        answers: ["The common difference is constant", "The terms are random", "The common ratio is constant", "The first term is constant"],
+        correct: 0
+    },
+    {
+        question: "Find the value of the angle formed between the hour and minute hands of a clock at 3:15.",
+        answers: ["7.5°", "22.5°", "90°", "45°"],
+        correct: 0
+    },
+    {
+        question: "What is the surface area of a sphere with radius 5 cm?",
+        answers: ["100π cm²", "25π cm²", "50π cm²", "125π cm²"],
+        correct: 0
+    },
+    {
+        question: "The equation of a circle with center (0, 0) and radius 5 is",
+        answers: ["x² + y² = 5", "x² + y² = 25", "x² + y² = 10", "x² + y² = 20"],
+        correct: 1
+    },
+    {
+        question: "In a coordinate plane, the distance between points (3, 4) and (0, 0) is",
+        answers: ["3", "5", "4", "7"],
+        correct: 1
+    },{
+        question: "If the sum of two angles of a triangle is 90°, what is the third angle?",
+        answers: ["90°", "60°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "The roots of the equation x² + 5x + 6 = 0 are",
+        answers: ["1 and 6", "-1 and -6", "2 and 3", "0 and 6"],
+        correct: 2
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is its diameter?",
+        answers: ["7 cm", "14 cm", "21 cm", "5 cm"],
+        correct: 1
+    },
+    {
+        question: "Which formula is used to calculate the area of a parallelogram?",
+        answers: ["Length × Width", "Length × Height", "Width × Height", "Height × Base"],
+        correct: 0
+    },{
+        question: "Which of the following is the formula for the volume of a cylinder?",
+        answers: ["πr²h", "2πr", "πr²", "4/3πr³"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a right-angled triangle with base 6 cm and height 8 cm.",
+        answers: ["24 cm²", "48 cm²", "12 cm²", "36 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(90°)?",
+        answers: ["1", "0", "√2", "∞"],
+        correct: 0
+    },
+    {
+        question: "The sum of the first 10 natural numbers is",
+        answers: ["55", "45", "50", "60"],
+        correct: 0
+    },
+    {
+        question: "Solve for x: 2x² + 3x - 5 = 0.",
+        answers: ["x = 1, -5/2", "x = 2, -1", "x = 5, -3", "x = 1, -2"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a property of an arithmetic progression (AP)?",
+        answers: ["The common difference is constant", "The terms are random", "The common ratio is constant", "The first term is constant"],
+        correct: 0
+    },
+    {
+        question: "Find the value of the angle formed between the hour and minute hands of a clock at 3:15.",
+        answers: ["7.5°", "22.5°", "90°", "45°"],
+        correct: 0
+    },
+    {
+        question: "What is the surface area of a sphere with radius 5 cm?",
+        answers: ["100π cm²", "25π cm²", "50π cm²", "125π cm²"],
+        correct: 0
+    },
+    {
+        question: "The equation of a circle with center (0, 0) and radius 5 is",
+        answers: ["x² + y² = 5", "x² + y² = 25", "x² + y² = 10", "x² + y² = 20"],
+        correct: 1
+    },
+    {
+        question: "In a coordinate plane, the distance between points (3, 4) and (0, 0) is",
+        answers: ["3", "5", "4", "7"],
+        correct: 1
+    },{
+        question: "If the sum of two angles of a triangle is 90°, what is the third angle?",
+        answers: ["90°", "60°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "The roots of the equation x² + 5x + 6 = 0 are",
+        answers: ["1 and 6", "-1 and -6", "2 and 3", "0 and 6"],
+        correct: 2
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is its diameter?",
+        answers: ["7 cm", "14 cm", "21 cm", "5 cm"],
+        correct: 1
+    },
+    {
+        question: "Which formula is used to calculate the area of a parallelogram?",
+        answers: ["Length × Width", "Length × Height", "Width × Height", "Height × Base"],
+        correct: 0
+    },{
+        question: "Which of the following is the formula for the volume of a cylinder?",
+        answers: ["πr²h", "2πr", "πr²", "4/3πr³"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a right-angled triangle with base 6 cm and height 8 cm.",
+        answers: ["24 cm²", "48 cm²", "12 cm²", "36 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(90°)?",
+        answers: ["1", "0", "√2", "∞"],
+        correct: 0
+    },
+    {
+        question: "The sum of the first 10 natural numbers is",
+        answers: ["55", "45", "50", "60"],
+        correct: 0
+    },
+    {
+        question: "Solve for x: 2x² + 3x - 5 = 0.",
+        answers: ["x = 1, -5/2", "x = 2, -1", "x = 5, -3", "x = 1, -2"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a property of an arithmetic progression (AP)?",
+        answers: ["The common difference is constant", "The terms are random", "The common ratio is constant", "The first term is constant"],
+        correct: 0
+    },
+    {
+        question: "Find the value of the angle formed between the hour and minute hands of a clock at 3:15.",
+        answers: ["7.5°", "22.5°", "90°", "45°"],
+        correct: 0
+    },
+    {
+        question: "What is the surface area of a sphere with radius 5 cm?",
+        answers: ["100π cm²", "25π cm²", "50π cm²", "125π cm²"],
+        correct: 0
+    },
+    {
+        question: "The equation of a circle with center (0, 0) and radius 5 is",
+        answers: ["x² + y² = 5", "x² + y² = 25", "x² + y² = 10", "x² + y² = 20"],
+        correct: 1
+    },
+    {
+        question: "In a coordinate plane, the distance between points (3, 4) and (0, 0) is",
+        answers: ["3", "5", "4", "7"],
+        correct: 1
+    },{
+        question: "If the sum of two angles of a triangle is 90°, what is the third angle?",
+        answers: ["90°", "60°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "The roots of the equation x² + 5x + 6 = 0 are",
+        answers: ["1 and 6", "-1 and -6", "2 and 3", "0 and 6"],
+        correct: 2
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is its diameter?",
+        answers: ["7 cm", "14 cm", "21 cm", "5 cm"],
+        correct: 1
+    },
+    {
+        question: "Which formula is used to calculate the area of a parallelogram?",
+        answers: ["Length × Width", "Length × Height", "Width × Height", "Height × Base"],
+        correct: 0
+    }
+
+]
+
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

@@ -1,0 +1,265 @@
+const botanyQuestions = [
+    // Plant Anatomy
+    {
+        question: "What is the main function of phloem in plants?",
+        answers: [
+            "Transport of water from roots to leaves",
+            "Transport of sugars and nutrients",
+            "Support for the plant structure",
+            "Protection against pathogens"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the main tissue responsible for the transport of water in plants?",
+        answers: [
+            "Phloem",
+            "Xylem",
+            "Parenchyma",
+            "Collenchyma"
+        ],
+        correct: 1
+    },
+
+    // Photosynthesis
+    {
+        question: "In which part of the plant does photosynthesis mainly occur?",
+        answers: [
+            "Roots",
+            "Stem",
+            "Leaves",
+            "Flowers"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the primary pigment involved in photosynthesis?",
+        answers: [
+            "Chlorophyll",
+            "Carotenoid",
+            "Phycocyanin",
+            "Xanthophyll"
+        ],
+        correct: 0
+    },
+
+    // Genetics
+    {
+        question: "What is the term used for the physical expression of genes in an organism?",
+        answers: [
+            "Genotype",
+            "Phenotype",
+            "Allele",
+            "Chromosome"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is responsible for the genetic variation in sexually reproducing organisms?",
+        answers: [
+            "Mitosis",
+            "Meiosis",
+            "Binary fission",
+            "Cloning"
+        ],
+        correct: 1
+    },
+
+    // Reproduction in Plants
+    {
+        question: "Which of the following is a type of asexual reproduction in plants?",
+        answers: [
+            "Pollination",
+            "Fertilization",
+            "Vegetative propagation",
+            "Cross-pollination"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the term used for the fusion of male and female gametes in plants?",
+        answers: [
+            "Germination",
+            "Fertilization",
+            "Meiosis",
+            "Mitosis"
+        ],
+        correct: 1
+    },
+
+    // Ecology
+    {
+        question: "Which of the following is an example of a biotic factor in an ecosystem?",
+        answers: [
+            "Temperature",
+            "Water",
+            "Soil",
+            "Plants"
+        ],
+        correct: 3
+    },
+    {
+        question: "What is the role of decomposers in an ecosystem?",
+        answers: [
+            "To produce food for plants",
+            "To consume primary producers",
+            "To recycle nutrients from dead organisms",
+            "To maintain population control"
+        ],
+        correct: 2
+    },
+
+    // Plant Growth
+    {
+        question: "Which hormone is primarily responsible for promoting plant cell growth?",
+        answers: [
+            "Auxin",
+            "Gibberellin",
+            "Cytokinin",
+            "Ethylene"
+        ],
+        correct: 0
+    },
+    {
+        question: "What is the process by which plants convert light energy into chemical energy?",
+        answers: [
+            "Respiration",
+            "Fermentation",
+            "Photosynthesis",
+            "Transpiration"
+        ],
+        correct: 2
+    },
+
+    // Plant Physiology
+    {
+        question: "What is the role of stomata in plants?",
+        answers: [
+            "Absorbing nutrients",
+            "Storing water",
+            "Gas exchange",
+            "Transporting food"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is transpiration in plants?",
+        answers: [
+            "The absorption of water by roots",
+            "The movement of water through xylem",
+            "The loss of water vapor from the leaves",
+            "The process of photosynthesis"
+        ],
+        correct: 2
+    },
+
+    // Plant Classification
+    {
+        question: "Which of the following plants is classified as a gymnosperm?",
+        answers: [
+            "Rose",
+            "Pine tree",
+            "Mango",
+            "Wheat"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which group of plants produces seeds in fruits?",
+        answers: [
+            "Bryophytes",
+            "Pteridophytes",
+            "Gymnosperms",
+            "Angiosperms"
+        ],
+        correct: 3
+    },
+
+    // Plant Diseases
+    {
+        question: "What is the cause of plant diseases like blight and rust?",
+        answers: [
+            "Bacteria",
+            "Fungi",
+            "Viruses",
+            "Insects"
+        ],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a viral disease affecting plants?",
+        answers: [
+            "Black spot disease",
+            "Powdery mildew",
+            "Tobacco mosaic virus",
+            "Root rot"
+        ],
+        correct: 2
+    },
+
+    // Biotechnology
+    {
+        question: "What is the technique of transferring genes from one organism to another called?",
+        answers: [
+            "Gene therapy",
+            "Genetic engineering",
+            "Cloning",
+            "Bioremediation"
+        ],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of Bt crops?",
+        answers: [
+            "To increase the growth rate of plants",
+            "To resist herbicide treatments",
+            "To resist insect pests",
+            "To improve the taste of crops"
+        ],
+        correct: 2
+    },
+
+    // Phylogeny
+    {
+        question: "Which of the following is the correct order of taxonomic classification?",
+        answers: [
+            "Kingdom, Phylum, Class, Order, Family, Genus, Species",
+            "Class, Order, Kingdom, Phylum, Family, Genus, Species",
+            "Family, Order, Class, Phylum, Genus, Species, Kingdom",
+            "Phylum, Class, Family, Order, Kingdom, Genus, Species"
+        ],
+        correct: 0
+    },
+    {
+        question: "Who is known as the father of modern taxonomy?",
+        answers: [
+            "Gregor Mendel",
+            "Carl Linnaeus",
+            "Charles Darwin",
+            "Louis Pasteur"
+        ],
+        correct: 1
+    },
+
+    // Plant Hormones
+    {
+        question: "Which plant hormone is involved in the ripening of fruits?",
+        answers: [
+            "Auxin",
+            "Cytokinin",
+            "Ethylene",
+            "Gibberellin"
+        ],
+        correct: 2
+    },
+    {
+        question: "What is the role of auxin in plants?",
+        answers: [
+            "Promotes seed germination",
+            "Inhibits flowering",
+            "Promotes root growth",
+            "Delays fruit ripening"
+        ],
+        correct: 2
+    }
+];

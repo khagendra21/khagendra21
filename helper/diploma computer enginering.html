@@ -1,0 +1,2185 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    const questions = [
+    {
+    question: "Which of the following is a primary function of an operating system?",
+    answers: ["Managing system hardware", "Data storage", "Providing internet access", "Performing arithmetic calculations"],
+    correct: 0
+},
+{
+    question: "Which of the following is the first stage of the operating system boot process?",
+    answers: ["BIOS initialization", "Kernel loading", "Device driver initialization", "File system mount"],
+    correct: 0
+},
+{
+    question: "Which of these is not a type of memory management in operating systems?",
+    answers: ["Paging", "Segmentation", "Scheduling", "Memory allocation"],
+    correct: 2
+}
+, {
+        question: "What is the primary function of the CPU in a computer system?",
+        answers: ["Data Storage", "Processing Instructions", "Input Devices", "Output Devices"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a non-volatile memory?",
+        answers: ["RAM", "Cache", "Hard Drive", "CPU Register"],
+        correct: 2
+    },
+    {
+        question: "Which data structure uses LIFO (Last In First Out) principle?",
+        answers: ["Queue", "Array", "Stack", "Linked List"],
+        correct: 2
+    },
+    {
+        question: "Which programming language is known as the 'mother of all languages'?",
+        answers: ["C", "Fortran", "Java", "Assembly"],
+        correct: 0
+    },
+    {
+        question: "Which one of the following is used to store data temporarily?",
+        answers: ["ROM", "RAM", "Hard Drive", "Floppy Disk"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of the ALU in a computer?",
+        answers: ["Control unit", "Arithmetic and logic operations", "Memory management", "Input/output operations"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of the operating system?",
+        answers: ["Performing calculations", "Managing hardware resources", "Providing internet services", "Running applications"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is not an operating system?",
+        answers: ["Windows", "Linux", "Python", "MacOS"],
+        correct: 2
+    },
+    {
+        question: "Which part of the computer is responsible for performing calculations and logical operations?",
+        answers: ["ALU", "Control Unit", "Cache", "Hard Disk"],
+        correct: 0
+    },
+    {
+        question: "Which is the first computer to use stored programs?",
+        answers: ["ENIAC", "EDVAC", "UNIVAC", "IBM PC"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a hardware component?",
+        answers: ["Operating System", "CPU", "Python", "JavaScript"],
+        correct: 1
+    },
+    {
+        question: "What is the full form of DNS in computer networks?",
+        answers: ["Domain Name System", "Data Network System", "Digital Network Service", "Direct Network Service"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a secondary memory?",
+        answers: ["RAM", "Cache", "Hard Disk", "Registers"],
+        correct: 2
+    },
+    {
+        question: "Which programming language is used for web development?",
+        answers: ["Python", "Java", "JavaScript", "C++"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the first step in the software development life cycle?",
+        answers: ["Design", "Testing", "Planning", "Implementation"],
+        correct: 2
+    },
+    {
+        question: "Which memory is directly accessible by the CPU?",
+        answers: ["RAM", "ROM", "Cache", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a type of software?",
+        answers: ["CPU", "RAM", "Word Processor", "Hard Drive"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a type of cloud computing service model?",
+        answers: ["IaaS", "PaaS", "SaaS", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What does HTTP stand for?",
+        answers: ["Hyper Text Transfer Protocol", "Hyper Tool Transfer Protocol", "Hyper Text Technical Protocol", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of an operating system?",
+        answers: ["Performing calculations", "Managing hardware and software resources", "Running applications", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a language for developing system software?",
+        answers: ["Python", "C", "HTML", "JavaScript"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used for version control in software development?",
+        answers: ["Git", "Docker", "AWS", "Firebase"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the fastest type of memory?",
+        answers: ["Cache", "RAM", "Hard Disk", "CD"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a database management system?",
+        answers: ["Storing data", "Processing data", "Managing data storage and retrieval", "All of the above"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of an open-source operating system?",
+        answers: ["Windows", "MacOS", "Linux", "None of the above"],
+        correct: 2
+    },
+    {
+        question: "What does SQL stand for?",
+        answers: ["Structured Query Language", "Sequential Query Language", "Simple Query Language", "Standard Query Language"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of a firewall in a network?",
+        answers: ["Increase speed", "Monitor bandwidth", "Prevent unauthorized access", "Share data"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is not a type of software?",
+        answers: ["Word Processor", "Operating System", "Hardware", "Database Management System"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a primary memory?",
+        answers: ["Hard Disk", "RAM", "Cache", "Both B and C"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a type of data structure?",
+        answers: ["Arrays", "Stacks", "Queues", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following protocols is used for secure communication over the internet?",
+        answers: ["HTTP", "HTTPS", "FTP", "SMTP"],
+        correct: 1
+    },
+    {
+        question: "What does RAM stand for?",
+        answers: ["Read Access Memory", "Random Access Memory", "Read And Memory", "Random And Memory"],
+        correct: 1
+    },  {
+        question: "Which of the following is a type of compiler error?",
+        answers: ["Syntax error", "Runtime error", "Logical error", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the full form of CSS in web development?",
+        answers: ["Cascading Style Sheets", "Creative Style Sheets", "Coded Style Sheets", "Computer Style Sheets"],
+        correct: 0
+    },
+    {
+        question: "What does the JavaScript 'this' keyword refer to?",
+        answers: ["The current function", "The global object", "The current object", "The document object"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a server-side language?",
+        answers: ["HTML", "JavaScript", "PHP", "CSS"],
+        correct: 2
+    },
+    {
+        question: "What is an example of an event in JavaScript?",
+        answers: ["click", "keydown", "mouseover", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following JavaScript methods can be used to change the content of an HTML element?",
+        answers: ["document.getElementById()", "innerHTML", "document.write()", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is used to define a variable in JavaScript?",
+        answers: ["var", "let", "const", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of a callback function in JavaScript?",
+        answers: ["It stores variables", "It handles events", "It returns values", "It executes after another function completes"],
+        correct: 3
+    },
+    {
+        question: "Which method is used to add an element to the end of an array in JavaScript?",
+        answers: ["push()", "pop()", "shift()", "unshift()"],
+        correct: 0
+    },
+    {
+        question: "What is the default value of the 'type' attribute in a <script> tag?",
+        answers: ["JavaScript", "text/javascript", "application/javascript", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "Which operator is used for strict equality comparison in JavaScript?",
+        answers: ["==", "===", "=", "!="],
+        correct: 1
+    },
+    {
+        question: "What will be the output of the following code: console.log(2 + '2');?",
+        answers: ["4", "22", "Error", "Undefined"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the correct syntax for creating an object in JavaScript?",
+        answers: ["var obj = {}", "var obj = []", "var obj = ()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to find the length of an array in JavaScript?",
+        answers: ["length", "size", "count", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a JavaScript framework?",
+        answers: ["React", "Laravel", "Django", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following methods can be used to stop a JavaScript function?",
+        answers: ["stop()", "exit()", "break()", "return()"],
+        correct: 3
+    },
+    {
+        question: "How do you create a comment in JavaScript?",
+        answers: ["// Comment", "/* Comment */", "# Comment", "Both A and B"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is used to parse a JSON string into a JavaScript object?",
+        answers: ["JSON.parse()", "JSON.stringify()", "parseJSON()", "stringifyJSON()"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is NOT a primitive data type in JavaScript?",
+        answers: ["String", "Number", "Object", "Boolean"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is used to create a function in JavaScript?",
+        answers: ["function", "create", "def", "method"],
+        correct: 0
+    },
+    {
+        question: "Which of the following functions is used to get a string’s length in JavaScript?",
+        answers: ["length()", "getLength()", "length", "None of the above"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the correct way to define a constant in JavaScript?",
+        answers: ["var x = 5", "let x = 5", "const x = 5", "None of the above"],
+        correct: 2
+    },
+    {
+        question: "Which JavaScript function is used to create a delay?",
+        answers: ["setTimeout()", "setInterval()", "delay()", "pause()"],
+        correct: 0
+    },
+    {
+        question: "What is the result of the following expression: 5 == '5'?",
+        answers: ["true", "false", "undefined", "error"],
+        correct: 0
+    },
+    {
+        question: "Which of the following methods is used to remove the last element of an array?",
+        answers: ["pop()", "push()", "shift()", "unshift()"],
+        correct: 0
+    },
+    {
+        question: "Which event occurs when a user clicks on an HTML element?",
+        answers: ["click", "mouseover", "keydown", "submit"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to select HTML elements in JavaScript?",
+        answers: ["getElementById()", "getElementsByClassName()", "querySelector()", "All of the above"],
+        correct: 3
+    },  // 1. Basics of JavaScript
+    {
+        question: "What is JavaScript used for in web development?",
+        answers: ["Server-side scripting", "Client-side scripting", "Database management", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the correct syntax to declare a variable in JavaScript?",
+        answers: ["var variableName", "let variableName", "const variableName", "All of the above"],
+        correct: 3
+    },
+
+    // 2. Functions and Scope
+    {
+        question: "What is the default scope of a variable declared with 'var' in JavaScript?",
+        answers: ["Global", "Function", "Block", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "What is a JavaScript function?",
+        answers: ["A block of code designed to perform a task", "A collection of variables", "A type of loop", "None of the above"],
+        correct: 0
+    },
+
+    // 3. Arrays and Objects
+    {
+        question: "Which of the following is used to create an array in JavaScript?",
+        answers: ["[]", "{}", "()", "<>"],
+        correct: 0
+    },
+    {
+        question: "Which method adds an element at the end of an array?",
+        answers: ["push()", "pop()", "shift()", "unshift()"],
+        correct: 0
+    },
+
+    // 4. DOM Manipulation
+    {
+        question: "Which method is used to get an element by its id in JavaScript?",
+        answers: ["getElementById()", "getElementByClassName()", "querySelector()", "getElementByTagName()"],
+        correct: 0
+    },
+    {
+        question: "How do you change the content of an HTML element using JavaScript?",
+        answers: ["element.innerHTML", "element.content", "element.innerText", "element.text"],
+        correct: 0
+    },
+
+    // 5. Event Handling
+    {
+        question: "Which event occurs when a user clicks on an HTML element?",
+        answers: ["click", "mouseover", "keydown", "submit"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to attach an event handler to an HTML element?",
+        answers: ["addEventListener()", "attachEvent()", "onClick()", "addHandler()"],
+        correct: 0
+    },
+
+    // 6. Loops and Iterations
+    {
+        question: "Which of the following is the correct syntax for a 'for' loop in JavaScript?",
+        answers: ["for (i=0; i<10; i++) {}", "for i=0 to 10 {}", "for (i; i<10; i++) {}", "for i=0, i<10, i++ {}"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of the 'break' statement in JavaScript?",
+        answers: ["To exit a loop", "To continue the next iteration", "To skip a function", "None of the above"],
+        correct: 0
+    },
+
+    // 7. Error Handling
+    {
+        question: "Which keyword is used to throw an exception in JavaScript?",
+        answers: ["throw", "catch", "try", "error"],
+        correct: 0
+    },
+    {
+        question: "Which of the following are used to handle exceptions in JavaScript?",
+        answers: ["try...catch", "throw", "finally", "All of the above"],
+        correct: 3
+    },
+
+    // 8. Asynchronous JavaScript
+    {
+        question: "Which of the following is used to handle asynchronous operations in JavaScript?",
+        answers: ["Callback functions", "Promises", "async/await", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of the 'async' keyword in JavaScript?",
+        answers: ["To make a function run asynchronously", "To handle errors", "To pause execution", "None of the above"],
+        correct: 0
+    },
+
+    // 9. Object-Oriented JavaScript
+    {
+        question: "Which of the following is used to create an object in JavaScript?",
+        answers: ["{}", "[]", "()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is a constructor function in JavaScript?",
+        answers: ["A function used to create objects", "A function used to start a program", "A function used to return a value", "None of the above"],
+        correct: 0
+    },
+
+    // 10. JavaScript Advanced Concepts
+    {
+        question: "Which of the following is used for inheritance in JavaScript?",
+        answers: ["prototype", "extends", "super", "all of the above"],
+        correct: 0
+    },
+    {
+        question: "What is a closure in JavaScript?",
+        answers: ["A function with its surrounding state", "A function that calls itself", "A type of loop", "A type of error"],
+        correct: 0
+    },
+
+    // 11. Frameworks and Libraries
+    {
+        question: "Which of the following is a JavaScript library?",
+        answers: ["React", "jQuery", "Angular", "All of the above"],
+        correct: 1
+    },
+    {
+        question: "Which JavaScript framework is developed by Google?",
+        answers: ["React", "Angular", "Vue", "Ember"],
+        correct: 1
+    },
+
+    // 12. Local Storage and Session Storage
+    {
+        question: "What is the main difference between localStorage and sessionStorage in JavaScript?",
+        answers: ["localStorage data persists until cleared, sessionStorage is cleared when the session ends", "Both persist indefinitely", "Both are cleared on page reload", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to store data in localStorage?",
+        answers: ["localStorage.store()", "localStorage.setItem()", "localStorage.addItem()", "None of the above"],
+        correct: 1
+    },
+
+    // 13. Web APIs
+    {
+        question: "Which Web API is used to send asynchronous HTTP requests in JavaScript?",
+        answers: ["XMLHttpRequest", "Fetch API", "AJAX", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What does the fetch() function return in JavaScript?",
+        answers: ["Response object", "Promise object", "JSON object", "String"],
+        correct: 1
+    },
+
+    // 14. JavaScript Performance
+    {
+        question: "Which of the following is used to optimize JavaScript performance?",
+        answers: ["Minifying code", "Using fewer loops", "Reducing DOM manipulation", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which JavaScript feature is used to load large amounts of data asynchronously without blocking the user interface?",
+        answers: ["Web Workers", "Promises", "Asynchronous Functions", "Event Listeners"],
+        correct: 0
+    },
+
+    // 15. Best Practices and Security
+    {
+        question: "Which of the following is a best practice for writing JavaScript?",
+        answers: ["Use var for variable declarations", "Avoid using semicolons", "Use 'let' and 'const' for variables instead of 'var'", "Write large chunks of code in one line"],
+        correct: 2
+    },
+    {
+        question: "What is Cross-Site Scripting (XSS) in JavaScript?",
+        answers: ["Injecting malicious scripts into web pages", "A type of SQL injection", "A method for handling exceptions", "A form of data encryption"],
+        correct: 0
+    }, {
+        question: "Which of the following is a feature introduced in ES6?",
+        answers: ["Arrow functions", "let and const", "Template literals", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What does the 'const' keyword do in JavaScript?",
+        answers: ["Declares a variable with block-level scope", "Creates a constant variable that cannot be reassigned", "Declares a function", "All of the above"],
+        correct: 1
+    },
+
+    // 17. JavaScript Modules
+    {
+        question: "Which of the following is used to import modules in JavaScript?",
+        answers: ["import", "include", "require", "module"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to export a function or variable from a module in JavaScript?",
+        answers: ["export", "exports", "module.exports", "All of the above"],
+        correct: 3
+    },
+
+    // 18. Higher-Order Functions
+    {
+        question: "What is a higher-order function in JavaScript?",
+        answers: ["A function that takes other functions as arguments", "A function that returns another function", "Both of the above", "None of the above"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a higher-order function?",
+        answers: ["map()", "filter()", "reduce()", "All of the above"],
+        correct: 3
+    },
+
+    // 19. JavaScript Array Methods
+    {
+        question: "Which method can be used to merge two arrays in JavaScript?",
+        answers: ["concat()", "push()", "slice()", "join()"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to find the index of an element in an array?",
+        answers: ["find()", "indexOf()", "search()", "getIndex()"],
+        correct: 1
+    },
+
+    // 20. String Methods
+    {
+        question: "Which method is used to convert a string to lowercase in JavaScript?",
+        answers: ["toLowerCase()", "toUpperCase()", "toLocaleLowerCase()", "toString()"],
+        correct: 0
+    },
+    {
+        question: "Which of the following methods is used to extract a part of a string in JavaScript?",
+        answers: ["slice()", "split()", "substring()", "All of the above"],
+        correct: 3
+    },
+
+    // 21. JavaScript Numbers and Math
+    {
+        question: "Which function returns the square root of a number in JavaScript?",
+        answers: ["Math.pow()", "Math.sqrt()", "Math.abs()", "Math.exp()"],
+        correct: 1
+    },
+    {
+        question: "Which method rounds a number to the nearest integer in JavaScript?",
+        answers: ["Math.round()", "Math.ceil()", "Math.floor()", "Math.trunc()"],
+        correct: 0
+    },
+
+    // 22. JSON (JavaScript Object Notation)
+    {
+        question: "Which method is used to parse a JSON string in JavaScript?",
+        answers: ["JSON.parse()", "JSON.stringify()", "JSON.decode()", "JSON.convert()"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to convert a JavaScript object into a JSON string?",
+        answers: ["JSON.parse()", "JSON.stringify()", "JSON.encode()", "JSON.objectify()"],
+        correct: 1
+    },
+
+    // 23. JavaScript Set and Map
+    {
+        question: "Which of the following is used to create a Set in JavaScript?",
+        answers: ["new Set()", "new Map()", "new Object()", "new Array()"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to add an element to a Map in JavaScript?",
+        answers: ["set()", "push()", "add()", "insert()"],
+        correct: 0
+    },
+
+    // 24. JavaScript Timers
+    {
+        question: "Which function is used to set a timeout in JavaScript?",
+        answers: ["setTimeout()", "setInterval()", "clearTimeout()", "clearInterval()"],
+        correct: 0
+    },
+    {
+        question: "Which function is used to repeatedly call a function at specified intervals?",
+        answers: ["setTimeout()", "setInterval()", "clearTimeout()", "clearInterval()"],
+        correct: 1
+    },
+
+    // 25. JavaScript Date and Time
+    {
+        question: "Which method is used to get the current date and time in JavaScript?",
+        answers: ["Date.now()", "new Date()", "getDate()", "getTime()"],
+        correct: 1
+    },
+    {
+        question: "Which method is used to get the full year of a date in JavaScript?",
+        answers: ["getYear()", "getFullYear()", "getDate()", "getMonth()"],
+        correct: 1
+    },
+
+    // 26. Regular Expressions
+    {
+        question: "Which of the following is used to test a regular expression in JavaScript?",
+        answers: ["test()", "match()", "exec()", "search()"],
+        correct: 0
+    },
+    {
+        question: "Which character is used to denote the beginning of a string in a regular expression?",
+        answers: ["^", "$", ".", "*"],
+        correct: 0
+    },
+
+    // 27. Web Storage API
+    {
+        question: "Which of the following is used to store data in the browser locally in JavaScript?",
+        answers: ["localStorage", "sessionStorage", "cookies", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to remove an item from localStorage?",
+        answers: ["removeItem()", "clear()", "delete()", "deleteItem()"],
+        correct: 0
+    },
+
+    // 28. WebSockets
+    {
+        question: "Which method is used to create a WebSocket connection in JavaScript?",
+        answers: ["new WebSocket()", "WebSocket.connect()", "openWebSocket()", "connectWebSocket()"],
+        correct: 0
+    },
+    {
+        question: "Which event is triggered when a WebSocket connection is closed?",
+        answers: ["onclose", "onopen", "onmessage", "onerror"],
+        correct: 0
+    },
+
+    // 29. JavaScript and CSS
+    {
+        question: "Which JavaScript method is used to change the style of an HTML element?",
+        answers: ["style()", "setStyle()", "setAttribute()", "style.setProperty()"],
+        correct: 2
+    },
+    {
+        question: "How do you add a CSS class to an element using JavaScript?",
+        answers: ["element.classList.add()", "element.addClass()", "element.setAttribute('class', 'newClass')", "All of the above"],
+        correct: 0
+    },
+
+    // 30. JavaScript Promises and Async/Await
+    {
+        question: "Which of the following is used to handle asynchronous operations in JavaScript?",
+        answers: ["Promises", "Callbacks", "async/await", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What does the 'await' keyword do in JavaScript?",
+        answers: ["Pauses execution until a Promise is resolved", "Defines a function as asynchronous", "Handles errors", "None of the above"],
+        correct: 0
+    }, {
+        question: "What is a function in JavaScript?",
+        answers: ["A block of code that performs a specific task", "A method to define variables", "A type of array", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to define a function in JavaScript?",
+        answers: ["function functionName()", "def functionName()", "method functionName()", "functionName() function"],
+        correct: 0
+    },
+
+    // 32. Scope and Closures
+    {
+        question: "What is a closure in JavaScript?",
+        answers: ["A function that has access to its own scope, outer function’s scope, and global scope", "A type of loop", "A special variable", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following defines the scope of a variable in JavaScript?",
+        answers: ["Global scope", "Local scope", "Block scope", "All of the above"],
+        correct: 3
+    },
+
+    // 33. Event Handling
+    {
+        question: "Which method is used to add an event listener to an element in JavaScript?",
+        answers: ["addEventListener()", "attachEvent()", "onClick()", "addEvent()"],
+        correct: 0
+    },
+    {
+        question: "Which of the following events is triggered when an element is clicked?",
+        answers: ["click", "hover", "focus", "mouseover"],
+        correct: 0
+    },
+
+    // 34. JavaScript Operators
+    {
+        question: "Which of the following is a comparison operator in JavaScript?",
+        answers: ["==", "===" , ">", "<", "All of the above"],
+        correct: 4
+    },
+    {
+        question: "Which operator is used to assign a value to a variable in JavaScript?",
+        answers: ["=", "==", "===", "+", "None of the above"],
+        correct: 0
+    },
+
+    // 35. JavaScript Object Oriented Programming
+    {
+        question: "Which of the following is used to create a new instance of a class in JavaScript?",
+        answers: ["new", "create", "instanceof", "object"],
+        correct: 0
+    },
+    {
+        question: "Which keyword is used to define a class in JavaScript?",
+        answers: ["class", "object", "function", "new"],
+        correct: 0
+    },
+
+    // 36. Loops and Iterations
+    {
+        question: "Which of the following is a loop used in JavaScript?",
+        answers: ["for", "while", "do-while", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which loop will always run at least once in JavaScript?",
+        answers: ["for", "while", "do-while", "forEach"],
+        correct: 2
+    },
+
+    // 37. JavaScript Timers and Intervals
+    {
+        question: "Which method is used to stop an interval in JavaScript?",
+        answers: ["clearInterval()", "clearTimeout()", "stopInterval()", "pause()"],
+        correct: 0
+    },
+    {
+        question: "What does the 'setInterval()' function do in JavaScript?",
+        answers: ["Calls a function repeatedly at specified intervals", "Pauses execution of code", "Returns a random number", "None of the above"],
+        correct: 0
+    },
+
+    // 38. DOM Manipulation
+    {
+        question: "Which method is used to get an element by its ID in JavaScript?",
+        answers: ["getElementById()", "querySelector()", "getElementByClassName()", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to change the content of an HTML element in JavaScript?",
+        answers: ["innerHTML", "setContent()", "textContent", "setText()"],
+        correct: 0
+    },
+
+    // 39. JavaScript Async Programming
+    {
+        question: "What does the 'async' keyword do in JavaScript?",
+        answers: ["Defines a function as asynchronous", "Pauses execution until the Promise is resolved", "Handles errors in the code", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which function is used to handle the result of a Promise in JavaScript?",
+        answers: [".then()", ".catch()", ".finally()", "All of the above"],
+        correct: 3
+    },
+
+    // 40. JavaScript Errors and Debugging
+    {
+        question: "What is a 'ReferenceError' in JavaScript?",
+        answers: ["Error when trying to access a variable that doesn't exist", "Error with function parameters", "Error with mathematical operations", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to print messages to the console for debugging in JavaScript?",
+        answers: ["console.log()", "console.print()", "debugger()", "alert()"],
+        correct: 0
+    },
+
+    // 41. JavaScript Data Types
+    {
+        question: "Which of the following is not a primitive data type in JavaScript?",
+        answers: ["String", "Number", "Boolean", "Object"],
+        correct: 3
+    },
+    {
+        question: "Which data type is used to store true or false values in JavaScript?",
+        answers: ["String", "Boolean", "Object", "Array"],
+        correct: 1
+    },
+
+    // 42. JavaScript Arrays
+    {
+        question: "Which of the following is used to add an element at the end of an array?",
+        answers: ["push()", "pop()", "shift()", "unshift()"],
+        correct: 0
+    },
+    {
+        question: "Which method removes the first element from an array in JavaScript?",
+        answers: ["shift()", "pop()", "splice()", "unshift()"],
+        correct: 0
+    },
+
+    // 43. Event Propagation
+    {
+        question: "What is event bubbling in JavaScript?",
+        answers: ["When an event propagates from the target element to the root element", "When an event is handled by multiple event listeners", "When an event doesn't propagate", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to stop event propagation in JavaScript?",
+        answers: ["stopPropagation()", "preventDefault()", "stopImmediatePropagation()", "Both 1 and 3"],
+        correct: 3
+    },
+
+    // 44. JavaScript Dates
+    {
+        question: "Which method returns the current date and time in JavaScript?",
+        answers: ["new Date()", "getDate()", "Date.now()", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method returns the current year in JavaScript?",
+        answers: ["getFullYear()", "getYear()", "getMonth()", "getDate()"],
+        correct: 0
+    },
+
+    // 45. JavaScript SetTimeout
+    {
+        question: "Which function is used to delay execution in JavaScript?",
+        answers: ["setTimeout()", "delay()", "wait()", "pause()"],
+        correct: 0
+    },
+    {
+        question: "What is the first parameter of the setTimeout() function in JavaScript?",
+        answers: ["The function to execute", "The delay time in milliseconds", "The number of times to execute", "None of the above"],
+        correct: 0
+    },
+
+    // 46. JavaScript Performance
+    {
+        question: "Which of the following can improve performance in JavaScript?",
+        answers: ["Using local variables", "Using let and const instead of var", "Minimizing DOM manipulation", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is used to check the performance of JavaScript code?",
+        answers: ["console.time()", "console.timeEnd()", "performance.now()", "All of the above"],
+        correct: 3
+    },
+
+    // 47. JavaScript JSON Methods
+    {
+        question: "What does the 'JSON.stringify()' method do?",
+        answers: ["Converts a JavaScript object into a JSON string", "Converts a JSON string into a JavaScript object", "Prints JSON objects to the console", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of 'JSON.parse()' method?",
+        answers: ["Converts a JSON string into a JavaScript object", "Converts JavaScript object to JSON", "Formats JSON data", "None of the above"],
+        correct: 0
+    },
+
+    // 48. JavaScript Event Listeners
+    {
+        question: "Which event is triggered when the user clicks on an element in JavaScript?",
+        answers: ["click", "onClick", "buttonClicked", "clickEvent"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to attach an event listener to a button in JavaScript?",
+        answers: ["button.addEventListener()", "button.addEvent()", "button.onclick()", "button.listen()"],
+        correct: 0
+    },{
+        question: "Which of the following is an object in JavaScript?",
+        answers: ["{} syntax", "[] syntax", "() syntax", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which JavaScript data structure allows you to store values as key-value pairs?",
+        answers: ["Array", "Object", "Set", "Map"],
+        correct: 1
+    },
+
+    // 50. JavaScript Arrays Methods
+    {
+        question: "Which method can be used to join all elements of an array into a string in JavaScript?",
+        answers: ["join()", "concat()", "slice()", "merge()"],
+        correct: 0
+    },
+    {
+        question: "Which method returns the first element of an array in JavaScript?",
+        answers: ["shift()", "pop()", "first()", "unshift()"],
+        correct: 0
+    },
+
+    // 51. JavaScript String Methods
+    {
+        question: "Which of the following methods returns the length of a string in JavaScript?",
+        answers: ["length", "size()", "getLength()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to convert a string to lowercase in JavaScript?",
+        answers: ["toLowerCase()", "toLower()", "lowerCase()", "convertToLower()"],
+        correct: 0
+    },
+
+    // 52. JavaScript Operators
+    {
+        question: "Which operator is used for exponentiation in JavaScript?",
+        answers: ["^", "**", "exponent()", "pow()"],
+        correct: 1
+    },
+    {
+        question: "What will '5' + 3 evaluate to in JavaScript?",
+        answers: ["8", "53", "5", "None of the above"],
+        correct: 1
+    },
+
+    // 53. JavaScript Objects and Functions
+    {
+        question: "How do you create a new object in JavaScript?",
+        answers: ["var obj = {}", "var obj = new Object()", "var obj = Object.create()", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What will the following code return: typeof([])?",
+        answers: ["'object'", "'array'", "'undefined'", "'null'"],
+        correct: 0
+    },
+
+    // 54. JavaScript String Manipulation
+    {
+        question: "Which method is used to extract a part of a string in JavaScript?",
+        answers: ["slice()", "substring()", "substr()", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What will the code 'Hello'.charAt(1) return?",
+        answers: ["H", "e", "l", "o"],
+        correct: 1
+    },
+
+    // 55. JavaScript Functions and Methods
+    {
+        question: "What does the function Math.random() return?",
+        answers: ["Random integer", "Random float", "Random boolean", "Random character"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is not a built-in method in JavaScript?",
+        answers: ["alert()", "console.log()", "createElement()", "parseInt()"],
+        correct: 2
+    },
+
+    // 56. JavaScript Object Methods
+    {
+        question: "What method can you use to check if a property exists in an object?",
+        answers: ["in", "hasOwnProperty()", "contains()", "exist()"],
+        correct: 1
+    },
+    {
+        question: "What does the Object.keys() method return?",
+        answers: ["The keys of an object", "The values of an object", "The properties of an object", "The functions of an object"],
+        correct: 0
+    },
+
+    // 57. JavaScript Events
+    {
+        question: "Which of the following is true about events in JavaScript?",
+        answers: ["Events are used to handle user interactions", "JavaScript events are triggered by mouse actions", "Events can be associated with elements", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which event occurs when the user presses a key on the keyboard?",
+        answers: ["keypress", "keydown", "keyup", "All of the above"],
+        correct: 3
+    },
+
+    // 58. JavaScript Debugging
+    {
+        question: "Which of the following tools is used for debugging JavaScript in web browsers?",
+        answers: ["Console", "Inspector", "Debugger", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What does the 'debugger' keyword do in JavaScript?",
+        answers: ["Pauses code execution", "Prints debugging information", "Continues execution after a breakpoint", "None of the above"],
+        correct: 0
+    },
+
+    // 59. JavaScript Error Handling
+    {
+        question: "Which method is used to throw an error manually in JavaScript?",
+        answers: ["throw", "Error()", "new Error", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is true about the 'try...catch' statement?",
+        answers: ["It handles errors in JavaScript code", "It always executes the catch block", "It prevents errors from occurring", "All of the above"],
+        correct: 0
+    },
+
+    // 60. JavaScript Promises
+    {
+        question: "Which method is used to handle a resolved promise in JavaScript?",
+        answers: [".then()", ".catch()", ".finally()", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following returns a promise in JavaScript?",
+        answers: ["Promise.resolve()", "Promise.reject()", "new Promise()", "All of the above"],
+        correct: 3
+    },
+
+    // 61. JavaScript Timers
+    {
+        question: "Which method is used to set a timer in JavaScript?",
+        answers: ["setInterval()", "setTimeout()", "setTimer()", "Both 1 and 2"],
+        correct: 3
+    },
+    {
+        question: "What is the maximum delay (in milliseconds) for setTimeout()?",
+        answers: ["2147483647", "1000", "0", "Infinity"],
+        correct: 0
+    },
+
+    // 62. JavaScript ES6 Features
+    {
+        question: "Which keyword is used to declare a block-scoped variable in JavaScript?",
+        answers: ["let", "var", "const", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What does 'const' keyword do in JavaScript?",
+        answers: ["Declares a variable that cannot be reassigned", "Declares a block-scoped variable", "Declares a variable with no value", "All of the above"],
+        correct: 0
+    },
+
+    // 63. JavaScript Arrow Functions
+    {
+        question: "Which of the following is a correct arrow function in JavaScript?",
+        answers: ["const add = (a, b) => a + b", "function add(a, b) => a + b", "const add = function(a, b) => a + b", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "How do you return multiple values from an arrow function in JavaScript?",
+        answers: ["return {a, b};", "return a + b;", "return [a, b];", "All of the above"],
+        correct: 0
+    },
+
+    // 64. JavaScript Array Methods
+    {
+        question: "Which of the following methods is used to add a new element to the beginning of an array in JavaScript?",
+        answers: ["unshift()", "shift()", "push()", "pop()"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to remove the last element of an array in JavaScript?",
+        answers: ["shift()", "pop()", "unshift()", "slice()"],
+        correct: 1
+    },
+
+    // 65. JavaScript Object Methods
+    {
+        question: "Which method is used to merge two or more objects in JavaScript?",
+        answers: ["Object.assign()", "Object.merge()", "merge()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What does the 'Object.values()' method return?",
+        answers: ["The values of an object", "The keys of an object", "Both values and keys", "None of the above"],
+        correct: 0
+    },
+
+    // 66. JavaScript Loops
+    {
+        question: "Which loop is used to loop through the properties of an object in JavaScript?",
+        answers: ["for-in", "for", "while", "for-of"],
+        correct: 0
+    },
+    {
+        question: "Which loop is used to iterate over arrays in JavaScript?",
+        answers: ["for", "for-in", "forEach", "All of the above"],
+        correct: 3
+    },  {
+        question: "Which method is used to add an element to the DOM in JavaScript?",
+        answers: ["appendChild()", "createElement()", "innerHTML", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to remove an element from the DOM in JavaScript?",
+        answers: ["removeChild()", "deleteElement()", "remove()", "detach()"],
+        correct: 0
+    },
+
+    // 69. JavaScript Event Listeners
+    {
+        question: "Which method is used to attach an event listener to an element?",
+        answers: ["addEventListener()", "attachEvent()", "setListener()", "onClick()"],
+        correct: 0
+    },
+    {
+        question: "Which event is fired when the mouse is clicked on an element?",
+        answers: ["click", "mousedown", "mouseup", "focus"],
+        correct: 0
+    },
+
+    // 70. JavaScript Closures
+    {
+        question: "What is a closure in JavaScript?",
+        answers: ["A function that references variables from outside its scope", "A block of code that is executed immediately", "A function that returns another function", "A function with no parameters"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a closure in JavaScript?",
+        answers: [
+            "function outer() { var x = 10; return function inner() { console.log(x); } }",
+            "var x = 10; function inner() { return x; }",
+            "function add(x, y) { return x + y; }",
+            "All of the above"
+        ],
+        correct: 0
+    },
+
+    // 71. JavaScript Scopes
+    {
+        question: "What is the scope of a variable declared with 'var' in JavaScript?",
+        answers: ["Block scope", "Function scope", "Global scope", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "Which type of scope is created by a function in JavaScript?",
+        answers: ["Local scope", "Global scope", "Block scope", "None of the above"],
+        correct: 0
+    },
+
+    // 72. JavaScript Object-Oriented Programming (OOP)
+    {
+        question: "What does 'this' refer to in a method in JavaScript?",
+        answers: ["The object that the method is a part of", "The global object", "The function itself", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to create an instance of a class in JavaScript?",
+        answers: ["new", "instanceof", "create()", "None of the above"],
+        correct: 0
+    },
+
+    // 73. JavaScript Classes
+    {
+        question: "How do you define a class in JavaScript?",
+        answers: ["class ClassName {}", "function ClassName {}", "var ClassName = {}", "class { }"],
+        correct: 0
+    },
+    {
+        question: "Which keyword is used to inherit from another class in JavaScript?",
+        answers: ["extend", "super", "inherits", "extends"],
+        correct: 3
+    },
+
+    // 74. JavaScript Promises and Async/Await
+    {
+        question: "Which of the following is a method that can be used to handle promises in JavaScript?",
+        answers: [".then()", ".catch()", ".finally()", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of the async keyword in JavaScript?",
+        answers: ["To declare a function as asynchronous", "To convert a promise to a synchronous function", "To pause execution of a function", "None of the above"],
+        correct: 0
+    },
+
+    // 75. JavaScript Regular Expressions
+    {
+        question: "Which method can be used to test a regular expression in JavaScript?",
+        answers: [".test()", ".exec()", ".match()", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which character is used to represent the beginning of a string in a regular expression?",
+        answers: ["^", "$", ".", "*"],
+        correct: 0
+    },
+
+    // 76. JavaScript and the Window Object
+    {
+        question: "Which method can be used to open a new browser window in JavaScript?",
+        answers: ["window.open()", "open.window()", "createWindow()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is true about the 'window' object in JavaScript?",
+        answers: ["It represents the browser window", "It provides access to the browser's history", "It is the global object in browsers", "All of the above"],
+        correct: 3
+    },
+
+    // 77. JavaScript Timers
+    {
+        question: "Which method is used to call a function at regular intervals in JavaScript?",
+        answers: ["setInterval()", "setTimeout()", "callInterval()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "How would you stop a timer created with setInterval()?",
+        answers: ["clearInterval()", "stopInterval()", "clearTimeout()", "None of the above"],
+        correct: 0
+    },
+
+    // 78. JavaScript Error Handling and Debugging
+    {
+        question: "What does 'try...catch' allow you to do in JavaScript?",
+        answers: ["Handle errors", "Ignore errors", "Throw errors", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to log errors to the console in JavaScript?",
+        answers: ["console.error()", "console.log()", "console.warn()", "console.debug()"],
+        correct: 0
+    },
+
+    // 79. JavaScript Modules
+    {
+        question: "Which keyword is used to import a module in JavaScript?",
+        answers: ["import", "require", "include", "use"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a correct way to export a function in JavaScript?",
+        answers: ["export function func() {}", "module.exports = func", "exports.func = func", "All of the above"],
+        correct: 3
+    },
+
+    // 80. JavaScript Fetch API
+    {
+        question: "Which of the following is true about the Fetch API in JavaScript?",
+        answers: ["It allows you to make network requests", "It returns a promise", "It is used for asynchronous operations", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which method is used to handle response data in the Fetch API?",
+        answers: [".then()", ".catch()", ".json()", ".text()"],
+        correct: 0
+    },
+
+    // 81. JavaScript Date Object
+    {
+        question: "How do you create a new Date object in JavaScript?",
+        answers: ["var date = new Date()", "var date = Date()", "var date = new Date.now()", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which method is used to get the current year from a Date object in JavaScript?",
+        answers: ["getYear()", "getFullYear()", "getDate()", "currentYear()"],
+        correct: 1
+    },
+
+    // 82. JavaScript Memory Management
+    {
+        question: "What is a memory leak in JavaScript?",
+        answers: ["When memory is not freed", "When memory is used inefficiently", "When variables are undefined", "When the garbage collector runs too often"],
+        correct: 0
+    },
+    {
+        question: "Which of the following can help prevent memory leaks in JavaScript?",
+        answers: ["Avoiding global variables", "Using 'var' instead of 'let'", "Manually freeing up memory", "None of the above"],
+        correct: 0
+    },
+
+    // 83. JavaScript and Browser Compatibility
+    {
+        question: "Which method is used to detect browser compatibility in JavaScript?",
+        answers: ["navigator.userAgent", "document.getElementById()", "console.log()", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which property can be used to detect the browser type in JavaScript?",
+        answers: ["navigator", "window", "document", "console"],
+        correct: 0
+    },
+
+    // 84. JavaScript Arrays and Iteration
+    {
+        question: "Which method is used to iterate over each element of an array in JavaScript?",
+        answers: ["forEach()", "map()", "reduce()", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the result of calling .map() on an array in JavaScript?",
+        answers: ["Returns a new array", "Modifies the original array", "Loops through the array", "None of the above"],
+        correct: 0
+    },
+
+    // 85. JavaScript Functional Programming
+    {
+        question: "Which method is used to combine elements in an array into a single value in JavaScript?",
+        answers: ["reduce()", "map()", "forEach()", "filter()"],
+        correct: 0
+    },
+    {
+        question: "What is the full form of CPU?",
+        answers: ["Central Processing Unit", "Central Process Unit", "Central Programming Unit", "Central Processor Unit"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of an input device?",
+        answers: ["Keyboard", "Monitor", "Printer", "Speaker"],
+        correct: 0
+    },
+
+    // 2. Computer Organization
+    {
+        question: "Which component is responsible for performing arithmetic and logical operations in a computer?",
+        answers: ["ALU", "Control Unit", "Memory", "Cache"],
+        correct: 0
+    },
+    {
+        question: "What is the role of the Control Unit in a computer?",
+        answers: ["Executes instructions", "Stores data", "Manages memory", "Directs the operation of the processor"],
+        correct: 3
+    },
+
+    // 3. Data Structures
+    {
+        question: "Which data structure uses LIFO (Last In First Out) method?",
+        answers: ["Queue", "Stack", "Array", "Linked List"],
+        correct: 1
+    },
+    {
+        question: "Which data structure is used for implementing recursion?",
+        answers: ["Array", "Stack", "Queue", "Linked List"],
+        correct: 1
+    },
+
+    // 4. Operating Systems
+    {
+        question: "Which of the following is not an operating system?",
+        answers: ["Windows", "Linux", "Python", "macOS"],
+        correct: 2
+    },
+    {
+        question: "What is the primary function of an operating system?",
+        answers: ["Manage hardware resources", "Manage software applications", "Control network communications", "All of the above"],
+        correct: 3
+    },
+
+    // 5. Networking
+    {
+        question: "Which device is used to connect different networks together?",
+        answers: ["Router", "Switch", "Hub", "Repeater"],
+        correct: 0
+    },
+    {
+        question: "What does the acronym IP stand for?",
+        answers: ["Internet Protocol", "Internal Protocol", "Interface Protocol", "Internet Process"],
+        correct: 0
+    },
+
+    // 6. Database Management
+    {
+        question: "Which SQL command is used to retrieve data from a database?",
+        answers: ["SELECT", "INSERT", "DELETE", "UPDATE"],
+        correct: 0
+    },
+    {
+        question: "What does the acronym DBMS stand for?",
+        answers: ["Database Management System", "Data Base System Management", "Data Bank System", "Database Management Software"],
+        correct: 0
+    },
+
+    // 7. Software Engineering
+    {
+        question: "Which of the following is a software development model?",
+        answers: ["Waterfall Model", "V-Model", "Spiral Model", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "In software engineering, what is a requirement specification?",
+        answers: ["A document that defines the required features of the software", "A list of software bugs", "A summary of system design", "A flowchart of the software functionality"],
+        correct: 0
+    },
+
+    // 8. Computer Networks
+    {
+        question: "Which protocol is used for sending email?",
+        answers: ["SMTP", "HTTP", "FTP", "POP3"],
+        correct: 0
+    },
+    {
+        question: "Which type of network is used for communication over a large geographic area?",
+        answers: ["LAN", "WAN", "MAN", "PAN"],
+        correct: 1
+    },
+
+    // 9. Microprocessors
+    {
+        question: "Which of the following is a function of the ALU?",
+        answers: ["Arithmetic operations", "Logical operations", "Bitwise operations", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is not an example of a microprocessor?",
+        answers: ["Intel 8086", "Intel Core i7", "ARM Cortex", "IBM SPARC"],
+        correct: 3
+    },
+
+    // 10. Digital Logic Design
+    {
+        question: "What is the Boolean expression for an AND gate?",
+        answers: ["A + B", "A . B", "A - B", "A XOR B"],
+        correct: 1
+    },
+    {
+        question: "Which device is used for converting digital signals to analog signals?",
+        answers: ["ADC", "DAC", "MUX", "DEMUX"],
+        correct: 1
+    },
+
+    // 11. Web Development
+    {
+        question: "Which of the following is a client-side scripting language?",
+        answers: ["JavaScript", "PHP", "Python", "Ruby"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used for styling a webpage?",
+        answers: ["HTML", "JavaScript", "CSS", "PHP"],
+        correct: 2
+    },
+
+    // 12. Cloud Computing
+    {
+        question: "What does the acronym SaaS stand for?",
+        answers: ["Software as a Service", "System as a Service", "Storage as a Service", "Security as a Service"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a cloud service provider?",
+        answers: ["Amazon Web Services", "Google Cloud", "Microsoft Azure", "All of the above"],
+        correct: 3
+    },
+
+    // 13. Cyber Security
+    {
+        question: "Which of the following is used for network security?",
+        answers: ["Firewall", "VPN", "Antivirus", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the process of encoding data to protect it from unauthorized access?",
+        answers: ["Encryption", "Decryption", "Compression", "Hashing"],
+        correct: 0
+    },
+
+    // 14. Algorithms and Complexity
+    {
+        question: "Which of the following is the time complexity of a binary search?",
+        answers: ["O(n)", "O(log n)", "O(n^2)", "O(1)"],
+        correct: 1
+    },
+    {
+        question: "Which algorithm is used to find the shortest path in a graph?",
+        answers: ["Dijkstra's Algorithm", "Bellman-Ford Algorithm", "Floyd-Warshall Algorithm", "All of the above"],
+        correct: 0
+    },
+
+    // 15. Programming Languages
+    {
+        question: "Which of the following is not a programming language?",
+        answers: ["Python", "Java", "Linux", "C++"],
+        correct: 2
+    },
+    {
+        question: "Which programming language is primarily used for web development?",
+        answers: ["Java", "C++", "JavaScript", "Ruby"],
+        correct: 2
+    },
+
+    // 16. Software Testing
+    {
+        question: "Which testing technique is used to identify defects in the system by checking the system behavior?",
+        answers: ["White-box testing", "Black-box testing", "Unit testing", "Integration testing"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of regression testing?",
+        answers: ["To check the system's performance", "To check new functionality", "To ensure new changes don't affect existing functionality", "To check the system's usability"],
+        correct: 2
+    },
+
+    // 17. Artificial Intelligence
+    {
+        question: "Which of the following is an example of AI?",
+        answers: ["Machine Learning", "Speech Recognition", "Computer Vision", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the primary goal of Natural Language Processing (NLP)?",
+        answers: ["To translate text", "To allow machines to understand human language", "To analyze data", "To process images"],
+        correct: 1
+    },
+
+    // 18. Virtualization
+    {
+        question: "Which of the following is used to create a virtual machine?",
+        answers: ["Hypervisor", "VirtualBox", "VMware", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which technology allows running multiple operating systems on a single physical machine?",
+        answers: ["Virtualization", "Cloud computing", "Load balancing", "Containerization"],
+        correct: 0
+    }, {
+        question: "What does CPU stand for?",
+        answers: ["Central Processing Unit", "Central Processor Unit", "Central Process Unit", "Central Programming Unit"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an output device?",
+        answers: ["Printer", "Keyboard", "Mouse", "Scanner"],
+        correct: 0
+    },
+
+    // 2. **Computer Organization**
+    {
+        question: "Which component is responsible for performing arithmetic and logical operations in a computer?",
+        answers: ["ALU", "Control Unit", "Cache Memory", "Registers"],
+        correct: 0
+    },
+    {
+        question: "The control unit of the computer system is responsible for:",
+        answers: ["Fetching instructions", "Executing instructions", "Storing instructions", "All of the above"],
+        correct: 0
+    },
+
+    // 3. **Operating Systems**
+    {
+        question: "Which of the following is not an operating system?",
+        answers: ["Windows", "Linux", "Mac OS", "Python"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is responsible for managing the computer's memory?",
+        answers: ["Memory Manager", "Control Unit", "Cache", "Register"],
+        correct: 0
+    },
+
+    // 4. **Networking**
+    {
+        question: "Which device connects multiple networks together?",
+        answers: ["Router", "Switch", "Hub", "Repeater"],
+        correct: 0
+    },
+    {
+        question: "What does IP in IP address stand for?",
+        answers: ["Internet Protocol", "Internal Protocol", "Interface Protocol", "Internet Program"],
+        correct: 0
+    },
+
+    // 5. **Data Structures**
+    {
+        question: "Which of the following is a linear data structure?",
+        answers: ["Queue", "Tree", "Graph", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the time complexity of the binary search algorithm?",
+        answers: ["O(n)", "O(log n)", "O(n^2)", "O(1)"],
+        correct: 1
+    },
+
+    // 6. **Database Management**
+    {
+        question: "What is the full form of DBMS?",
+        answers: ["Database Management System", "DataBase Machine System", "Data Management System", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a SQL statement used to retrieve data from a table?",
+        answers: ["SELECT", "INSERT", "UPDATE", "DELETE"],
+        correct: 0
+    },
+
+    // 7. **Algorithms**
+    {
+        question: "Which of the following is a sorting algorithm?",
+        answers: ["Bubble Sort", "Quick Sort", "Merge Sort", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following algorithms is used for finding the shortest path in a graph?",
+        answers: ["Dijkstra’s Algorithm", "Kruskal’s Algorithm", "Bellman-Ford Algorithm", "Prim’s Algorithm"],
+        correct: 0
+    },
+
+    // 8. **Software Engineering**
+    {
+        question: "Which model is known as the 'Waterfall' model?",
+        answers: ["Sequential model", "Incremental model", "Prototyping model", "Spiral model"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a software testing type that checks individual components of a system?",
+        answers: ["Unit testing", "Integration testing", "System testing", "Acceptance testing"],
+        correct: 0
+    },
+
+    // 9. **Microprocessor & Digital Logic**
+    {
+        question: "The Boolean expression for the AND gate is:",
+        answers: ["A+B", "A-B", "A.B", "A XOR B"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is used for converting digital signals to analog signals?",
+        answers: ["ADC", "DAC", "MUX", "DEMUX"],
+        correct: 1
+    },
+
+    // 10. **Web Technologies**
+    {
+        question: "Which language is primarily used for structuring webpages?",
+        answers: ["HTML", "CSS", "JavaScript", "PHP"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used for styling web pages?",
+        answers: ["HTML", "CSS", "JavaScript", "SQL"],
+        correct: 1
+    },
+
+    // 11. **Cloud Computing**
+    {
+        question: "Which of the following is a cloud computing service model?",
+        answers: ["IaaS", "PaaS", "SaaS", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a leading cloud service provider?",
+        answers: ["Amazon Web Services", "Google Cloud", "Microsoft Azure", "All of the above"],
+        correct: 3
+    },
+
+    // 12. **Cyber Security**
+    {
+        question: "Which of the following is a method used for securing online communications?",
+        answers: ["Encryption", "Firewall", "Antivirus", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "What does VPN stand for in cybersecurity?",
+        answers: ["Virtual Private Network", "Virtual Protected Network", "Variable Public Network", "None of the above"],
+        correct: 0
+    },
+
+    // 13. **Artificial Intelligence & Machine Learning**
+    {
+        question: "Which of the following is an application of Artificial Intelligence?",
+        answers: ["Machine Learning", "Speech Recognition", "Computer Vision", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which machine learning technique is used for classification?",
+        answers: ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "None of the above"],
+        correct: 0
+    },
+
+    // 14. **Computer Architecture**
+    {
+        question: "Which type of memory is used for storing the booting instructions of a computer?",
+        answers: ["RAM", "ROM", "Cache Memory", "Hard Disk"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a RISC architecture?",
+        answers: ["ARM", "Intel", "AMD", "SPARC"],
+        correct: 0
+    },
+
+    // 15. **Networking and Communication**
+    {
+        question: "Which layer of the OSI model is responsible for end-to-end communication?",
+        answers: ["Physical Layer", "Data Link Layer", "Transport Layer", "Network Layer"],
+        correct: 2
+    },
+    {
+        question: "What is the maximum transmission speed of Ethernet in most modern networks?",
+        answers: ["100 Mbps", "1 Gbps", "10 Gbps", "100 Gbps"],
+        correct: 1
+    },
+
+    // 16. **Programming Languages**
+    {
+        question: "Which programming language is primarily used for Android app development?",
+        answers: ["Java", "Swift", "C#", "Kotlin"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to declare a variable in JavaScript?",
+        answers: ["var", "let", "const", "All of the above"],
+        correct: 3
+    },
+
+    // 17. **Virtualization & Cloud Technologies**
+    {
+        question: "Which of the following technologies is responsible for creating virtual machines?",
+        answers: ["Hypervisor", "VirtualBox", "VMware", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the function of Docker in software development?",
+        answers: ["Containerization", "Virtualization", "Cloud storage", "Database management"],
+        correct: 0
+    },
+
+    // 18. **Internet of Things (IoT)**
+    {
+        question: "Which of the following is an IoT device?",
+        answers: ["Smartphone", "Smartwatch", "Smart thermostat", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following communication protocols is widely used in IoT devices?",
+        answers: ["Bluetooth", "Wi-Fi", "Zigbee", "All of the above"],
+        correct: 3
+    },
+
+    // 19. **Computer Graphics**
+    {
+        question: "Which of the following is a computer graphics software?",
+        answers: ["Adobe Photoshop", "CorelDraw", "AutoCAD", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which technique is used to convert a 3D object into a 2D image?",
+        answers: ["Rendering", "Modeling", "Texturing", "Animation"],
+        correct: 0
+    },
+
+    // 20. **Software Development Lifecycle (SDLC)**
+    {
+        question: "Which phase comes first in the Software Development Life Cycle?",
+        answers: ["Design", "Planning", "Development", "Testing"],
+        correct: 1
+    }
+
+  
+];
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

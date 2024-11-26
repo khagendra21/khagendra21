@@ -1,0 +1,1017 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    const questions = [
+    {
+        question: "जनस्वास्थ्यको मुख्य उद्देश्य के हो?",
+        answers: ["रोगको उपचार", "स्वास्थ्यको प्रवर्धन", "आवश्यक उपचार", "स्वास्थ्य सेवाको विस्तार"],
+        correct: 1
+    },
+    {
+        question: "स्वास्थ्यको परिभाषा कुन संगठनले दिएका छन्?",
+        answers: ["नेपाल सरकार", "विश्व स्वास्थ्य संगठन", "भारत सरकार", "संयुक्त राष्ट्रसंघ"],
+        correct: 1
+    },
+    {
+        question: "नियमित शारीरिक अभ्यासको के फाइदा छ?",
+        answers: ["वजन घटाउँछ", "रोगको जोखिम कम गर्छ", "मानसिक शान्ति ल्याउँछ", "सबै उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "तम्बाकूको सेवनले कुन रोगको सम्भावना बढाउँछ?",
+        answers: ["हृदय रोग", "मधुमेह", "क्यान्सर", "सबै उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "जनस्वास्थ्यमा 'स्वच्छता'को महत्त्व के हो?",
+        answers: ["स्वास्थ्यलाई सुधार्न", "रोगको रोकथाम गर्न", "सफाइको प्रवर्धन गर्न", "सबै उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "अत्यधिक मदिरा सेवनले कुन समस्याहरू निम्त्याउन सक्छ?",
+        answers: ["मानसिक समस्या", "हृदय रोग", "लिवरका समस्याहरू", "सबै उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै आलस्यता वा निष्क्रियता जनस्वास्थ्यको लागि के बनाउँछ?",
+        answers: ["स्वस्थ", "रोगी", "सम्पन्न", "सम्पूर्ण शारीरिक क्षमता"],
+        correct: 1
+    },
+    {
+        question: "कोण स्वास्थ्यको एक आधारभूत तत्त्व हो?",
+        answers: ["स्वच्छ पानी", "अपर्याप्त निद्रा", "वृद्धावस्था", "स्मोकिंग"],
+        correct: 0
+    },
+    {
+        question: "दैनिक शारीरिक अभ्यासको सिफारिश कति समयको लागि छ?",
+        answers: ["30 मिनेट", "60 मिनेट", "15 मिनेट", "45 मिनेट"],
+        correct: 0
+    },
+    {
+        question: "खानपानमा ताजै फलफूल र सागसब्जीको महत्त्व के हो?",
+        answers: ["सात्तिकता", "पोषण", "स्वास्थ्यको कमी", "ग्लूटेन"],
+        correct: 1
+    },
+    {
+        question: "कुन पदार्थले मानसिक स्वास्थ्यमा सकारात्मक प्रभाव पार्न सक्छ?",
+        answers: ["शराब", "तम्बाकू", "ध्यान र योग", "मिठा खानेकुरा"],
+        correct: 2
+    },
+    {
+        question: "व्यायाम नगरेका कारण के हुन्छ?",
+        answers: ["मानसिक अवसाद", "शरीरको बलियो बनावट", "ऊर्जा बढ़ाउन", "स्मार्ट विचार"],
+        correct: 0
+    },
+    {
+        question: "अत्यधिक चिनीको सेवनले कुन रोगको सम्भावना बढाउँछ?",
+        answers: ["मधुमेह", "हृदय रोग", "क्यान्सर", "सभी उत्तर सही"],
+        correct: 0
+    },
+    {
+        question: "कोण समस्या हाम्रो जीवनशैलीमा समयमै निवारण गर्न आवश्यक छ?",
+        answers: ["निन्द्रा", "दृष्टि समस्याहरू", "मानसिक स्वास्थ्य", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "मनोरञ्जनका लागि शारीरिक अभ्यासले के प्रदान गर्छ?",
+        answers: ["वजन घटाउँछ", "तनाव कम गर्छ", "शरीरको गतिशीलता बढाउँछ", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "आध्यात्मिक स्वास्थ्यमा के महत्त्वपूर्ण छ?",
+        answers: ["शरीरको बनावट", "ध्यान र योग", "खानपान", "वृद्धावस्था"],
+        correct: 1
+    },
+    {
+        question: "वजन घटाउनका लागि के कति समय व्यायाम गर्न आवश्यक छ?",
+        answers: ["20 मिनेट", "30 मिनेट", "45 मिनेट", "60 मिनेट"],
+        correct: 1
+    },
+    {
+        question: "कोण मानिसलाई स्वस्थ जीवनशैलीको प्रवर्धन गर्नको लागि प्रेरित गर्न मद्दत पुर्याउँछ?",
+        answers: ["व्यायाम", "तम्बाकू सेवन", "मदिरा सेवन", "अल्कोहल सेवन"],
+        correct: 0
+    },
+    {
+        question: "कोण खाद्यान्नको सेवनले हाम्रो प्रतिरक्षा प्रणालीलाई बलियो बनाउन मद्दत गर्छ?",
+        answers: ["फलफूल", "सागसब्जी", "दूध र अण्डा", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "कुन प्रकारको निद्रा जनस्वास्थ्यका लागि महत्त्वपूर्ण छ?",
+        answers: ["आलस्य निद्रा", "गहिरो निद्रा", "हल्का निद्रा", "एक्स्ट्रा निद्रा"],
+        correct: 1
+    },
+    {
+        question: "जीवनशैलीमा 'स्मोकिंग'को सँग सम्बन्धित प्रमुख समस्या के हो?",
+        answers: ["हृदय रोग", "सांसका समस्याहरू", "क्यान्सर", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "अत्यधिक परिश्रमले शरीरमा कुन समस्याहरू निम्त्याउन सक्छ?",
+        answers: ["थकान", "दिमागी तनाव", "शरीरको कमजोरी", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै समय कम्प्युटरमा काम गर्नाले कुन समस्याहरू उत्पन्न हुन सक्छ?",
+        answers: ["दृष्टि समस्याहरू", "पठाइ समस्याहरू", "मानसिक स्वास्थ्य समस्याहरू", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "शरीरको वजन नियन्त्रण गर्नको लागि के महत्त्वपूर्ण छ?",
+        answers: ["शारीरिक अभ्यास", "समीक्षा", "स्मोकिंग", "अत्यधिक खानेकुरा"],
+        correct: 0
+    },
+    {
+        question: "शरीरको लागि के महत्त्वपूर्ण पोषक तत्व हो?",
+        answers: ["विटामिन", "कैल्सियम", "पोषक तत्व", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "जीवनशैलीको स्वस्थ्य प्रवृत्तिहरूमा के शामिल छन्?",
+        answers: ["स्मोकिंग", "नियमित व्यायाम", "मदिरा सेवन", "अत्यधिक खानपान"],
+        correct: 1
+    },
+    {
+        question: "ध्यान र योगको अभ्यासले के फाइदा पुर्याउँछ?",
+        answers: ["शारीरिक र मानसिक शान्ति", "ऊर्जा बढाउँछ", "तनाव कम गर्छ", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "सुपरफूड्सको सेवनले शरीरमा के प्रभाव पार्न सक्छ?",
+        answers: ["पोषक तत्वको वृद्धि", "रोगको रोकथाम", "मानसिक स्वास्थ्य सुधार", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "पानीको अधिक सेवनले कुन समस्याहरूको रोकथाम गर्न मद्दत पुर्याउँछ?",
+        answers: ["पाचन समस्या", "त्वचा सम्बन्धी समस्या", "मूत्र प्रणालीको समस्या", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "आवश्यक निद्रा नपाएपछि कुन समस्याहरू उत्पन्न हुन सक्छ?",
+        answers: ["शरीरको थकान", "स्मरण शक्ति घटाउँछ", "मानसिक समस्या", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "मानसिक स्वास्थ्यका लागि कुन उपाय महत्त्वपूर्ण छ?",
+        answers: ["व्यायाम", "स्मोकिंग", "अत्यधिक खानपान", "संगीत सुन्नु"],
+        correct: 0
+    },
+    {
+        question: "जनस्वास्थ्यको सबैभन्दा महत्वपूर्ण अंश के हो?",
+        answers: ["स्वास्थ्य शिक्षा", "स्वास्थ्य सेवाहरू", "स्वच्छता", "स्वास्थ्यको प्रवर्धन"],
+        correct: 3
+    },
+    {
+        question: "व्यायाम नगरेका कारण शरीरमा के समस्या उत्पन्न हुन्छ?",
+        answers: ["रोगको संक्रमण", "वजन बढ्नु", "मानसिक थकान", "सभी उत्तर सही"],
+        correct: 1
+    },
+    {
+        question: "शरीरको रगतको प्रवाहलाई प्रभावकारी बनाउन कुन अभ्यास महत्त्वपूर्ण छ?",
+        answers: ["व्यायाम", "ध्यान", "तम्बाकू सेवन", "मदिरा सेवन"],
+        correct: 0
+    }, {
+        question: "कुन खाद्यान्नले शरीरलाई ऊर्जा प्रदान गर्छ?",
+        answers: ["प्रोटीन", "कार्बोहाइड्रेट", "फ्याट", "विटामिन"],
+        correct: 1
+    },
+    {
+        question: "पानीको अधिक सेवनले के फाइदा पुर्याउँछ?",
+        answers: ["मुलायम छाला", "शरीरको सफा राख्न", "पाचन सुधार", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "कोण जिवाणुबाट बच्नका लागि सबैभन्दा महत्त्वपूर्ण उपाय के हो?",
+        answers: ["दस्त सफा राख्नु", "स्वच्छता अपनाउनु", "सुनिश्चित पानी पिउनु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "मधुमेहका लक्षणहरू कुन हुन्?",
+        answers: ["अत्यधिक प्यास", "अत्यधिक थकान", "वजन घट्नु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै चिनीको सेवनले के असर पुर्याउँछ?",
+        answers: ["मधुमेह", "वजन बढ्नु", "दाँतको समस्याहरू", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "कुन ब्यायामले मानसिक स्वास्थ्य सुधार गर्न मद्दत पुर्याउँछ?",
+        answers: ["ध्यान", "योग", "जगिंग", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ जीवनशैलीका लागि कुन तत्व महत्त्वपूर्ण छ?",
+        answers: ["नियमित शारीरिक व्यायाम", "सामाजिक गतिविधिहरू", "स्वस्थ आहार", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "के तपाईलाई थाहा छ कि अधिक मदिरा सेवनले के असर पुर्याउँछ?",
+        answers: ["मानसिक स्वास्थ्यमा असर", "जिगरको समस्या", "मृत्युको सम्भावना", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ शरीरका लागि कति घण्टा निद्रा आवश्यक छ?",
+        answers: ["4 घण्टा", "6 घण्टा", "8 घण्टा", "10 घण्टा"],
+        correct: 2
+    },
+    {
+        question: "खानपानमा पोषणको महत्त्व के हो?",
+        answers: ["शरीरलाई आवश्यक तत्व दिन्छ", "स्वस्थ राख्छ", "ऊर्जा दिन्छ", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "बच्चाहरूको लागि पोषणको आवश्यकता के हो?",
+        answers: ["शारीरिक विकास", "मानसिक विकास", "बढ्दो शरीरको आवश्यकता", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै गहिरो निद्राले के फाइदा पुर्याउँछ?",
+        answers: ["शरीरको मांसपेशीको पुनर्निर्माण", "मस्तिष्कको विश्राम", "तनाव कम गर्नु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "अत्यधिक निन्द्रा शरीरको लागि के हानिकारक हुन्छ?",
+        answers: ["अत्यधिक थकान", "स्मरण शक्ति कम हुनु", "मानसिक असन्तुलन", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "शरीरको औसत तापमान कुन हो?",
+        answers: ["36.5°C", "37°C", "38°C", "39°C"],
+        correct: 1
+    },
+    {
+        question: "स्वस्थ आहारमा के समावेश गर्नु पर्छ?",
+        answers: ["फलफूल र सागसब्जी", "प्रोटीन", "पानी", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "रक्तको शर्करा स्तरलाई स्थिर राख्नका लागि कुन खाद्य पदार्थ महत्त्वपूर्ण छ?",
+        answers: ["कार्बोहाइड्रेट", "प्रोटीन", "स्मोकिंग", "अल्कोहल"],
+        correct: 0
+    },
+    {
+        question: "धेरै तेलको सेवनले कुन समस्या उत्पन्न गर्छ?",
+        answers: ["वजन बढ्नु", "रक्तदाबको समस्या", "हृदय रोग", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "पानीको न्यूनतम सेवन कति हुनु पर्छ?",
+        answers: ["2 लिटर", "3 लिटर", "4 लिटर", "5 लिटर"],
+        correct: 1
+    },
+    {
+        question: "शरीरको मांसपेशीको विकासका लागि के महत्त्वपूर्ण छ?",
+        answers: ["प्रोटीन", "चिनी", "विटामिन", "फ्याट"],
+        correct: 0
+    },
+    {
+        question: "शरीरको मांसपेशीहरूको पुनर्निर्माणका लागि के महत्त्वपूर्ण छ?",
+        answers: ["प्रोटीन", "कार्बोहाइड्रेट", "पानी", "फ्याट"],
+        correct: 0
+    },
+    {
+        question: "आधुनिक जीवनशैलीका कारण के समस्याहरू उत्पन्न भएका छन्?",
+        answers: ["शारीरिक निष्क्रियता", "मानसिक स्वास्थ्य समस्याहरू", "वजन बढ्नु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ शरीरको लागि के आवश्यक छ?",
+        answers: ["व्यायाम", "सन्तुलित आहार", "प्रत्येक दिन पानी पिउनु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "मानसिक स्वास्थ्यको लागि के महत्त्वपूर्ण छ?",
+        answers: ["सकारात्मक सोच", "समयमै विश्राम", "सामाजिक सम्बन्ध", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ शरीरको लागि 'होलिस्टिक स्वास्थ्य' के हो?",
+        answers: ["शरीर र मस्तिष्कको एकताबाट स्वास्थ्य", "दिमागी शान्ति", "शारीरिक व्यायाम", "सभी उत्तर सही"],
+        correct: 0
+    },
+    {
+        question: "मानसिक स्वास्थ्यका लागि के महत्वपूर्ण छ?",
+        answers: ["योग र ध्यान", "समयमै विश्राम", "सकारात्मक सोच", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "पोषणको सन्तुलन राख्नका लागि के महत्त्वपूर्ण छ?",
+        answers: ["विभिन्न प्रकारका खाद्य पदार्थ", "कच्चा फलफूल", "अल्कोहलको सेवन", "स्मोकिंग"],
+        correct: 0
+    },
+    {
+        question: "नियमित शारीरिक अभ्यासले कुन प्रणालीमा सुधार ल्याउँछ?",
+        answers: ["हृदय प्रणाली", "पाचन प्रणाली", "सांस प्रणाली", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "शरीरको तापक्रममा कमीले कुन समस्या उत्पन्न गर्न सक्छ?",
+        answers: ["सर्दी", "सांस समस्या", "थकान", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "माइक्रोन्यूट्रिएन्ट्स (जस्तै विटामिन र मिनरल्स) को कमीले कुन समस्या उत्पन्न गर्छ?",
+        answers: ["पोषण सम्बन्धी समस्या", "आहारमा कम प्रोटीन", "वजन बढ्नु", "सभी उत्तर सही"],
+        correct: 0
+    }, {
+        question: "कुन खाद्यान्नले शरीरलाई ऊर्जा प्रदान गर्छ?",
+        answers: ["प्रोटीन", "कार्बोहाइड्रेट", "फ्याट", "विटामिन"],
+        correct: 1
+    },
+    {
+        question: "पानीको अधिक सेवनले के फाइदा पुर्याउँछ?",
+        answers: ["मुलायम छाला", "शरीरको सफा राख्न", "पाचन सुधार", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "कोण जिवाणुबाट बच्नका लागि सबैभन्दा महत्त्वपूर्ण उपाय के हो?",
+        answers: ["दस्त सफा राख्नु", "स्वच्छता अपनाउनु", "सुनिश्चित पानी पिउनु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "मधुमेहका लक्षणहरू कुन हुन्?",
+        answers: ["अत्यधिक प्यास", "अत्यधिक थकान", "वजन घट्नु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै चिनीको सेवनले के असर पुर्याउँछ?",
+        answers: ["मधुमेह", "वजन बढ्नु", "दाँतको समस्याहरू", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "कुन ब्यायामले मानसिक स्वास्थ्य सुधार गर्न मद्दत पुर्याउँछ?",
+        answers: ["ध्यान", "योग", "जगिंग", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ जीवनशैलीका लागि कुन तत्व महत्त्वपूर्ण छ?",
+        answers: ["नियमित शारीरिक व्यायाम", "सामाजिक गतिविधिहरू", "स्वस्थ आहार", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "के तपाईलाई थाहा छ कि अधिक मदिरा सेवनले के असर पुर्याउँछ?",
+        answers: ["मानसिक स्वास्थ्यमा असर", "जिगरको समस्या", "मृत्युको सम्भावना", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ शरीरका लागि कति घण्टा निद्रा आवश्यक छ?",
+        answers: ["4 घण्टा", "6 घण्टा", "8 घण्टा", "10 घण्टा"],
+        correct: 2
+    },
+    {
+        question: "खानपानमा पोषणको महत्त्व के हो?",
+        answers: ["शरीरलाई आवश्यक तत्व दिन्छ", "स्वस्थ राख्छ", "ऊर्जा दिन्छ", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "बच्चाहरूको लागि पोषणको आवश्यकता के हो?",
+        answers: ["शारीरिक विकास", "मानसिक विकास", "बढ्दो शरीरको आवश्यकता", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै गहिरो निद्राले के फाइदा पुर्याउँछ?",
+        answers: ["शरीरको मांसपेशीको पुनर्निर्माण", "मस्तिष्कको विश्राम", "तनाव कम गर्नु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "अत्यधिक निन्द्रा शरीरको लागि के हानिकारक हुन्छ?",
+        answers: ["अत्यधिक थकान", "स्मरण शक्ति कम हुनु", "मानसिक असन्तुलन", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "शरीरको औसत तापमान कुन हो?",
+        answers: ["36.5°C", "37°C", "38°C", "39°C"],
+        correct: 1
+    },
+    {
+        question: "स्वस्थ आहारमा के समावेश गर्नु पर्छ?",
+        answers: ["फलफूल र सागसब्जी", "प्रोटीन", "पानी", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "रक्तको शर्करा स्तरलाई स्थिर राख्नका लागि कुन खाद्य पदार्थ महत्त्वपूर्ण छ?",
+        answers: ["कार्बोहाइड्रेट", "प्रोटीन", "स्मोकिंग", "अल्कोहल"],
+        correct: 0
+    },
+    {
+        question: "धेरै तेलको सेवनले कुन समस्या उत्पन्न गर्छ?",
+        answers: ["वजन बढ्नु", "रक्तदाबको समस्या", "हृदय रोग", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "पानीको न्यूनतम सेवन कति हुनु पर्छ?",
+        answers: ["2 लिटर", "3 लिटर", "4 लिटर", "5 लिटर"],
+        correct: 1
+    },
+    {
+        question: "शरीरको मांसपेशीको विकासका लागि के महत्त्वपूर्ण छ?",
+        answers: ["प्रोटीन", "चिनी", "विटामिन", "फ्याट"],
+        correct: 0
+    },
+    {
+        question: "शरीरको मांसपेशीहरूको पुनर्निर्माणका लागि के महत्त्वपूर्ण छ?",
+        answers: ["प्रोटीन", "कार्बोहाइड्रेट", "पानी", "फ्याट"],
+        correct: 0
+    },
+    {
+        question: "आधुनिक जीवनशैलीका कारण के समस्याहरू उत्पन्न भएका छन्?",
+        answers: ["शारीरिक निष्क्रियता", "मानसिक स्वास्थ्य समस्याहरू", "वजन बढ्नु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ शरीरको लागि के आवश्यक छ?",
+        answers: ["व्यायाम", "सन्तुलित आहार", "प्रत्येक दिन पानी पिउनु", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "मानसिक स्वास्थ्यको लागि के महत्त्वपूर्ण छ?",
+        answers: ["सकारात्मक सोच", "समयमै विश्राम", "सामाजिक सम्बन्ध", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ शरीरको लागि 'होलिस्टिक स्वास्थ्य' के हो?",
+        answers: ["शरीर र मस्तिष्कको एकताबाट स्वास्थ्य", "दिमागी शान्ति", "शारीरिक व्यायाम", "सभी उत्तर सही"],
+        correct: 0
+    },
+    {
+        question: "मानसिक स्वास्थ्यका लागि के महत्वपूर्ण छ?",
+        answers: ["योग र ध्यान", "समयमै विश्राम", "सकारात्मक सोच", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "पोषणको सन्तुलन राख्नका लागि के महत्त्वपूर्ण छ?",
+        answers: ["विभिन्न प्रकारका खाद्य पदार्थ", "कच्चा फलफूल", "अल्कोहलको सेवन", "स्मोकिंग"],
+        correct: 0
+    },
+    {
+        question: "नियमित शारीरिक अभ्यासले कुन प्रणालीमा सुधार ल्याउँछ?",
+        answers: ["हृदय प्रणाली", "पाचन प्रणाली", "सांस प्रणाली", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "शरीरको तापक्रममा कमीले कुन समस्या उत्पन्न गर्न सक्छ?",
+        answers: ["सर्दी", "सांस समस्या", "थकान", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "माइक्रोन्यूट्रिएन्ट्स (जस्तै विटामिन र मिनरल्स) को कमीले कुन समस्या उत्पन्न गर्छ?",
+        answers: ["पोषण सम्बन्धी समस्या", "आहारमा कम प्रोटीन", "वजन बढ्नु", "सभी उत्तर सही"],
+        correct: 0
+    }, {
+        question: "कति समयसम्म खतरनाक रोगहरूको संक्रमण शरीरमा फैलन सक्छ?",
+        answers: ["12 घण्टा", "24 घण्टा", "48 घण्टा", "72 घण्टा"],
+        correct: 1
+    },
+    {
+        question: "कोल्ड ड्रिंकको अधिक सेवनले कुन प्रकारको समस्याहरू निम्त्याउँछ?",
+        answers: ["शरीरको वजन घटाउँछ", "दाँत बिगार्न सक्छ", "हृदयको स्वास्थ्य सुधार्छ", "स्मरण शक्ति बढाउँछ"],
+        correct: 1
+    },
+    {
+        question: "कुन तत्वले शरीरको पाचन प्रक्रियामा मद्दत पुर्याउँछ?",
+        answers: ["प्रोटीन", "विटामिन C", "फाइबर", "लोहा"],
+        correct: 2
+    },
+    {
+        question: "धूम्रपानको अधिक सेवनले कुन प्रकारका रोगहरूको सम्भावना बढाउँछ?",
+        answers: ["मधुमेह", "हृदय रोग", "क्यान्सर", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "कोण कसरतले मांसपेशीको बल बढाउँछ?",
+        answers: ["कार्डियो", "वजन उठाउने", "योग", "प्याकिंग"],
+        correct: 1
+    },
+    {
+        question: "स्वस्थ शरीरका लागि प्रोटीन कति महत्त्वपूर्ण छ?",
+        answers: ["महत्त्वपूर्ण छैन", "सुनिश्चित रूपमा महत्त्वपूर्ण", "कभी-कभी महत्त्वपूर्ण", "हामीलाई प्रोटीन आवश्यक छैन"],
+        correct: 1
+    },
+    {
+        question: "उच्च रक्तचापलाई नियन्त्रण गर्नका लागि कुन उपाय उपयुक्त छ?",
+        answers: ["नियमित व्यायाम", "स्मोकिंग", "चिल्लो खाना", "रातको समयमा जागरण"],
+        correct: 0
+    },
+    {
+        question: "मासु खानेको सट्टा कुन खाद्य पदार्थहरू उपयुक्त छन्?",
+        answers: ["सागसब्जी", "फलफूल", "मिठाई", "सभी उत्तर सही"],
+        correct: 0
+    },
+    {
+        question: "कुन प्रकारको आहारले शरीरलाई ऊर्जा दिन्छ?",
+        answers: ["चिनी", "प्रोटीन", "कार्बोहाइड्रेट", "विटामिन C"],
+        correct: 2
+    },
+    {
+        question: "स्वस्थ जीवनशैलीका लागि कुन प्रकारको खानपान चाहिन्छ?",
+        answers: ["सन्तुलित आहार", "मात्र मांसाहार", "मात्र शाकाहार", "कस्तो पनि खान"],
+        correct: 0
+    },
+    {
+        question: "अत्यधिक व्यायाम गर्दा कुन समस्या उत्पन्न हुन सक्छ?",
+        answers: ["मांसपेशीमा चिल्लो", "शरीरको कमजोरी", "स्मरण शक्ति बढाउँछ", "उर्जा बढाउँछ"],
+        correct: 1
+    },
+    {
+        question: "मूलभूत स्वच्छता कति महत्त्वपूर्ण छ?",
+        answers: ["महत्त्वपूर्ण छैन", "प्रारम्भिक प्राथमिकता", "द्वितीयक प्राथमिकता", "अत्यन्त महत्त्वपूर्ण"],
+        correct: 3
+    },
+    {
+        question: "स्वस्थ जीवनशैलीका लागि कति घण्टा निद्रा आवश्यक छ?",
+        answers: ["४ घण्टा", "६ घण्टा", "८ घण्टा", "१० घण्टा"],
+        correct: 2
+    },
+    {
+        question: "के स्वच्छ पानी पिउनुले शरीरमा लाभ पुर्याउँछ?",
+        answers: ["हो", "हुँदैन", "मात्र गुनगुना पानी", "पानी पिउनु राम्रो छैन"],
+        correct: 0
+    },
+    {
+        question: "कसरी मानसिक तनाव कम गर्न सकिन्छ?",
+        answers: ["ध्यान र योग", "व्यायाम", "सकारात्मक सोच", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै अल्कोहल सेवन गर्नाले शरीरमा के असर पर्छ?",
+        answers: ["पाचन प्रक्रियामा सुधार", "मस्तिष्कको हानि", "हृदयको स्वास्थ्य सुधार", "स्मरण शक्ति बढाउँछ"],
+        correct: 1
+    },
+    {
+        question: "शरीरलाई पर्याप्त जल प्रदान गर्नका लागि के गर्नुपर्छ?",
+        answers: ["पानी पिउनु", "फलफूल र तरकारी खाने", "स्मोकिंग गर्नु", "थप अल्कोहल सेवन गर्नु"],
+        correct: 0
+    },
+    {
+        question: "धेरै चिया र कफी पिउनाले कुन समस्याहरू निम्त्याउँछ?",
+        answers: ["पाचन समस्या", "ध्यान केन्द्रित गर्न मद्दत पुर्याउँछ", "रक्तचाप बढाउँछ", "स्मरण शक्ति सुधार्छ"],
+        correct: 2
+    },
+    {
+        question: "स्वस्थ जिवनशैली अपनाउँदा कुन प्रकारका रोगहरू कम हुन्छ?",
+        answers: ["हृदय रोग", "मधुमेह", "क्यान्सर", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "धेरै जंक फूड खानेले कुन स्वास्थ्य समस्याहरू उत्पन्न गर्छ?",
+        answers: ["वजन बढाउँछ", "मधुमेह", "हृदय रोग", "सभी उत्तर सही"],
+        correct: 3
+    },
+    {
+        question: "शरीरलाई अधिक स्वस्थ राख्नका लागि कुन प्रकारको गतिविधि उपयुक्त छ?",
+        answers: ["धूम्रपान", "नियमित व्यायाम", "अल्कोहल सेवन", "अत्यधिक मांसाहार"],
+        correct: 1
+    },
+    {
+        question: "शारीरिक स्वास्थ्यलाई सुधार गर्नका लागि कुन खाद्य समूह महत्त्वपूर्ण छ?",
+        answers: ["प्रोटीन", "चिनी", "तलको खाना", "मसलाह"],
+        correct: 0
+    },
+    {
+        question: "शरीरमा पर्याप्त पानीको मात्रा राख्नका लागि कुन खानेकुरा उपयुक्त हुन्छ?",
+        answers: ["तरकारी", "मासु", "चिकन", "भुजा"],
+        correct: 0
+    },
+    {
+        question: "धेरै पटक थकान महसुस गर्दा के गर्नुपर्छ?",
+        answers: ["सुत्नु", "अल्कोहल पिउनु", "धूम्रपान गर्नु", "फास्ट फूड खाना"],
+        correct: 0
+    }
+
+
+  
+    
+   
+];
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

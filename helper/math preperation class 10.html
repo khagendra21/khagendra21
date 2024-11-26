@@ -1,0 +1,1460 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    const questions=
+    [
+    {
+        question: "If the sum of two angles of a triangle is 90°, what is the third angle?",
+        answers: ["90°", "60°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "Find the value of x in the equation: 5x + 3 = 23.",
+        answers: ["x = 4", "x = 5", "x = 3", "x = 2"],
+        correct: 0
+    },
+    {
+        question: "The quadratic equation x² + 5x + 6 = 0 has roots",
+        answers: ["1 and 6", "-1 and -6", "2 and 3", "0 and 6"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the correct formula for the area of a circle?",
+        answers: ["πr²", "2πr", "πd", "πr"],
+        correct: 0
+    },
+    {
+        question: "If a right triangle has legs of length 3 and 4, what is the length of the hypotenuse?",
+        answers: ["4", "5", "6", "7"],
+        correct: 1
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is its circumference?",
+        answers: ["14π cm", "49π cm", "7π cm", "28π cm"],
+        correct: 0
+    },
+    {
+        question: "Find the value of x if 2x + 5 = 13.",
+        answers: ["x = 4", "x = 5", "x = 2", "x = 6"],
+        correct: 0
+    },
+    {
+        question: "What is the discriminant of the quadratic equation x² - 6x + 9 = 0?",
+        answers: ["9", "0", "6", "-9"],
+        correct: 1
+    },
+    {
+        question: "What is the sum of the interior angles of a triangle?",
+        answers: ["180°", "90°", "360°", "270°"],
+        correct: 0
+    },
+    {
+        question: "Find the value of tan(45°).",
+        answers: ["1", "√2", "0", "√3"],
+        correct: 0
+    },
+    {
+        question: "What is the solution to the equation 3x = 9?",
+        answers: ["x = 3", "x = 2", "x = 0", "x = 1"],
+        correct: 0
+    },
+    {
+        question: "The equation of a straight line is y = 2x + 3. What is the slope of the line?",
+        answers: ["2", "3", "1", "0"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the formula for the volume of a cylinder?",
+        answers: ["πr²h", "2πr", "πr²", "4/3πr³"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a right-angled triangle with base 6 cm and height 8 cm.",
+        answers: ["24 cm²", "48 cm²", "12 cm²", "36 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(90°)?",
+        answers: ["1", "0", "√2", "∞"],
+        correct: 0
+    },
+    {
+        question: "The sum of the first 10 natural numbers is",
+        answers: ["55", "45", "50", "60"],
+        correct: 0
+    },
+    {
+        question: "Solve for x: 2x² + 3x - 5 = 0.",
+        answers: ["x = 1, -5/2", "x = 2, -1", "x = 5, -3", "x = 1, -2"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a property of an arithmetic progression (AP)?",
+        answers: ["The common difference is constant", "The terms are random", "The common ratio is constant", "The first term is constant"],
+        correct: 0
+    },
+    {
+        question: "Find the value of the angle formed between the hour and minute hands of a clock at 3:15.",
+        answers: ["7.5°", "22.5°", "90°", "45°"],
+        correct: 0
+    },
+    {
+        question: "What is the surface area of a sphere with radius 5 cm?",
+        answers: ["100π cm²", "25π cm²", "50π cm²", "125π cm²"],
+        correct: 0
+    },
+    {
+        question: "The equation of a circle with center (0, 0) and radius 5 is",
+        answers: ["x² + y² = 5", "x² + y² = 25", "x² + y² = 10", "x² + y² = 20"],
+        correct: 1
+    },
+    {
+        question: "In a coordinate plane, the distance between points (3, 4) and (0, 0) is",
+        answers: ["3", "5", "4", "7"],
+        correct: 1
+    },{
+        question: "If the sum of two angles of a triangle is 90°, what is the third angle?",
+        answers: ["90°", "60°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "The roots of the equation x² + 5x + 6 = 0 are",
+        answers: ["1 and 6", "-1 and -6", "2 and 3", "0 and 6"],
+        correct: 2
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is its diameter?",
+        answers: ["7 cm", "14 cm", "21 cm", "5 cm"],
+        correct: 1
+    },
+    {
+        question: "Which formula is used to calculate the area of a parallelogram?",
+        answers: ["Length × Width", "Length × Height", "Width × Height", "Height × Base"],
+        correct: 0
+    },
+    {
+        question: "If a right-angled triangle has legs of length 3 cm and 4 cm, what is the length of the hypotenuse?",
+        answers: ["5 cm", "4 cm", "6 cm", "7 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the solution to the equation x² - 4x + 4 = 0?",
+        answers: ["x = 2", "x = -2", "x = 4", "x = -4"],
+        correct: 0
+    },
+    {
+        question: "What is the value of the sine of a right angle?",
+        answers: ["0", "1", "√2", "∞"],
+        correct: 1
+    },
+    {
+        question: "What is the formula for the area of a circle?",
+        answers: ["πr", "2πr", "πr²", "2πr²"],
+        correct: 2
+    },
+    {
+        question: "What is the slope of a parallel line?",
+        answers: ["Period", "Length", "Rate", "0"],
+        correct: 3
+    },
+    {
+        question: "What is the sum of the digits in our decimal system?",
+        answers: ["0", "9", "10", "1"],
+        correct: 1
+    },
+    {
+        question: "Find the value of x in the equation: 2x + 5 = 15.",
+        answers: ["x = 4", "x = 5", "x = 3", "x = 2"],
+        correct: 0
+    },
+    {
+        question: "What is the volume formula of a cylinder?",
+        answers: ["πr²h", "2πr", "πr²", "4/3πr³"],
+        correct: 0
+    },
+    {
+        question: "What is the sum of the interior angles of a triangle?",
+        answers: ["180°", "90°", "360°", "270°"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is its circumference?",
+        answers: ["14π cm", "49π cm", "7π cm", "28π cm"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(45°)?",
+        answers: ["1", "√2", "0", "∞"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a right-angled triangle with base 6 cm and height 8 cm.",
+        answers: ["24 cm²", "48 cm²", "12 cm²", "36 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the solution to the equation 3x = 9?",
+        answers: ["x = 3", "x = 2", "x = 0", "x = 1"],
+        correct: 0
+    },
+    {
+        question: "What is the discriminant of the quadratic equation x² - 6x + 9 = 0?",
+        answers: ["9", "0", "6", "-9"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a property of an arithmetic progression (AP)?",
+        answers: ["The common difference is constant", "The terms are random", "The common ratio is constant", "The first term is constant"],
+        correct: 0
+    },{
+        question: "What is the solution to the equation 2x - 3 = 7?",
+        answers: ["x = 5", "x = 4", "x = 3", "x = 2"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(30°)?",
+        answers: ["1/√3", "√3", "1", "0"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a triangle with base 5 cm and height 12 cm.",
+        answers: ["30 cm²", "60 cm²", "20 cm²", "25 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(45°)?",
+        answers: ["1/√2", "√2", "0", "1"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for the surface area of a sphere?",
+        answers: ["4πr²", "2πr²", "πr²", "πr³"],
+        correct: 0
+    },
+    {
+        question: "If x² + 4x + 4 = 0, what is the value of x?",
+        answers: ["x = -2", "x = 2", "x = 4", "x = -4"],
+        correct: 0
+    },
+    {
+        question: "Find the volume of a cube with side 5 cm.",
+        answers: ["125 cm³", "25 cm³", "50 cm³", "20 cm³"],
+        correct: 0
+    },
+    {
+        question: "What is the sum of the first 10 natural numbers?",
+        answers: ["55", "50", "60", "45"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a rectangle with length 10 cm and width 5 cm?",
+        answers: ["30 cm", "40 cm", "20 cm", "15 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the value of cos(60°)?",
+        answers: ["1/2", "√3/2", "1", "0"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a circle with radius 7 cm.",
+        answers: ["49π cm²", "14π cm²", "28π cm²", "7π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the slope of the line passing through points (1, 2) and (3, 6)?",
+        answers: ["2", "3", "1", "4"],
+        correct: 0
+    },
+    {
+        question: "If a triangle has angles 30°, 60°, and 90°, it is a",
+        answers: ["Right-angled triangle", "Acute-angled triangle", "Obtuse-angled triangle", "Equilateral triangle"],
+        correct: 0
+    },
+    {
+        question: "What is the value of (3x - 5) = 16?",
+        answers: ["x = 7", "x = 5", "x = 10", "x = 3"],
+        correct: 0
+    },
+    {
+        question: "What is the product of the roots of the equation x² - 7x + 10 = 0?",
+        answers: ["10", "7", "5", "1"],
+        correct: 0
+    },
+    {
+        question: "What is the quadratic formula used to solve the equation ax² + bx + c = 0?",
+        answers: ["x = (-b ± √(b² - 4ac)) / 2a", "x = (-b ± √(b² + 4ac)) / 2a", "x = (-a ± √(b² - 4ac)) / 2b", "x = (-b ± √(a² - 4ac)) / 2a"],
+        correct: 0
+    },
+    {
+        question: "Find the roots of the quadratic equation x² - 8x + 16 = 0.",
+        answers: ["x = 4", "x = 2", "x = 1", "x = -4"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a rhombus with diagonals 8 cm and 6 cm?",
+        answers: ["24 cm²", "48 cm²", "36 cm²", "18 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of cos(90°)?",
+        answers: ["0", "1", "√2", "1/2"],
+        correct: 0
+    },
+    {
+        question: "The sum of the first n terms of an arithmetic series is given by the formula Sn = n/2[2a + (n - 1)d]. What is the sum of the first 5 terms of the series with a = 3 and d = 2?",
+        answers: ["35", "40", "45", "50"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a trapezium with parallel sides 8 cm and 12 cm and height 6 cm?",
+        answers: ["60 cm²", "40 cm²", "48 cm²", "72 cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the solution to the equation 5x + 10 = 30?",
+        answers: ["x = 4", "x = 3", "x = 5", "x = 2"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of a straight line with slope 3 and y-intercept 4?",
+        answers: ["y = 3x + 4", "y = 4x + 3", "y = 3x - 4", "y = -3x + 4"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(0°)?",
+        answers: ["0", "1", "√3", "1/2"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of an equilateral triangle with side length 7 cm?",
+        answers: ["21 cm", "14 cm", "28 cm", "7 cm"],
+        correct: 0
+    },
+    {
+        question: "Find the value of x in the equation x² = 64.",
+        answers: ["x = 8", "x = -8", "x = ±8", "x = 4"],
+        correct: 2
+    },
+    {
+        question: "What is the formula to find the sum of an arithmetic progression?",
+        answers: ["S = n/2 (a + l)", "S = n/2 (2a + (n - 1)d)", "S = n (a + l)", "S = n² (a + l)"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(60°)?",
+        answers: ["√3", "1", "√2", "1/√3"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of a circle with center (0, 0) and radius r?",
+        answers: ["x² + y² = r²", "x² + y² = 2r", "x + y = r", "x² + y² = 0"],
+        correct: 0
+    },
+    {
+        question: "What is the sum of the first 20 terms of the arithmetic progression with first term 3 and common difference 5?",
+        answers: ["830", "800", "850", "900"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a sector of a circle with radius 7 cm and central angle 60°.",
+        answers: ["7π cm²", "14π cm²", "21π cm²", "5π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the volume of a cylinder with radius 4 cm and height 8 cm?",
+        answers: ["128π cm³", "160π cm³", "100π cm³", "50π cm³"],
+        correct: 0
+    },
+    {
+        question: "What is the value of cos(30°)?",
+        answers: ["√3/2", "1/2", "1", "√2/2"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a square with side 6 cm.",
+        answers: ["36 cm²", "12 cm²", "24 cm²", "18 cm²"],
+        correct: 0
+    },{
+        question: "What is the value of sin(45°)?",
+        answers: ["1/√2", "√3/2", "1/2", "1"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(60°).",
+        answers: ["1/2", "√2/2", "1", "√3/2"],
+        correct: 0
+    },
+    {
+        question: "If sinθ = 3/5, find cosθ.",
+        answers: ["4/5", "3/5", "2/5", "5/3"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(45°)?",
+        answers: ["1", "0", "√3", "∞"],
+        correct: 0
+    },
+    {
+        question: "What is the relationship between sin²θ + cos²θ?",
+        answers: ["1", "0", "2", "tan²θ"],
+        correct: 0
+    },
+    {
+        question: "Find the value of sin(90°).",
+        answers: ["1", "0", "√2", "1/2"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(30°).",
+        answers: ["√3/2", "1/2", "√2/2", "1"],
+        correct: 0
+    },
+    {
+        question: "Find the value of tan(60°).",
+        answers: ["√3", "1", "1/√3", "√2"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of a circle with center (0, 0) and radius r?",
+        answers: ["x² + y² = r²", "x² + y² = 2r", "x² + y² = 4r²", "x + y = r"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is 5 cm, what is the area of the circle?",
+        answers: ["25π cm²", "10π cm²", "15π cm²", "5π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the circumference of a circle with radius 7 cm?",
+        answers: ["14π cm", "21π cm", "7π cm", "5π cm"],
+        correct: 0
+    },
+    {
+        question: "In a right-angled triangle, if the base is 4 cm and height is 3 cm, what is the length of the hypotenuse?",
+        answers: ["5 cm", "6 cm", "4 cm", "7 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for the area of a sector of a circle?",
+        answers: ["(θ/360) * πr²", "(θ/2) * πr²", "(θ/180) * πr²", "(πr²)/360"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for the length of an arc of a circle?",
+        answers: ["(θ/360) * 2πr", "(θ/180) * πr", "(θ/2) * πr", "(θ/360) * πr²"],
+        correct: 0
+    },
+    {
+        question: "The angle between the line joining the center of a circle and a point on the circle and the tangent at the point is",
+        answers: ["90°", "45°", "0°", "60°"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of a circle with center at (h, k) and radius r?",
+        answers: ["(x - h)² + (y - k)² = r²", "(x + h)² + (y + k)² = r²", "(x - h)² + (y + k)² = r²", "(x + h)² + (y - k)² = r²"],
+        correct: 0
+    },
+    {
+        question: "If the length of a chord is 6 cm and the perpendicular distance from the center to the chord is 4 cm, find the radius of the circle.",
+        answers: ["5 cm", "6 cm", "7 cm", "8 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin²(θ) + cos²(θ) for any angle θ?",
+        answers: ["1", "2", "0", "tan²(θ)"],
+        correct: 0
+    },
+    {
+        question: "In a unit circle, the radius is always",
+        answers: ["1", "2", "π", "r"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a sector of a circle with radius 6 cm and central angle 60°?",
+        answers: ["6π cm²", "12π cm²", "18π cm²", "9π cm²"],
+        correct: 0
+    },
+    {
+        question: "If a point (x, y) lies on the circle with equation x² + y² = r², what is the value of x² + y²?",
+        answers: ["r²", "2r", "πr", "r"],
+        correct: 0
+    },
+    {
+        question: "What is the radius of a circle whose circumference is 22 cm?",
+        answers: ["7 cm", "10 cm", "5 cm", "11 cm"],
+        correct: 0
+    },
+    {
+        question: "In a right triangle, the sine of an angle is the ratio of the length of the side opposite the angle to the length of the",
+        answers: ["Hypotenuse", "Base", "Adjacent side", "Altitude"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(90°).",
+        answers: ["0", "1", "√3", "1/2"],
+        correct: 0
+    },
+    {
+        question: "What is the radius of the unit circle?",
+        answers: ["1", "2", "π", "0"],
+        correct: 0
+    },
+    {
+        question: "If a circle has a radius of 4 cm, what is its area?",
+        answers: ["16π cm²", "8π cm²", "4π cm²", "32π cm²"],
+        correct: 0
+    },
+    {
+        question: "Find the value of tan(45°).",
+        answers: ["1", "0", "√3", "∞"],
+        correct: 0
+    },
+    {
+        question: "The equation x² + y² = 36 represents a circle with center at the origin and radius",
+        answers: ["6", "3", "12", "9"],
+        correct: 0
+    }, {
+        question: "What is the value of tan(30°)?",
+        answers: ["1/√3", "√3", "1", "2"],
+        correct: 0
+    },
+    {
+        question: "The general equation of a circle is x² + y² + 2gx + 2fy + c = 0. If the center of the circle is (-g, -f), what is the radius?",
+        answers: ["√(g² + f² - c)", "√(g + f + c)", "√(g² + f²)", "√(c)"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(90°).",
+        answers: ["0", "1", "√2/2", "1/2"],
+        correct: 0
+    },
+    {
+        question: "If sinθ = 1/2, find θ.",
+        answers: ["30°", "45°", "60°", "90°"],
+        correct: 0
+    },
+    {
+        question: "The angle subtended by a chord at the center of a circle is 60°. What is the angle subtended at any point on the remaining part of the circle?",
+        answers: ["30°", "60°", "90°", "120°"],
+        correct: 0
+    },
+    {
+        question: "Find the value of tan(60°).",
+        answers: ["√3", "1", "1/√3", "2"],
+        correct: 0
+    },
+    {
+        question: "A circle has an equation x² + y² = 16. What is the radius of the circle?",
+        answers: ["4", "2", "8", "16"],
+        correct: 0
+    },
+    {
+        question: "Find the value of sin(90°).",
+        answers: ["1", "0", "√3", "1/2"],
+        correct: 0
+    },
+    {
+        question: "The radius of a circle is 10 cm. Find the length of an arc subtended by a central angle of 45°.",
+        answers: ["π cm", "5π/2 cm", "5π cm", "2π cm"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for the area of a triangle in terms of sine of the angle?",
+        answers: ["(1/2) * a * b * sin(θ)", "(1/2) * a * b", "(1/2) * sin(θ)", "a * b * cos(θ)"],
+        correct: 0
+    },
+    {
+        question: "In a circle, the angle subtended by a diameter at any point on the circle is always",
+        answers: ["90°", "60°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "If tanθ = 2, what is the value of sinθ?",
+        answers: ["2/√5", "1/√5", "2/√3", "1/2"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of the tangent to a circle with equation x² + y² = r² at the point (x₁, y₁)?",
+        answers: ["x₁x + y₁y = r²", "x₁x + y₁y = 2r", "x² + y² = r²", "x₁² + y₁² = r²"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a circle with radius 3 cm?",
+        answers: ["9π cm²", "3π cm²", "6π cm²", "π cm²"],
+        correct: 0
+    },
+    {
+        question: "The distance from the center of a circle to a point on the circle is called the",
+        answers: ["Radius", "Diameter", "Chord", "Tangent"],
+        correct: 0
+    },
+    {
+        question: "What is the length of the hypotenuse in a right triangle with base 6 cm and height 8 cm?",
+        answers: ["10 cm", "12 cm", "14 cm", "15 cm"],
+        correct: 0
+    },
+    {
+        question: "The equation of a circle with center (h, k) and radius r is (x - h)² + (y - k)² = r². What happens when the radius is 0?",
+        answers: ["The circle degenerates into a point", "The circle has infinite points", "It becomes a line", "There is no solution"],
+        correct: 0
+    },
+    {
+        question: "Find the value of sin(30°).",
+        answers: ["1/2", "√3/2", "1", "0"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is doubled, what happens to the area?",
+        answers: ["It becomes four times larger", "It becomes twice as large", "It becomes half", "It stays the same"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(120°).",
+        answers: ["-1/2", "1/2", "√3/2", "-√3/2"],
+        correct: 0
+    },
+    {
+        question: "A sector of a circle with radius 5 cm and central angle 60° has an area of",
+        answers: ["5π cm²", "5/6 π cm²", "5π/6 cm²", "π cm²"],
+        correct: 0
+    },
+    {
+        question: "In a circle, the line joining the center to any point on the circle is called the",
+        answers: ["Radius", "Diameter", "Tangent", "Chord"],
+        correct: 0
+    },
+    {
+        question: "In a right triangle, the cosine of an angle is the ratio of the length of the adjacent side to the",
+        answers: ["Hypotenuse", "Base", "Opposite side", "Altitude"],
+        correct: 0
+    },
+    {
+        question: "If cosθ = 3/5, find tanθ.",
+        answers: ["4/3", "5/3", "3/4", "5/4"],
+        correct: 0
+    },  {
+        question: "In a right triangle, the sine of an angle is the ratio of the length of the opposite side to the",
+        answers: ["Hypotenuse", "Adjacent side", "Base", "Height"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is 7 cm, what is the circumference of the circle?",
+        answers: ["14π cm", "49π cm", "7π cm", "14 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of the tangent to a circle with center at (0, 0) and radius r?",
+        answers: ["x² + y² = r²", "x + y = r", "x² + y² = 2r", "x² + y² = r², x + y = r"],
+        correct: 0
+    },
+    {
+        question: "If a circle has a radius of 6 cm, what is the area of the circle?",
+        answers: ["36π cm²", "6π cm²", "12π cm²", "72π cm²"],
+        correct: 0
+    },
+    {
+        question: "A circle has a radius of 4 cm. What is the length of a diameter?",
+        answers: ["4 cm", "8 cm", "12 cm", "16 cm"],
+        correct: 1
+    },
+    {
+        question: "If tan(θ) = 1, what is the value of θ?",
+        answers: ["45°", "30°", "60°", "90°"],
+        correct: 0
+    },
+    {
+        question: "What is the general form of the equation of a circle with center at (h, k) and radius r?",
+        answers: ["(x - h)² + (y - k)² = r²", "(x + h)² + (y + k)² = r²", "(x - h)² + (y - k)² = 2r²", "(x + h)² + (y + k)² = 2r²"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is doubled, how does the area change?",
+        answers: ["It becomes four times larger", "It becomes half", "It remains the same", "It becomes twice as large"],
+        correct: 0
+    },
+    {
+        question: "What is the sine of 0°?",
+        answers: ["0", "1", "√3/2", "1/2"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(180°).",
+        answers: ["-1", "1", "0", "∞"],
+        correct: 0
+    },
+    {
+        question: "The angle subtended by a chord at the center of the circle is 120°. What is the angle subtended at the circumference of the circle?",
+        answers: ["60°", "120°", "90°", "180°"],
+        correct: 0
+    },
+    {
+        question: "In a circle, the perpendicular from the center to a chord",
+        answers: ["Bisects the chord", "Is equal to the radius", "Is the tangent", "Is parallel to the chord"],
+        correct: 0
+    },
+    {
+        question: "Find the value of tan(45°).",
+        answers: ["1", "0", "√3", "∞"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a sector with a central angle of 60° and radius 5 cm?",
+        answers: ["(π/3) cm²", "(5π/3) cm²", "(π/6) cm²", "5π cm²"],
+        correct: 0
+    },
+    {
+        question: "The line joining the center of the circle to the point of tangency is",
+        answers: ["Perpendicular to the tangent", "Parallel to the tangent", "Equal to the radius", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "Find the value of sin(60°).",
+        answers: ["√3/2", "1/2", "1", "√2/2"],
+        correct: 0
+    },
+    {
+        question: "If a circle has a radius of 3 cm, what is the circumference?",
+        answers: ["6π cm", "3π cm", "9π cm", "π cm"],
+        correct: 0
+    },
+    {
+        question: "In a right triangle, the tangent of an angle is the ratio of the length of the opposite side to the",
+        answers: ["Adjacent side", "Hypotenuse", "Base", "Height"],
+        correct: 0
+    },
+    {
+        question: "What is the value of cos(0°)?",
+        answers: ["1", "0", "√3/2", "1/2"],
+        correct: 0
+    },
+    {
+        question: "The radius of a circle is 10 cm. What is the length of an arc subtended by a central angle of 90°?",
+        answers: ["5π cm", "5 cm", "2π cm", "10 cm"],
+        correct: 0
+    },
+    {
+        question: "The equation of a circle with radius 4 cm and center (3, 2) is",
+        answers: ["(x - 3)² + (y - 2)² = 16", "(x + 3)² + (y + 2)² = 16", "(x - 3)² + (y - 2)² = 8", "(x + 3)² + (y + 2)² = 8"],
+        correct: 0
+    },
+    {
+        question: "The sum of the angles of a sector of a circle is always",
+        answers: ["360°", "180°", "90°", "Varies"],
+        correct: 0
+    },{
+        question: "In a right triangle, if the adjacent side is 3 units and the hypotenuse is 5 units, what is the value of cos(θ)?",
+        answers: ["3/5", "4/5", "5/3", "3/4"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a sector of a circle with radius 6 cm and central angle 120°.",
+        answers: ["12π cm²", "24π cm²", "6π cm²", "4π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(90°)?",
+        answers: ["1", "0", "√2/2", "√3/2"],
+        correct: 0
+    },
+    {
+        question: "The diameter of a circle is 10 cm. What is the radius?",
+        answers: ["5 cm", "10 cm", "15 cm", "20 cm"],
+        correct: 0
+    },
+    {
+        question: "The sum of the angles in a triangle is always",
+        answers: ["180°", "90°", "360°", "270°"],
+        correct: 0
+    },
+    {
+        question: "If sin(θ) = 1/2, what is the value of θ?",
+        answers: ["30°", "60°", "45°", "90°"],
+        correct: 0
+    },
+    {
+        question: "What is the length of an arc subtended by a central angle of 60° in a circle with radius 4 cm?",
+        answers: ["4π/3 cm", "2π cm", "4 cm", "2π/3 cm"],
+        correct: 0
+    },
+    {
+        question: "The tangent to a circle is always",
+        answers: ["Perpendicular to the radius at the point of contact", "Parallel to the radius", "Equal to the radius", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of the circle with center at (3, -2) and radius 5?",
+        answers: ["(x - 3)² + (y + 2)² = 25", "(x + 3)² + (y - 2)² = 25", "(x - 3)² + (y + 2)² = 5", "(x + 3)² + (y - 2)² = 5"],
+        correct: 0
+    },
+    {
+        question: "In a right triangle, the value of tan(45°) is",
+        answers: ["1", "0", "√3", "∞"],
+        correct: 0
+    },
+    {
+        question: "The angle of elevation of a tower is 30°. If the height of the tower is 100 m, what is the distance from the base of the tower?",
+        answers: ["173.2 m", "100 m", "50 m", "200 m"],
+        correct: 0
+    },
+    {
+        question: "The radius of a circle is 5 cm. What is the area of the circle?",
+        answers: ["25π cm²", "10π cm²", "20π cm²", "50π cm²"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(0°).",
+        answers: ["1", "0", "√2/2", "1/2"],
+        correct: 0
+    },
+    {
+        question: "The perimeter of a sector of a circle with radius 7 cm and central angle 60° is",
+        answers: ["14 cm", "21 cm", "7 cm", "28 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(60°)?",
+        answers: ["√3", "1", "√2", "2"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a circle with a diameter of 8 cm?",
+        answers: ["16π cm²", "32π cm²", "64π cm²", "8π cm²"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is doubled, how does the area of the circle change?",
+        answers: ["It becomes four times larger", "It remains the same", "It becomes half", "It becomes twice as large"],
+        correct: 0
+    },
+    {
+        question: "The length of an arc subtended by an angle θ in a circle is given by the formula",
+        answers: ["rθ", "θ/r", "2πr", "πr²"],
+        correct: 0
+    },
+    {
+        question: "The center of a circle lies on the line of symmetry of a regular polygon. What is the relationship between the radius and the side length of the polygon?",
+        answers: ["The radius is equal to the side length", "The radius is less than the side length", "The radius is greater than the side length", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is 10 cm, what is the circumference of the circle?",
+        answers: ["20π cm", "10π cm", "5π cm", "50π cm"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a sector of a circle with a central angle of 90° and radius 4 cm?",
+        answers: ["4π cm²", "π cm²", "2π cm²", "3π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of a circle with center (0, 0) and radius r?",
+        answers: ["x² + y² = r²", "x + y = r", "x² + y² = 2r", "x² + y² = r², x + y = r"],
+        correct: 0
+    },
+    {
+        question: "The distance between two points on the circumference of a circle is called",
+        answers: ["Chord", "Radius", "Diameter", "Arc"],
+        correct: 0
+    },
+    {
+        question: "What is the value of cos(30°)?",
+        answers: ["√3/2", "1/2", "1", "√2/2"],
+        correct: 0
+    },
+    {
+        question: "If the area of a circle is 36π cm², what is the radius?",
+        answers: ["6 cm", "12 cm", "36 cm", "18 cm"],
+        correct: 0
+    },
+    {
+        question: "In a right triangle, the sine of an angle is defined as the ratio of the",
+        answers: ["Opposite side to hypotenuse", "Adjacent side to hypotenuse", "Opposite side to adjacent side", "None of the above"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(0°)?",
+        answers: ["0", "1", "∞", "√3"],
+        correct: 0
+    },
+    {
+        question: "The radius of a circle is 8 cm. What is the circumference of the circle?",
+        answers: ["16π cm", "8π cm", "4π cm", "32π cm"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a sector of a circle with central angle 180° and radius 5 cm?",
+        answers: ["25π cm²", "50π cm²", "20π cm²", "10π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the angle between the radius and the tangent at the point of contact?",
+        answers: ["90°", "45°", "60°", "180°"],
+        correct: 0
+    },
+    {
+        question: "Find the value of sin(45°).",
+        answers: ["√2/2", "1/2", "√3/2", "1"],
+        correct: 0
+    },
+    {
+        question: "What is the sum of the angles in a circle?",
+        answers: ["360°", "180°", "90°", "270°"],
+        correct: 0
+    }, {
+        question: "The value of cos(90°) is",
+        answers: ["0", "1", "√2/2", "√3/2"],
+        correct: 0
+    },
+    {
+        question: "In a right-angled triangle, the side opposite the 30° angle is 4 cm. What is the length of the hypotenuse?",
+        answers: ["8 cm", "4√3 cm", "2√3 cm", "8√3 cm"],
+        correct: 0
+    },
+    {
+        question: "If tan(θ) = 1, what is the value of θ?",
+        answers: ["45°", "30°", "60°", "90°"],
+        correct: 0
+    },
+    {
+        question: "What is the length of the diameter of a circle if the radius is 7 cm?",
+        answers: ["14 cm", "21 cm", "7 cm", "3.5 cm"],
+        correct: 0
+    },
+    {
+        question: "Find the area of a circle with a radius of 12 cm.",
+        answers: ["144π cm²", "24π cm²", "36π cm²", "48π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the perimeter of a semicircle with radius 10 cm?",
+        answers: ["20 + 10π cm", "20 + π cm", "10π cm", "20 cm"],
+        correct: 0
+    },
+    {
+        question: "If the hypotenuse of a right triangle is 13 cm and one side is 5 cm, what is the length of the other side?",
+        answers: ["12 cm", "10 cm", "8 cm", "6 cm"],
+        correct: 0
+    },
+    {
+        question: "Find the angle whose tangent is 1.",
+        answers: ["45°", "30°", "60°", "90°"],
+        correct: 0
+    },
+    {
+        question: "What is the area of a sector of a circle with a radius of 8 cm and a central angle of 45°?",
+        answers: ["8π cm²", "4π cm²", "2π cm²", "π cm²"],
+        correct: 0
+    },
+    {
+        question: "In a right-angled triangle, if the opposite side is 7 cm and the adjacent side is 24 cm, what is the value of tan(θ)?",
+        answers: ["7/24", "24/7", "1", "√7/24"],
+        correct: 0
+    },
+    {
+        question: "What is the value of sin(60°)?",
+        answers: ["√3/2", "1/2", "√2/2", "1"],
+        correct: 0
+    },
+    {
+        question: "The radius of a circle is doubled. How does the area change?",
+        answers: ["It becomes four times larger", "It becomes half", "It remains the same", "It becomes twice as large"],
+        correct: 0
+    },
+    {
+        question: "What is the equation of a circle with center at (4, -3) and radius 5?",
+        answers: ["(x - 4)² + (y + 3)² = 25", "(x + 4)² + (y - 3)² = 25", "(x - 4)² + (y - 3)² = 25", "(x + 4)² + (y + 3)² = 25"],
+        correct: 0
+    },
+    {
+        question: "What is the length of an arc subtended by a central angle of 90° in a circle with radius 10 cm?",
+        answers: ["5π cm", "10π cm", "10 cm", "5 cm"],
+        correct: 0
+    },
+    {
+        question: "The angle between two tangents drawn from an external point to a circle is 60°. What is the angle subtended by the line joining the points of contact at the center of the circle?",
+        answers: ["120°", "60°", "90°", "180°"],
+        correct: 0
+    },
+    {
+        question: "Find the value of cos(45°).",
+        answers: ["√2/2", "1/2", "√3/2", "1"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is 15 cm, what is the area of the circle?",
+        answers: ["225π cm²", "15π cm²", "30π cm²", "60π cm²"],
+        correct: 0
+    },
+    {
+        question: "What is the length of the diameter of a circle if the area is 100π cm²?",
+        answers: ["10 cm", "20 cm", "15 cm", "5 cm"],
+        correct: 0
+    },
+    {
+        question: "In a right triangle, if the opposite side is 9 cm and the adjacent side is 12 cm, what is the value of sin(θ)?",
+        answers: ["9/15", "12/15", "9/12", "12/9"],
+        correct: 0
+    },
+    {
+        question: "What is the length of the chord of a circle with radius 5 cm and central angle 60°?",
+        answers: ["5 cm", "10 cm", "5√3 cm", "5√2 cm"],
+        correct: 0
+    },
+    {
+        question: "What is the value of tan(30°)?",
+        answers: ["1/√3", "√3", "1", "√2"],
+        correct: 0
+    },
+    {
+        question: "If the radius of a circle is halved, how does the circumference change?",
+        answers: ["It becomes half", "It becomes twice as large", "It remains the same", "It becomes four times smaller"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for the area of a circle?",
+        answers: ["πr²", "2πr", "πd", "2r"],
+        correct: 0
+    },
+    {
+        question: "What is the central angle of a sector with an area of 50 cm² and a radius of 5 cm?",
+        answers: ["60°", "90°", "120°", "180°"],
+        correct: 0
+    },
+    {
+        question: "In a circle, the angle subtended by a chord at the center is twice the angle subtended at any point on the circumference. This is known as which theorem?",
+        answers: ["Angle at the center theorem", "Angle at the circumference theorem", "Chord theorem", "Tangent theorem"],
+    }
+]
+
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

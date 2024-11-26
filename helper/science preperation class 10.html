@@ -1,0 +1,1526 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    const questions=
+    [
+    {
+        question: "Which of the following is a chemical change?",
+        answers: ["Boiling water", "Rusting of iron", "Dissolving sugar in water", "Melting ice"],
+        correct: 1
+    },
+    {
+        question: "Which is the main source of energy for the Earth?",
+        answers: ["The Moon", "The Sun", "Volcanic activity", "Geothermal energy"],
+        correct: 1
+    },
+    {
+        question: "What is the SI unit of force?",
+        answers: ["Joule", "Newton", "Meter", "Watt"],
+        correct: 1
+    },
+    {
+        question: "What is the process by which plants make their food?",
+        answers: ["Respiration", "Transpiration", "Photosynthesis", "Digestion"],
+        correct: 2
+    },
+    {
+        question: "Which gas do plants absorb from the atmosphere for photosynthesis?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for water?",
+        answers: ["H2O", "O2", "H2", "CO2"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for calculating the force exerted on an object?",
+        answers: ["F = ma", "F = mv", "F = m/g", "F = 2ma"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a non-renewable resource?",
+        answers: ["Solar energy", "Wind energy", "Coal", "Geothermal energy"],
+        correct: 2
+    },
+    {
+        question: "Which element has the atomic number 8?",
+        answers: ["Oxygen", "Carbon", "Nitrogen", "Hydrogen"],
+        correct: 0
+    },
+    {
+        question: "What is the main component of the Earth's atmosphere?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Argon"],
+        correct: 2
+    },
+    {
+        question: "What is the atomic number of carbon?",
+        answers: ["6", "8", "12", "14"],
+        correct: 0
+    },
+    {
+        question: "What type of energy is stored in a battery?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Electrical energy"],
+        correct: 2
+    },
+    {
+        question: "Which force keeps the planets in orbit around the Sun?",
+        answers: ["Electromagnetic force", "Gravity", "Friction", "Inertia"],
+        correct: 1
+    },
+    {
+        question: "What is the process by which a liquid turns into a gas?",
+        answers: ["Evaporation", "Condensation", "Sublimation", "Freezing"],
+        correct: 0
+    },
+    {
+        question: "Which planet is known as the 'Red Planet'?",
+        answers: ["Earth", "Mars", "Venus", "Jupiter"],
+        correct: 1
+    },
+    {
+        question: "Which element is essential for the production of thyroid hormones?",
+        answers: ["Iodine", "Iron", "Calcium", "Potassium"],
+        correct: 0
+    },
+    {
+        question: "Which part of the cell contains the genetic material?",
+        answers: ["Mitochondria", "Nucleus", "Ribosome", "Chloroplast"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a type of simple machine?",
+        answers: ["Lever", "Circuit", "Transistor", "Battery"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for methane?",
+        answers: ["CH4", "CO2", "C2H6", "H2O"],
+        correct: 0
+    },
+    {
+        question: "What type of bond is formed when two atoms share electrons?",
+        answers: ["Ionic bond", "Covalent bond", "Metallic bond", "Hydrogen bond"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of the human respiratory system?",
+        answers: ["Pump blood", "Digest food", "Transport oxygen", "Regulate body temperature"],
+        correct: 2
+    },
+    {
+        question: "What is the most common gas in the Earth’s atmosphere?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Argon"],
+        correct: 2
+    },
+    {
+        question: "What is the hardest known natural material?",
+        answers: ["Gold", "Diamond", "Iron", "Platinum"],
+        correct: 1
+    },
+    {
+        question: "Which body system is responsible for transporting oxygen and nutrients?",
+        answers: ["Nervous system", "Circulatory system", "Digestive system", "Endocrine system"],
+        correct: 1
+    },
+    {
+        question: "What is the unit of electric current?",
+        answers: ["Volt", "Ohm", "Ampere", "Watt"],
+        correct: 2
+    },
+    {
+        question: "Who developed the theory of relativity?",
+        answers: ["Isaac Newton", "Albert Einstein", "Galileo Galilei", "Nikola Tesla"],
+        correct: 1
+    },
+    {
+        question: "Which element is used in making the filament of light bulbs?",
+        answers: ["Gold", "Iron", "Tungsten", "Copper"],
+        correct: 2
+    },
+    {
+        question: "Which planet is closest to the Sun?",
+        answers: ["Venus", "Earth", "Mars", "Mercury"],
+        correct: 3
+    },
+    {
+        question: "What is the primary purpose of the digestive system?",
+        answers: ["To break down food", "To transport oxygen", "To remove waste", "To circulate blood"],
+        correct: 0
+    },
+    {
+        question: "What do we call the process of a solid changing directly into a gas?",
+        answers: ["Sublimation", "Evaporation", "Condensation", "Fusion"],
+        correct: 0
+    },
+    {
+        question: "What is the process by which plants lose water vapor through their leaves?",
+        answers: ["Transpiration", "Evaporation", "Absorption", "Condensation"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for sulfuric acid?",
+        answers: ["HCl", "H2SO4", "NaOH", "CH4"],
+        correct: 1
+    },
+    {
+        question: "What type of energy does a moving object have?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Electrical energy"],
+        correct: 0
+    },
+    {
+        question: "Which particle has a negative charge?",
+        answers: ["Proton", "Neutron", "Electron", "Positron"],
+        correct: 2
+    },
+    {
+        question: "What is the unit of measurement for electrical resistance?",
+        answers: ["Volt", "Ampere", "Ohm", "Watt"],
+        correct: 2
+    },
+    {
+        question: "What type of wave is sound?",
+        answers: ["Transverse wave", "Longitudinal wave", "Electromagnetic wave", "Gravitational wave"],
+        correct: 1
+    },
+    {
+        question: "What is the process of breaking down food into nutrients called?",
+        answers: ["Respiration", "Digestion", "Excretion", "Absorption"],
+        correct: 1
+    },
+    {
+        question: "Which scientist is known for the laws of motion?",
+        answers: ["Isaac Newton", "Albert Einstein", "Nikola Tesla", "Galileo Galilei"],
+        correct: 0
+    },
+    {
+        question: "What type of energy is stored in food?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Thermal energy"],
+        correct: 2
+    },
+    {
+        question: "Which is the densest planet in our solar system?",
+        answers: ["Earth", "Jupiter", "Saturn", "Mercury"],
+        correct: 0
+    },
+    {
+        question: "What is the most abundant element in the universe?",
+        answers: ["Oxygen", "Hydrogen", "Carbon", "Nitrogen"],
+        correct: 1
+    },
+    {
+        question: "Which energy transformation occurs when a battery is used?",
+        answers: ["Chemical to electrical", "Electrical to chemical", "Mechanical to electrical", "Electrical to light"],
+        correct: 0
+    },
+    {
+        question: "What is the boiling point of water in degrees Celsius?",
+        answers: ["0°C", "50°C", "100°C", "200°C"],
+        correct: 2
+    },
+    {
+        question: "What do we call the process where liquid changes into a solid?",
+        answers: ["Freezing", "Melting", "Evaporation", "Condensation"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of red blood cells?",
+        answers: ["To carry oxygen", "To fight infections", "To clot blood", "To carry nutrients"],
+        correct: 0
+    },{
+        question: "What is the chemical symbol for gold?",
+        answers: ["Au", "Ag", "Pb", "Fe"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a noble gas?",
+        answers: ["Oxygen", "Neon", "Hydrogen", "Nitrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the primary purpose of chlorophyll in plants?",
+        answers: ["To absorb water", "To absorb sunlight", "To release oxygen", "To release carbon dioxide"],
+        correct: 1
+    },
+    {
+        question: "What is the hardest natural substance on Earth?",
+        answers: ["Gold", "Diamond", "Iron", "Platinum"],
+        correct: 1
+    },
+    {
+        question: "What is the atomic number of hydrogen?",
+        answers: ["1", "2", "8", "10"],
+        correct: 0
+    },
+    {
+        question: "What force keeps the Earth in orbit around the Sun?",
+        answers: ["Magnetic force", "Gravitational force", "Electromagnetic force", "Frictional force"],
+        correct: 1
+    },
+    {
+        question: "Which planet is known as the 'Morning Star'?",
+        answers: ["Mars", "Venus", "Jupiter", "Saturn"],
+        correct: 1
+    },
+    {
+        question: "What is the process of turning a liquid into a gas called?",
+        answers: ["Freezing", "Melting", "Evaporation", "Condensation"],
+        correct: 2
+    },
+    {
+        question: "Which element is found in all organic compounds?",
+        answers: ["Oxygen", "Carbon", "Nitrogen", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical formula for carbon dioxide?",
+        answers: ["CO", "CO2", "O2", "H2O"],
+        correct: 1
+    },
+    {
+        question: "What is the boiling point of water in Celsius?",
+        answers: ["50°C", "100°C", "200°C", "0°C"],
+        correct: 1
+    },
+    {
+        question: "Which part of the plant is responsible for photosynthesis?",
+        answers: ["Roots", "Stem", "Leaves", "Flowers"],
+        correct: 2
+    },
+    {
+        question: "Which gas is most responsible for the greenhouse effect?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What type of rock is formed by the cooling and solidification of magma?",
+        answers: ["Sedimentary", "Metamorphic", "Igneous", "Fossil"],
+        correct: 2
+    },
+    {
+        question: "What is the unit of force?",
+        answers: ["Joule", "Newton", "Ampere", "Watt"],
+        correct: 1
+    },
+    {
+        question: "What is the smallest unit of an element?",
+        answers: ["Molecule", "Atom", "Proton", "Neutron"],
+        correct: 1
+    },
+    {
+        question: "What is the main gas responsible for acid rain?",
+        answers: ["Sulfur dioxide", "Carbon dioxide", "Nitrogen oxide", "Oxygen"],
+        correct: 0
+    },
+    {
+        question: "What type of bond involves the sharing of electrons?",
+        answers: ["Ionic bond", "Covalent bond", "Hydrogen bond", "Metallic bond"],
+        correct: 1
+    },
+    {
+        question: "What is the atomic number of oxygen?",
+        answers: ["6", "8", "10", "12"],
+        correct: 1
+    },
+    {
+        question: "Which particle has a positive charge?",
+        answers: ["Electron", "Proton", "Neutron", "Positron"],
+        correct: 1
+    },
+    {
+        question: "What is the most abundant gas in the Earth's atmosphere?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Argon"],
+        correct: 2
+    },
+    {
+        question: "What is the process by which a gas turns into a liquid?",
+        answers: ["Evaporation", "Condensation", "Freezing", "Melting"],
+        correct: 1
+    },
+    {
+        question: "What is the most common form of energy in a moving car?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Electrical energy"],
+        correct: 0
+    },
+    {
+        question: "What is the pH value of water?",
+        answers: ["0", "7", "10", "14"],
+        correct: 1
+    },
+    {
+        question: "Which part of the cell controls its activities?",
+        answers: ["Nucleus", "Mitochondria", "Ribosome", "Cytoplasm"],
+        correct: 0
+    },
+    {
+        question: "What is the function of white blood cells?",
+        answers: ["Carry oxygen", "Fight infections", "Produce insulin", "Clot blood"],
+        correct: 1
+    },
+    {
+        question: "Which is the smallest planet in the solar system?",
+        answers: ["Mercury", "Venus", "Earth", "Mars"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for methane?",
+        answers: ["CH4", "C2H6", "CO2", "H2O"],
+        correct: 0
+    },
+    {
+        question: "What does DNA stand for?",
+        answers: ["Deoxyribonucleic acid", "Dioxyribonucleic acid", "Deoxyribose nucleic acid", "Dioxyribose acid"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of an exothermic reaction?",
+        answers: ["Boiling water", "Burning wood", "Dissolving salt", "Melting ice"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of the circulatory system?",
+        answers: ["To protect the body from diseases", "To transport nutrients and oxygen", "To regulate body temperature", "To digest food"],
+        correct: 1
+    },
+    {
+        question: "Which scientist is known for the law of gravity?",
+        answers: ["Isaac Newton", "Albert Einstein", "Niels Bohr", "Marie Curie"],
+        correct: 0
+    },
+    {
+        question: "Which planet is known as the 'Giant Planet'?",
+        answers: ["Saturn", "Jupiter", "Uranus", "Neptune"],
+        correct: 1
+    },
+    {
+        question: "What is the unit of measurement for electric potential difference?",
+        answers: ["Volt", "Ampere", "Ohm", "Watt"],
+        correct: 0
+    },
+    {
+        question: "What is the process in which plants lose water through their leaves?",
+        answers: ["Absorption", "Respiration", "Transpiration", "Evaporation"],
+        correct: 2
+    },
+    {
+        question: "What is the process of converting a solid directly into a gas?",
+        answers: ["Sublimation", "Evaporation", "Condensation", "Freezing"],
+        correct: 0
+    },
+    {
+        question: "Which substance is essential for the formation of red blood cells?",
+        answers: ["Iodine", "Calcium", "Iron", "Magnesium"],
+        correct: 2
+    },
+    {
+        question: "What is the function of the kidneys in humans?",
+        answers: ["To produce insulin", "To filter blood", "To store food", "To regulate heart rate"],
+        correct: 1
+    },
+    {
+        question: "What is the atomic number of helium?",
+        answers: ["1", "2", "3", "4"],
+        correct: 1
+    },
+    {
+        question: "What is the process by which a solid changes into a liquid?",
+        answers: ["Melting", "Freezing", "Evaporation", "Condensation"],
+        correct: 0
+    },
+    {
+        question: "Which element is the most abundant in the Earth’s crust?",
+        answers: ["Iron", "Oxygen", "Silicon", "Aluminum"],
+        correct: 2
+    },
+    {
+        question: "What is the process by which a liquid turns into a solid?",
+        answers: ["Condensation", "Freezing", "Evaporation", "Melting"],
+        correct: 1
+    },
+    {
+        question: "What type of cell division produces gametes?",
+        answers: ["Mitosis", "Meiosis", "Binary fission", "Fertilization"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of the digestive system?",
+        answers: ["To regulate body temperature", "To break down food", "To pump blood", "To transport oxygen"],
+        correct: 1
+    },
+    {
+        question: "Which element is found in the highest amount in the human body?",
+        answers: ["Oxygen", "Hydrogen", "Carbon", "Nitrogen"],
+        correct: 0
+    },{
+        question: "What is the SI unit of force?",
+        answers: ["Joule", "Newton", "Pascal", "Ampere"],
+        correct: 1
+    },
+    {
+        question: "Which planet is known as the Red Planet?",
+        answers: ["Venus", "Earth", "Mars", "Jupiter"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical formula for water?",
+        answers: ["H2O", "O2", "CO2", "H2O2"],
+        correct: 0
+    },
+    {
+        question: "What is the speed of light in a vacuum?",
+        answers: ["3 x 10^8 m/s", "1 x 10^6 m/s", "2 x 10^8 m/s", "5 x 10^7 m/s"],
+        correct: 0
+    },
+    {
+        question: "What type of bond occurs when electrons are shared between atoms?",
+        answers: ["Ionic bond", "Covalent bond", "Hydrogen bond", "Metallic bond"],
+        correct: 1
+    },
+    {
+        question: "What is the smallest bone in the human body?",
+        answers: ["Stapes", "Femur", "Tibia", "Radius"],
+        correct: 0
+    },
+    {
+        question: "What type of energy is stored in food?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Nuclear energy"],
+        correct: 2
+    },
+    {
+        question: "What is the main gas in the Earth's atmosphere?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Helium"],
+        correct: 2
+    },
+    {
+        question: "Which of these is a non-renewable resource?",
+        answers: ["Solar energy", "Wind energy", "Natural gas", "Hydropower"],
+        correct: 2
+    },
+    {
+        question: "What type of rock forms from cooling magma?",
+        answers: ["Sedimentary", "Metamorphic", "Igneous", "Fossil"],
+        correct: 2
+    },
+    {
+        question: "Which organ in the human body is responsible for filtering blood?",
+        answers: ["Heart", "Lungs", "Kidneys", "Liver"],
+        correct: 2
+    },
+    {
+        question: "What is the main function of red blood cells?",
+        answers: ["To fight infection", "To carry oxygen", "To digest food", "To produce insulin"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical formula for ammonia?",
+        answers: ["NH3", "H2O", "CO2", "C2H6"],
+        correct: 0
+    },
+    {
+        question: "What is the atomic number of carbon?",
+        answers: ["6", "8", "12", "14"],
+        correct: 0
+    },
+    {
+        question: "What is the most abundant element in the Earth’s crust?",
+        answers: ["Oxygen", "Silicon", "Iron", "Aluminum"],
+        correct: 1
+    },
+    {
+        question: "Which of these is an example of an exothermic reaction?",
+        answers: ["Boiling water", "Dissolving salt in water", "Burning wood", "Melting ice"],
+        correct: 2
+    },
+    {
+        question: "What is the process by which plants make their own food?",
+        answers: ["Respiration", "Photosynthesis", "Digestion", "Fermentation"],
+        correct: 1
+    },
+    {
+        question: "What is the distance between the Earth and the Sun?",
+        answers: ["93 million miles", "10 million miles", "1 million miles", "100 million miles"],
+        correct: 0
+    },
+    {
+        question: "Which planet has the most moons?",
+        answers: ["Earth", "Mars", "Jupiter", "Saturn"],
+        correct: 2
+    },
+    {
+        question: "Which gas makes up about 21% of the Earth's atmosphere?",
+        answers: ["Oxygen", "Carbon dioxide", "Hydrogen", "Nitrogen"],
+        correct: 0
+    },
+    {
+        question: "Which organ produces insulin in the human body?",
+        answers: ["Stomach", "Liver", "Pancreas", "Kidneys"],
+        correct: 2
+    },
+    {
+        question: "What is the primary function of the human skeleton?",
+        answers: ["Movement", "Protection", "Support", "Blood circulation"],
+        correct: 2
+    },
+    {
+        question: "What is the boiling point of water at sea level?",
+        answers: ["90°C", "100°C", "110°C", "120°C"],
+        correct: 1
+    },
+    {
+        question: "Which particle has no charge?",
+        answers: ["Electron", "Proton", "Neutron", "Positron"],
+        correct: 2
+    },
+    {
+        question: "What is the most common element in the human body?",
+        answers: ["Oxygen", "Carbon", "Nitrogen", "Hydrogen"],
+        correct: 3
+    },
+    {
+        question: "Which scientist developed the theory of relativity?",
+        answers: ["Isaac Newton", "Albert Einstein", "Nikola Tesla", "Marie Curie"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for sodium?",
+        answers: ["Na", "S", "K", "Cl"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for table salt?",
+        answers: ["NaCl", "H2O", "CO2", "Na2SO4"],
+        correct: 0
+    },
+    {
+        question: "What is the human body's largest organ?",
+        answers: ["Liver", "Skin", "Heart", "Lungs"],
+        correct: 1
+    },
+    {
+        question: "What is the process by which animals convert food into energy?",
+        answers: ["Respiration", "Photosynthesis", "Fermentation", "Digestion"],
+        correct: 0
+    },
+    {
+        question: "Which vitamin is produced when the skin is exposed to sunlight?",
+        answers: ["Vitamin A", "Vitamin B", "Vitamin C", "Vitamin D"],
+        correct: 3
+    },
+    {
+        question: "Which planet is closest to the Sun?",
+        answers: ["Earth", "Venus", "Mercury", "Mars"],
+        correct: 2
+    },
+    {
+        question: "Which type of energy does a moving car have?",
+        answers: ["Kinetic energy", "Potential energy", "Chemical energy", "Thermal energy"],
+        correct: 0
+    },
+    {
+        question: "What is the most common type of rock in the Earth's crust?",
+        answers: ["Sedimentary", "Metamorphic", "Igneous", "Fossil"],
+        correct: 2
+    },
+    {
+        question: "What is the SI unit of power?",
+        answers: ["Joule", "Watt", "Newton", "Volt"],
+        correct: 1
+    },
+    {
+        question: "What is the process of turning a gas into a liquid?",
+        answers: ["Sublimation", "Freezing", "Condensation", "Evaporation"],
+        correct: 2
+    },
+    {
+        question: "What is the main function of mitochondria?",
+        answers: ["Protein synthesis", "Energy production", "DNA storage", "Cell division"],
+        correct: 1
+    },
+    {
+        question: "What is the center of an atom called?",
+        answers: ["Nucleus", "Electron cloud", "Proton", "Neutron"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a renewable energy source?",
+        answers: ["Coal", "Natural gas", "Solar energy", "Nuclear energy"],
+        correct: 2
+    },
+    {
+        question: "What is the process of photosynthesis mainly responsible for?",
+        answers: ["Producing oxygen", "Producing glucose", "Absorbing carbon dioxide", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the chemical formula for sulfuric acid?",
+        answers: ["H2SO4", "HCl", "HNO3", "NaOH"],
+        correct: 0
+    },
+    {
+        question: "Which gas do plants absorb from the atmosphere for photosynthesis?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 1
+    }, {
+        question: "What is the acceleration due to gravity on Earth?",
+        answers: ["9.8 m/s²", "10 m/s²", "9.2 m/s²", "8.9 m/s²"],
+        correct: 0
+    },
+    {
+        question: "Which of these is not a type of electromagnetic radiation?",
+        answers: ["Radio waves", "X-rays", "Sound waves", "Microwaves"],
+        correct: 2
+    },
+    {
+        question: "What type of energy is stored in a stretched rubber band?",
+        answers: ["Kinetic energy", "Potential energy", "Thermal energy", "Mechanical energy"],
+        correct: 1
+    },
+    {
+        question: "What is the atomic number of oxygen?",
+        answers: ["6", "8", "10", "12"],
+        correct: 1
+    },
+    {
+        question: "Which of these is a conductor of electricity?",
+        answers: ["Rubber", "Wood", "Copper", "Plastic"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical symbol for potassium?",
+        answers: ["P", "K", "Pa", "Pt"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a property of an acid?",
+        answers: ["Bitter taste", "Slippery texture", "Turns blue litmus paper red", "Feels rough to the touch"],
+        correct: 2
+    },
+    {
+        question: "Which gas is released when an acid reacts with a metal?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 3
+    },
+    {
+        question: "What is the main purpose of the respiratory system?",
+        answers: ["Circulate blood", "Exchange gases", "Break down food", "Produce hormones"],
+        correct: 1
+    },
+    {
+        question: "Which part of the plant is responsible for photosynthesis?",
+        answers: ["Roots", "Stem", "Leaves", "Flowers"],
+        correct: 2
+    },
+    {
+        question: "What is the largest planet in our solar system?",
+        answers: ["Earth", "Saturn", "Jupiter", "Neptune"],
+        correct: 2
+    },
+    {
+        question: "What is the center of an atom called?",
+        answers: ["Electron cloud", "Proton", "Neutron", "Nucleus"],
+        correct: 3
+    },
+    {
+        question: "What is the process by which plants release water vapor into the atmosphere?",
+        answers: ["Evaporation", "Transpiration", "Condensation", "Precipitation"],
+        correct: 1
+    },
+    {
+        question: "What type of reaction is used to break down food in the body?",
+        answers: ["Combustion", "Synthesis", "Respiration", "Decomposition"],
+        correct: 2
+    },
+    {
+        question: "What is the main function of white blood cells?",
+        answers: ["Transport oxygen", "Fight infection", "Carry nutrients", "Help in blood clotting"],
+        correct: 1
+    },
+    {
+        question: "Which of the following elements is a noble gas?",
+        answers: ["Oxygen", "Hydrogen", "Neon", "Nitrogen"],
+        correct: 2
+    },
+    {
+        question: "What is the process by which a solid changes directly into a gas?",
+        answers: ["Sublimation", "Melting", "Freezing", "Evaporation"],
+        correct: 0
+    },
+    {
+        question: "What is the boiling point of water in Fahrenheit?",
+        answers: ["100°F", "212°F", "32°F", "0°F"],
+        correct: 1
+    },
+    {
+        question: "Which scientist is known for the discovery of the law of gravity?",
+        answers: ["Galileo", "Newton", "Einstein", "Tesla"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for iron?",
+        answers: ["Fe", "Ir", "I", "Fr"],
+        correct: 0
+    },
+    {
+        question: "Which of these elements is a halogen?",
+        answers: ["Oxygen", "Chlorine", "Neon", "Argon"],
+        correct: 1
+    },
+    {
+        question: "What is the SI unit of temperature?",
+        answers: ["Kelvin", "Celsius", "Fahrenheit", "Joule"],
+        correct: 0
+    },
+    {
+        question: "What is the main component of natural gas?",
+        answers: ["Methane", "Ethane", "Butane", "Propane"],
+        correct: 0
+    },
+    {
+        question: "What is the force that pulls objects towards the Earth?",
+        answers: ["Inertia", "Gravity", "Magnetism", "Friction"],
+        correct: 1
+    },
+    {
+        question: "What is the common name for the element NaCl?",
+        answers: ["Water", "Table salt", "Sodium", "Sulfur"],
+        correct: 1
+    },
+    {
+        question: "What is the molecular formula for carbon dioxide?",
+        answers: ["CO", "CO2", "C2O", "C3O2"],
+        correct: 1
+    },
+    {
+        question: "Which is the most abundant gas in Earth's atmosphere?",
+        answers: ["Oxygen", "Nitrogen", "Carbon dioxide", "Argon"],
+        correct: 1
+    },
+    {
+        question: "What is the primary energy source for the Sun?",
+        answers: ["Nuclear fusion", "Chemical reactions", "Electrical energy", "Solar energy"],
+        correct: 0
+    },
+    {
+        question: "What is the study of the Earth's structure and materials called?",
+        answers: ["Geology", "Astronomy", "Meteorology", "Biology"],
+        correct: 0
+    },
+    {
+        question: "Which of these is an example of a compound?",
+        answers: ["Oxygen", "Water", "Iron", "Carbon"],
+        correct: 1
+    },
+    {
+        question: "Which scientist is credited with developing the periodic table of elements?",
+        answers: ["Mendeleev", "Einstein", "Bohr", "Thomson"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for methane?",
+        answers: ["CH4", "C2H6", "C3H8", "CO2"],
+        correct: 0
+    },
+    {
+        question: "What is the main component of the Earth's core?",
+        answers: ["Iron", "Oxygen", "Nickel", "Sulfur"],
+        correct: 0
+    },
+    {
+        question: "What is the primary source of Earth's energy?",
+        answers: ["The Moon", "The Sun", "Wind", "Fossil fuels"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a physical change?",
+        answers: ["Burning wood", "Rusting iron", "Boiling water", "Digesting food"],
+        correct: 2
+    },{
+        question: "What is the chemical symbol for gold?",
+        answers: ["Go", "Ag", "Au", "Pb"],
+        correct: 2
+    },
+    {
+        question: "What is the process by which plants make their own food?",
+        answers: ["Respiration", "Photosynthesis", "Fermentation", "Transpiration"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of red blood cells?",
+        answers: ["Fight infection", "Transport oxygen", "Clot blood", "Carry nutrients"],
+        correct: 1
+    },
+    {
+        question: "Which of these is the largest organ in the human body?",
+        answers: ["Brain", "Heart", "Liver", "Skin"],
+        correct: 3
+    },
+    {
+        question: "Which planet is known as the Red Planet?",
+        answers: ["Earth", "Mars", "Venus", "Jupiter"],
+        correct: 1
+    },
+    {
+        question: "What type of energy is stored in a battery?",
+        answers: ["Potential energy", "Kinetic energy", "Chemical energy", "Nuclear energy"],
+        correct: 2
+    },
+    {
+        question: "Which gas is primarily responsible for global warming?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is not a greenhouse gas?",
+        answers: ["Methane", "Carbon dioxide", "Oxygen", "Nitrous oxide"],
+        correct: 2
+    },
+    {
+        question: "What is the main gas found in Earth's atmosphere?",
+        answers: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the force that opposes motion between two surfaces?",
+        answers: ["Inertia", "Friction", "Gravity", "Magnetism"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a non-renewable energy source?",
+        answers: ["Solar energy", "Wind energy", "Coal", "Geothermal energy"],
+        correct: 2
+    },
+    {
+        question: "Which planet is closest to the Sun?",
+        answers: ["Earth", "Mercury", "Venus", "Mars"],
+        correct: 1
+    },
+    {
+        question: "What is the atomic number of carbon?",
+        answers: ["6", "12", "8", "14"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a conductor?",
+        answers: ["Wood", "Plastic", "Copper", "Rubber"],
+        correct: 2
+    },
+    {
+        question: "Which part of the atom carries a positive charge?",
+        answers: ["Electron", "Proton", "Neutron", "Nucleus"],
+        correct: 1
+    },
+    {
+        question: "What is the process by which water turns from a liquid to a gas?",
+        answers: ["Freezing", "Melting", "Evaporation", "Condensation"],
+        correct: 2
+    },
+    {
+        question: "What is the formula for calculating work done?",
+        answers: ["W = F × D", "W = F × V", "W = F × A", "W = M × V"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a chemical change?",
+        answers: ["Boiling water", "Dissolving sugar", "Burning wood", "Breaking glass"],
+        correct: 2
+    },
+    {
+        question: "What is the unit of electric current?",
+        answers: ["Volt", "Watt", "Ampere", "Ohm"],
+        correct: 2
+    },
+    {
+        question: "Which of these is a renewable energy source?",
+        answers: ["Coal", "Natural gas", "Wind", "Nuclear energy"],
+        correct: 2
+    },
+    {
+        question: "What is the chemical symbol for sodium?",
+        answers: ["Na", "S", "So", "Sn"],
+        correct: 0
+    },
+    {
+        question: "Which planet has the longest day?",
+        answers: ["Earth", "Venus", "Mars", "Jupiter"],
+        correct: 1
+    },
+    {
+        question: "Which of these is an example of an insulator?",
+        answers: ["Aluminum", "Copper", "Wood", "Iron"],
+        correct: 2
+    },
+    {
+        question: "Which type of energy does a moving car have?",
+        answers: ["Potential energy", "Kinetic energy", "Thermal energy", "Chemical energy"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a characteristic of a living organism?",
+        answers: ["Ability to move", "Ability to reproduce", "Ability to conduct electricity", "Ability to dissolve in water"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of the digestive system?",
+        answers: ["Transport oxygen", "Break down food", "Control body temperature", "Send signals to the brain"],
+        correct: 1
+    },
+    {
+        question: "What is the largest internal organ in the human body?",
+        answers: ["Heart", "Liver", "Lungs", "Kidneys"],
+        correct: 1
+    },
+    {
+        question: "What is the boiling point of water in Celsius?",
+        answers: ["0°C", "100°C", "212°C", "50°C"],
+        correct: 1
+    },
+    {
+        question: "What is the most common element in the Earth's crust?",
+        answers: ["Iron", "Aluminum", "Oxygen", "Silicon"],
+        correct: 2
+    },
+    {
+        question: "What is the primary source of energy for Earth?",
+        answers: ["Moon", "Wind", "Sun", "Fossil Fuels"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a chemical change?",
+        answers: ["Boiling water", "Melting ice", "Rusting of iron", "Dissolving sugar in water"],
+        correct: 2
+    },
+    {
+        question: "Which is the main source of energy for the Earth?",
+        answers: ["The Moon", "The Sun", "The Earth’s core", "Wind energy"],
+        correct: 1
+    },
+    {
+        question: "What is the SI unit of force?",
+        answers: ["Newton", "Joule", "Pascal", "Watt"],
+        correct: 0
+    },
+    {
+        question: "What is the process by which plants make their food?",
+        answers: ["Respiration", "Digestion", "Photosynthesis", "Transpiration"],
+        correct: 2
+    },
+    {
+        question: "Which gas do plants absorb from the atmosphere for photosynthesis?",
+        answers: ["Oxygen", "Carbon dioxide", "Nitrogen", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the chemical symbol for water?",
+        answers: ["H2O", "O2", "CO2", "H2"],
+        correct: 0
+    },
+    {
+        question: "What is the formula for calculating the force exerted on an object?",
+        answers: ["F = mv", "F = m/g", "F = ma", "F = mV²"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a non-renewable resource?",
+        answers: ["Wind energy", "Solar energy", "Coal", "Geothermal energy"],
+        correct: 2
+    },
+    {
+        question: "Which element has the atomic number 8?",
+        answers: ["Oxygen", "Hydrogen", "Carbon", "Nitrogen"],
+        correct: 0
+    },
+    {
+        question: "What is the main component of the Earth's atmosphere?",
+        answers: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"],
+        correct: 1
+    },
+    {
+        question: "What is the atomic number of carbon?",
+        answers: ["4", "6", "8", "12"],
+        correct: 1
+    },
+    {
+        question: "What type of energy is stored in a battery?",
+        answers: ["Chemical energy", "Kinetic energy", "Thermal energy", "Potential energy"],
+        correct: 0
+    },
+    {
+        question: "Which force keeps the planets in orbit around the Sun?",
+        answers: ["Friction", "Magnetic force", "Gravitational force", "Electrostatic force"],
+        correct: 2
+    },
+    {
+        question: "What is the process by which a liquid turns into a gas?",
+        answers: ["Condensation", "Evaporation", "Sublimation", "Freezing"],
+        correct: 1
+    },
+    {
+        question: "Which planet is known as the 'Red Planet'?",
+        answers: ["Earth", "Mars", "Venus", "Saturn"],
+        correct: 1
+    },
+    {
+        question: "Which element is essential for the production of thyroid hormones?",
+        answers: ["Iodine", "Iron", "Calcium", "Magnesium"],
+        correct: 0
+    },
+    {
+        question: "Which part of the cell contains the genetic material?",
+        answers: ["Cytoplasm", "Mitochondria", "Nucleus", "Ribosome"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a type of simple machine?",
+        answers: ["Inclined plane", "Bicycle", "Car", "Airplane"],
+        correct: 0
+    },
+    {
+        question: "What is the chemical formula for methane?",
+        answers: ["CH4", "C2H6", "C3H8", "C4H10"],
+        correct: 0
+    },
+    {
+        question: "What type of bond is formed when two atoms share electrons?",
+        answers: ["Ionic bond", "Covalent bond", "Hydrogen bond", "Metallic bond"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of the human respiratory system?",
+        answers: ["Transporting oxygen to the blood", "Transporting nutrients", "Digesting food", "Excreting waste products"],
+        correct: 0
+    }
+
+
+]
+
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

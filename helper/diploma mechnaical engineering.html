@@ -1,0 +1,2048 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    
+    const questions = [
+    {
+    question: "Which of the following is used to measure the velocity of a fluid?",
+    answers: ["Pitot tube", "Manometer", "Thermocouple", "Barometer"],
+    correct: 0
+}
+,{
+    question: "Which law states that the pressure of a gas is directly proportional to its temperature at constant volume?",
+    answers: ["Boyle's Law", "Charles's Law", "Gay-Lussac's Law", "Avogadro's Law"],
+    correct: 2
+},
+{
+    question: "What is the primary purpose of a governor in an engine?",
+    answers: ["To control the fuel injection", "To regulate engine speed", "To monitor exhaust gases", "To increase engine power"],
+    correct: 1
+},
+{
+    question: "In a refrigeration cycle, which component is responsible for the expansion of refrigerant?",
+    answers: ["Condenser", "Compressor", "Expansion valve", "Evaporator"],
+    correct: 2
+},
+{
+    question: "Which of the following materials is commonly used for manufacturing engine pistons?",
+    answers: ["Cast iron", "Aluminum alloy", "Copper", "Steel"],
+    correct: 1
+},
+{
+    question: "What type of stress is experienced by a material under tension?",
+    answers: ["Compressive stress", "Shear stress", "Tensile stress", "Bending stress"],
+    correct: 2
+}
+,{
+    question: "Which of the following devices is used to measure the flow rate of a fluid?",
+    answers: ["Orifice plate", "Venturi meter", "Rotameter", "All of the above"],
+    correct: 3
+},
+{
+    question: "What is the function of a heat exchanger in a mechanical system?",
+    answers: ["To transfer heat between two fluids", "To increase fluid velocity", "To filter impurities from fluids", "To cool down the engine"],
+    correct: 0
+},
+{
+    question: "In a four-stroke engine, which stroke is responsible for exhaust gas removal?",
+    answers: ["Intake stroke", "Compression stroke", "Power stroke", "Exhaust stroke"],
+    correct: 3
+},
+{
+    question: "What is the main purpose of a flywheel in an engine?",
+    answers: ["To reduce vibration", "To store rotational energy", "To cool the engine", "To increase torque"],
+    correct: 1
+},
+{
+    question: "Which property of a material is measured using a Rockwell hardness test?",
+    answers: ["Tensile strength", "Elasticity", "Hardness", "Impact resistance"],
+    correct: 2
+}
+,
+    {
+        question: "Which of the following is the primary purpose of a centrifugal pump?",
+        answers: ["To increase fluid pressure", "To decrease fluid temperature", "To measure fluid flow", "To filter impurities from the fluid"],
+        correct: 0
+    },
+    {
+        question: "What is the unit of torque in the SI system?",
+        answers: ["Newton", "Joule", "Newton-meter", "Pascal"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is used to measure high temperatures?",
+        answers: ["Thermocouple", "Manometer", "Pyrometer", "Anemometer"],
+        correct: 2
+    },
+    {
+        question: "What is the main function of a radiator in an automobile?",
+        answers: ["To cool the engine", "To lubricate the engine", "To filter exhaust gases", "To store fuel"],
+        correct: 0
+    },
+    {
+        question: "Which cycle is used in internal combustion engines?",
+        answers: ["Rankine Cycle", "Brayton Cycle", "Otto Cycle", "Carnot Cycle"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an example of a non-renewable energy source?",
+        answers: ["Wind energy", "Solar energy", "Coal", "Hydroelectric energy"],
+        correct: 2
+    },
+    {
+        question: "Which of the following stresses is experienced by a body under torsion?",
+        answers: ["Shear stress", "Tensile stress", "Compressive stress", "Bending stress"],
+        correct: 0
+    },
+    {
+        question: "In a refrigeration system, the refrigerant is typically compressed in which component?",
+        answers: ["Condenser", "Compressor", "Evaporator", "Expansion valve"],
+        correct: 1
+    },
+    {
+        question: "Which material is most commonly used in the manufacturing of turbine blades?",
+        answers: ["Aluminum", "Titanium", "Stainless steel", "Nickel alloys"],
+        correct: 3
+    },
+    {
+        question: "What is the primary function of an intercooler in a turbocharged engine?",
+        answers: ["To increase the pressure of the intake air", "To increase engine speed", "To cool the compressed air", "To filter the exhaust gases"],
+        correct: 2
+    },{
+        question: "Which of the following is a type of fluid friction?",
+        answers: ["Viscous drag", "Tensile stress", "Shear stress", "Compressive stress"],
+        correct: 0
+    },
+    {
+        question: "In thermodynamics, which law states that energy cannot be created or destroyed?",
+        answers: ["First Law of Thermodynamics", "Second Law of Thermodynamics", "Third Law of Thermodynamics", "Zeroth Law of Thermodynamics"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common method of reducing friction in mechanical systems?",
+        answers: ["Lubrication", "Heating", "Shocking", "Tensile strength"],
+        correct: 0
+    },
+    {
+        question: "What is the primary purpose of a valve in a mechanical system?",
+        answers: ["To increase pressure", "To control the flow of fluid", "To decrease temperature", "To filter impurities"],
+        correct: 1
+    },
+    {
+        question: "Which of the following materials is commonly used for making machine bearings?",
+        answers: ["Copper", "Aluminum", "Bronze", "Cast iron"],
+        correct: 2
+    },
+    {
+        question: "In the context of heat transfer, what does 'convection' refer to?",
+        answers: ["Heat transfer through solid materials", "Heat transfer through fluid motion", "Heat transfer via electromagnetic radiation", "None of the above"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a thermodynamic cycle used in refrigeration?",
+        answers: ["Carnot Cycle", "Brayton Cycle", "Rankine Cycle", "Vapor-compression Cycle"],
+        correct: 3
+    },
+    {
+        question: "Which of the following methods is used to improve the efficiency of an internal combustion engine?",
+        answers: ["Turbocharging", "Supercharging", "Variable valve timing", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the role of a clutch in a mechanical system?",
+        answers: ["To increase torque", "To reduce vibration", "To engage or disengage power transmission", "To cool the engine"],
+        correct: 2
+    },
+    {
+        question: "Which type of material is primarily used for manufacturing gears?",
+        answers: ["Plastic", "Rubber", "Steel", "Copper"],
+        correct: 2
+    }, {
+        question: "Which of the following devices is used to measure the flow of gases?",
+        answers: ["Orifice meter", "Rotameter", "Pitot tube", "Venturi meter"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'specific heat capacity' refer to?",
+        answers: ["The heat required to change the temperature of a unit mass of a substance by one degree Celsius", "The heat required to melt a unit mass of a substance", "The total energy stored in a material", "The energy required to vaporize a substance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is not a property of an ideal fluid?",
+        answers: ["Incompressibility", "Viscosity", "Irrotational", "Steady flow"],
+        correct: 1
+    },
+    {
+        question: "In the context of fluid dynamics, what is the Reynolds number used to determine?",
+        answers: ["Viscosity of the fluid", "Type of flow (laminar or turbulent)", "Density of the fluid", "Velocity of the fluid"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the primary function of a compressor in a refrigeration system?",
+        answers: ["To increase the temperature of the refrigerant", "To compress the refrigerant and raise its pressure", "To reduce the energy consumption", "To control refrigerant flow"],
+        correct: 1
+    },
+    {
+        question: "In a steam power plant, the function of a condenser is to?",
+        answers: ["Increase steam temperature", "Convert steam into liquid water", "Burn coal", "Heat the feed water"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used in the manufacturing of high-strength steel?",
+        answers: ["Iron", "Carbon", "Nickel", "Manganese"],
+        correct: 1
+    },
+    {
+        question: "Which of the following materials is commonly used for the construction of turbine blades in power plants?",
+        answers: ["Aluminum", "Stainless steel", "Titanium", "Nickel-based alloys"],
+        correct: 3
+    },
+    {
+        question: "What is the primary purpose of a bearing in mechanical systems?",
+        answers: ["To reduce friction between moving parts", "To increase speed", "To store energy", "To cool the engine"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the temperature of a substance?",
+        answers: ["Manometer", "Thermometer", "Anemometer", "Barometer"],
+        correct: 1
+    },{
+        question: "What is the main purpose of the crankshaft in an engine?",
+        answers: ["To compress the fuel-air mixture", "To convert linear motion into rotational motion", "To circulate coolant", "To ignite the fuel"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a common method of heat transfer in a fluid system?",
+        answers: ["Convection", "Conduction", "Radiation", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which material is commonly used in the construction of heat exchangers?",
+        answers: ["Copper", "Aluminum", "Stainless steel", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "In thermodynamics, which process occurs at constant pressure?",
+        answers: ["Isochoric process", "Isobaric process", "Isothermal process", "Adiabatic process"],
+        correct: 1
+    },
+    {
+        question: "Which component of an internal combustion engine is responsible for controlling the intake and exhaust of gases?",
+        answers: ["Pistons", "Crankshaft", "Valves", "Flywheel"],
+        correct: 2
+    },
+    {
+        question: "What is the function of the radiator in an automobile?",
+        answers: ["To increase engine power", "To reduce the exhaust temperature", "To remove heat from the engine", "To filter the exhaust gases"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'hydraulic pressure' refer to?",
+        answers: ["The force per unit area exerted by a liquid", "The speed of a liquid in motion", "The amount of heat generated in a fluid system", "The volume of fluid passing through a pipe"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure fluid pressure?",
+        answers: ["Thermometer", "Manometer", "Anemometer", "Barometer"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a type of welding process?",
+        answers: ["Milling", "Turning", "Arc welding", "Grinding"],
+        correct: 2
+    },
+    {
+        question: "Which of the following materials is used for manufacturing the body of a car engine?",
+        answers: ["Cast iron", "Aluminum alloy", "Plastic", "Copper"],
+        correct: 1
+    },{
+        question: "What is the main function of a governor in an engine?",
+        answers: ["To control the fuel-air mixture", "To regulate the engine speed", "To increase engine power", "To reduce the engine noise"],
+        correct: 1
+    },
+    {
+        question: "In which type of pump is the fluid moved by centrifugal force?",
+        answers: ["Gear pump", "Piston pump", "Centrifugal pump", "Diaphragm pump"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the primary function of a differential in an automobile?",
+        answers: ["To distribute power between the wheels", "To increase torque", "To reduce speed", "To control the engine temperature"],
+        correct: 0
+    },
+    {
+        question: "What is the unit of power in the International System of Units (SI)?",
+        answers: ["Newton", "Joule", "Watt", "Pascal"],
+        correct: 2
+    },
+    {
+        question: "Which of the following materials has the highest thermal conductivity?",
+        answers: ["Copper", "Aluminum", "Steel", "Silver"],
+        correct: 3
+    },
+    {
+        question: "In a diesel engine, what type of ignition system is used?",
+        answers: ["Spark ignition", "Compression ignition", "Magnetic ignition", "Electronic ignition"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of the camshaft in an engine?",
+        answers: ["To control the intake and exhaust valves", "To compress the fuel-air mixture", "To convert rotational motion into linear motion", "To circulate the coolant"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the hardness of a material?",
+        answers: ["Tensile test", "Rockwell test", "Impact test", "Fatigue test"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the main advantage of using a supercharger in an engine?",
+        answers: ["To reduce engine weight", "To increase engine power", "To improve fuel efficiency", "To reduce engine size"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used in the construction of a gas turbine engine?",
+        answers: ["Aluminum alloy", "Nickel alloy", "Copper", "Plastic"],
+        correct: 1
+    },{
+        question: "What is the main purpose of a muffler in an automobile?",
+        answers: ["To increase engine power", "To reduce engine noise", "To filter the exhaust gases", "To cool the engine"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a measure of the amount of heat needed to raise the temperature of a unit mass of a substance by one degree Celsius?",
+        answers: ["Specific heat capacity", "Latent heat", "Thermal conductivity", "Temperature gradient"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of a flywheel in an engine?",
+        answers: ["To store energy", "To increase engine speed", "To control the fuel-air mixture", "To reduce friction"],
+        correct: 0
+    },
+    {
+        question: "Which type of fluid is primarily used in hydraulic systems?",
+        answers: ["Air", "Water", "Oil", "Gas"],
+        correct: 2
+    },
+    {
+        question: "Which of the following processes is used to reduce the carbon content of steel?",
+        answers: ["Annealing", "Quenching", "Tempering", "Decarburizing"],
+        correct: 3
+    },
+    {
+        question: "What type of energy is stored in a compressed spring?",
+        answers: ["Kinetic energy", "Elastic potential energy", "Gravitational potential energy", "Chemical energy"],
+        correct: 1
+    },
+    {
+        question: "Which of the following materials is commonly used in the construction of boiler tubes?",
+        answers: ["Copper", "Steel", "Aluminum", "Brass"],
+        correct: 1
+    },
+    {
+        question: "Which law of thermodynamics deals with the entropy of a system?",
+        answers: ["Zeroth Law", "First Law", "Second Law", "Third Law"],
+        correct: 2
+    },
+    {
+        question: "In an internal combustion engine, which component is responsible for igniting the fuel-air mixture in a gasoline engine?",
+        answers: ["Piston", "Spark plug", "Valve", "Crankshaft"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to measure the flow of fluids in a pipeline?",
+        answers: ["Manometer", "Rotameter", "Thermometer", "Barometer"],
+        correct: 1
+    },{
+        question: "Which of the following is a common method of heat treatment for improving the hardness of steel?",
+        answers: ["Annealing", "Quenching", "Tempering", "Normalizing"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of the radiator in an internal combustion engine?",
+        answers: ["To cool the engine coolant", "To lubricate the engine", "To ignite the fuel-air mixture", "To increase engine power"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is typically used for the construction of exhaust systems in automobiles?",
+        answers: ["Cast iron", "Aluminum", "Stainless steel", "Copper"],
+        correct: 2
+    },
+    {
+        question: "What is the key advantage of using a turbocharger in an engine?",
+        answers: ["To increase engine torque", "To reduce fuel consumption", "To increase engine power", "To decrease engine temperature"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a function of a timing belt in an engine?",
+        answers: ["To synchronize the rotation of the crankshaft and camshaft", "To increase engine power", "To cool the engine", "To regulate exhaust flow"],
+        correct: 0
+    },
+    {
+        question: "What is the primary purpose of an air filter in an engine?",
+        answers: ["To increase air intake", "To prevent dirt and debris from entering the engine", "To cool the engine air", "To increase engine power"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a non-ferrous metal used in engineering applications?",
+        answers: ["Cast iron", "Steel", "Aluminum", "Copper alloy"],
+        correct: 2
+    },
+    {
+        question: "Which law of thermodynamics states that energy cannot be created or destroyed?",
+        answers: ["Zeroth Law", "First Law", "Second Law", "Third Law"],
+        correct: 1
+    },
+    {
+        question: "In the context of engines, what does the term 'compression ratio' refer to?",
+        answers: ["The ratio of the volume of the cylinder at the bottom of the piston stroke to the volume at the top", "The ratio of the fuel efficiency to engine displacement", "The pressure of the air-fuel mixture before ignition", "The fuel consumption rate"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a key component in a refrigeration system responsible for transferring heat?",
+        answers: ["Compressor", "Evaporator", "Condenser", "All of the above"],
+        correct: 3
+    }, {
+        question: "Which of the following is the primary function of a turbocharger in an engine?",
+        answers: ["To reduce exhaust emissions", "To increase engine power by forcing more air into the combustion chamber", "To reduce engine noise", "To cool the engine"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a property of a good refrigerant?",
+        answers: ["Low boiling point", "High boiling point", "High thermal conductivity", "Low viscosity"],
+        correct: 0
+    },
+    {
+        question: "Which of the following components is used to control the flow of exhaust gases in a turbocharger?",
+        answers: ["Wastegate", "Intercooler", "Blower", "Fuel injector"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'specific heat' refer to in thermodynamics?",
+        answers: ["The heat required to raise the temperature of a unit mass of a substance by one degree Celsius", "The heat absorbed during a phase change", "The heat lost by a substance during cooling", "The heat required to melt a substance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main advantage of using composite materials in mechanical engineering?",
+        answers: ["Low density", "High strength-to-weight ratio", "High thermal conductivity", "Low cost"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of a bearing in a mechanical system?",
+        answers: ["To reduce friction between moving parts", "To store energy", "To increase the speed of rotation", "To support a load without moving"],
+        correct: 0
+    },
+    {
+        question: "Which of the following welding processes uses a non-consumable electrode?",
+        answers: ["MIG welding", "TIG welding", "Stick welding", "Plasma arc welding"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a non-mechanical energy source used in engineering?",
+        answers: ["Wind energy", "Internal combustion energy", "Electrical energy", "Thermal energy"],
+        correct: 0
+    },
+    {
+        question: "Which material is commonly used to manufacture gears in mechanical systems?",
+        answers: ["Steel", "Cast iron", "Aluminum", "Copper"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common method of cooling in a high-performance engine?",
+        answers: ["Water cooling", "Air cooling", "Oil cooling", "All of the above"],
+        correct: 3
+    },{
+        question: "Which of the following materials is commonly used for manufacturing piston rings?",
+        answers: ["Cast iron", "Aluminum", "Copper", "Brass"],
+        correct: 0
+    },
+    {
+        question: "What is the primary function of the timing belt in an engine?",
+        answers: ["To power the alternator", "To regulate the intake and exhaust valves", "To cool the engine", "To increase engine power"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the primary purpose of a clutch in an automobile?",
+        answers: ["To control the fuel-air mixture", "To disconnect the engine from the transmission", "To increase engine speed", "To cool the engine"],
+        correct: 1
+    },
+    {
+        question: "Which of the following components is responsible for mixing the fuel and air in an internal combustion engine?",
+        answers: ["Piston", "Carburetor", "Alternator", "Radiator"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of a camshaft in an engine?",
+        answers: ["To control the timing of the intake and exhaust valves", "To ignite the fuel-air mixture", "To circulate the coolant", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the unit of angular velocity?",
+        answers: ["Meter", "Foot", "Radian per second", "Newton"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a characteristic of a heat exchanger?",
+        answers: ["To transfer heat between two or more fluids", "To generate electricity", "To filter contaminants", "To reduce noise"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the flow of fluid in a pipeline?",
+        answers: ["Manometer", "Rotameter", "Barometer", "Thermometer"],
+        correct: 1
+    },
+    {
+        question: "In which of the following components is the fuel-air mixture compressed in an internal combustion engine?",
+        answers: ["Cylinder", "Crankshaft", "Spark plug", "Camshaft"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main advantage of using aluminum in engineering applications?",
+        answers: ["High strength-to-weight ratio", "High thermal conductivity", "Low cost", "High durability"],
+        correct: 0
+    },{
+        question: "Which of the following is the function of a piston in an internal combustion engine?",
+        answers: ["To compress the fuel-air mixture", "To ignite the fuel", "To control the exhaust flow", "To reduce the engine temperature"],
+        correct: 0
+    },
+    {
+        question: "What is the primary material used for the construction of turbine blades in steam power plants?",
+        answers: ["Steel", "Aluminum", "Titanium", "Nickel-based alloys"],
+        correct: 3
+    },
+    {
+        question: "Which of the following devices is used to measure pressure in a closed vessel?",
+        answers: ["Thermometer", "Manometer", "Barometer", "Flowmeter"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'thermal conductivity' refer to in materials science?",
+        answers: ["The ability of a material to conduct electricity", "The ability of a material to resist thermal expansion", "The ability of a material to transfer heat", "The ability of a material to absorb moisture"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the most common type of bearing used in mechanical systems?",
+        answers: ["Ball bearing", "Roller bearing", "Needle bearing", "Sleeve bearing"],
+        correct: 0
+    },
+    {
+        question: "Which law of thermodynamics defines the concept of entropy?",
+        answers: ["Zeroth Law", "First Law", "Second Law", "Third Law"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is commonly used to reduce vibrations in mechanical systems?",
+        answers: ["Shock absorber", "Gearbox", "Camshaft", "Piston ring"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the rotational speed of a shaft?",
+        answers: ["Tachometer", "Barometer", "Anemometer", "Manometer"],
+        correct: 0
+    },
+    {
+        question: "In mechanical engineering, what does the term 'fatigue' refer to?",
+        answers: ["The gradual weakening of a material under cyclic stress", "The loss of strength due to excessive heat", "The reduction of elasticity due to pressure", "The permanent deformation of a material under high load"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a governor in an internal combustion engine?",
+        answers: ["To regulate the speed of the engine", "To control the exhaust gases", "To lubricate the engine parts", "To ignite the fuel-air mixture"],
+        correct: 0
+    },{
+        question: "Which of the following types of welding is most commonly used for joining thin sheet metals?",
+        answers: ["MIG welding", "TIG welding", "Stick welding", "Spot welding"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of an intercooler in a turbocharged engine?",
+        answers: ["To increase the air intake temperature", "To reduce the air intake temperature before compression", "To increase exhaust temperature", "To prevent turbocharger failure"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'specific volume' refer to in thermodynamics?",
+        answers: ["The volume occupied by a unit mass of a substance", "The volume occupied by a unit temperature", "The volume occupied by a substance at a constant pressure", "The volume of the fuel-air mixture"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main advantage of using a heat pump for heating and cooling?",
+        answers: ["It is energy efficient", "It requires no electricity", "It is low-cost", "It does not require maintenance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the most common material used for manufacturing gears?",
+        answers: ["Steel", "Copper", "Aluminum", "Titanium"],
+        correct: 0
+    },
+    {
+        question: "Which of the following properties is most important when selecting a material for high-temperature applications?",
+        answers: ["Thermal conductivity", "Density", "Melting point", "Color"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is used to measure torque in a mechanical system?",
+        answers: ["Thermometer", "Tachometer", "Dynamometer", "Manometer"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'draft' refer to in casting operations?",
+        answers: ["The taper provided to the pattern to allow it to be removed from the mold", "The type of metal used in casting", "The time required for cooling", "The process of cleaning the mold"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is commonly used as a lubricant in internal combustion engines?",
+        answers: ["Water", "Oil", "Air", "Coolant"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a key characteristic of a compressor in a refrigeration system?",
+        answers: ["It compresses the refrigerant gas", "It increases the temperature of the refrigerant gas", "It absorbs heat from the environment", "It removes moisture from the refrigerant"],
+        correct: 0
+    }, {
+        question: "Which of the following types of pump is used for high-pressure applications?",
+        answers: ["Centrifugal pump", "Reciprocating pump", "Gear pump", "Peristaltic pump"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to increase the efficiency of an internal combustion engine?",
+        answers: ["Turbocharger", "Water pump", "Exhaust valve", "Flywheel"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is best suited for high-speed bearings?",
+        answers: ["Steel", "Cast iron", "Copper", "Aluminum"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a flywheel in a mechanical system?",
+        answers: ["To store rotational energy", "To reduce vibration", "To generate electricity", "To regulate exhaust gases"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common method used to reduce friction in mechanical systems?",
+        answers: ["Lubrication", "Compression", "Tension", "Vibration"],
+        correct: 0
+    },
+    {
+        question: "Which law of thermodynamics is concerned with the conservation of energy?",
+        answers: ["First Law", "Second Law", "Third Law", "Zeroth Law"],
+        correct: 0
+    },
+    {
+        question: "Which of the following components is responsible for controlling the airflow into an internal combustion engine?",
+        answers: ["Throttle valve", "Fuel injector", "Piston", "Crankshaft"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main advantage of using a ceramic material in engineering applications?",
+        answers: ["High thermal resistance", "High electrical conductivity", "Low melting point", "Low density"],
+        correct: 0
+    },
+    {
+        question: "What is the function of an air compressor in a pneumatic system?",
+        answers: ["To convert mechanical energy into potential energy", "To convert electrical energy into mechanical energy", "To convert compressed air into electricity", "To reduce pressure in the system"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is commonly used to measure the pressure of gases?",
+        answers: ["Manometer", "Barometer", "Tachometer", "Voltmeter"],
+        correct: 0
+    }, {
+        question: "Which of the following is a property of a good refrigerant in a refrigeration cycle?",
+        answers: ["High thermal conductivity", "Low boiling point", "Low density", "Low specific heat capacity"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to prevent overheating in an internal combustion engine?",
+        answers: ["Radiator", "Flywheel", "Clutch", "Compressor"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a differential in an automobile?",
+        answers: ["To transmit torque from the engine to the wheels", "To adjust the braking power", "To allow the wheels to rotate at different speeds", "To control exhaust emissions"],
+        correct: 2
+    },
+    {
+        question: "What type of stress is experienced by a material subjected to twisting or rotational forces?",
+        answers: ["Shear stress", "Tensile stress", "Compressive stress", "Bending stress"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to remove the heat from the refrigerant in a refrigeration system?",
+        answers: ["Condenser", "Evaporator", "Compressor", "Expansion valve"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the unit of work in mechanical systems?",
+        answers: ["Newton", "Joule", "Meter", "Pascal"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of an expansion valve in a refrigeration system?",
+        answers: ["To increase the pressure of the refrigerant", "To reduce the pressure of the refrigerant", "To control the refrigerant flow", "To absorb heat from the environment"],
+        correct: 2
+    },
+    {
+        question: "What is the function of a governor in an engine?",
+        answers: ["To regulate the engine speed", "To regulate the fuel-air mixture", "To ignite the fuel", "To increase the torque"],
+        correct: 0
+    },
+    {
+        question: "What is the most common type of corrosion in metals?",
+        answers: ["Galvanic corrosion", "Pitting corrosion", "Uniform corrosion", "Crevice corrosion"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a commonly used method for material testing to determine the hardness of a material?",
+        answers: ["Brinell hardness test", "Tensile test", "Impact test", "Fatigue test"],
+        correct: 0
+    },{
+        question: "Which of the following is used to measure the strain in a material?",
+        answers: ["Strain gauge", "Manometer", "Thermometer", "Tachometer"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a camshaft in an internal combustion engine?",
+        answers: ["To control the opening and closing of the engine valves", "To compress the fuel-air mixture", "To ignite the fuel", "To control exhaust gases"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is commonly used for making pistons in an engine?",
+        answers: ["Aluminum", "Copper", "Steel", "Brass"],
+        correct: 0
+    },
+    {
+        question: "In a steam turbine, which of the following is used to extract the work from the high-pressure steam?",
+        answers: ["Turbine blades", "Compressor", "Pump", "Condensor"],
+        correct: 0
+    },
+    {
+        question: "Which of the following types of welding uses a filler material that is melted to form a joint?",
+        answers: ["MIG welding", "TIG welding", "Stick welding", "Gas welding"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the primary function of the flywheel in an engine?",
+        answers: ["To store energy and maintain a constant rotational speed", "To ignite the fuel", "To reduce friction", "To increase the engine temperature"],
+        correct: 0
+    },
+    {
+        question: "What is the term for the process of reducing the size of a material through the application of force?",
+        answers: ["Milling", "Grinding", "Machining", "Forging"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is commonly used as a coolant in engine radiators?",
+        answers: ["Water", "Oil", "Antifreeze", "Gasoline"],
+        correct: 2
+    },
+    {
+        question: "Which of the following materials is often used for high-performance bearings in machinery?",
+        answers: ["Copper", "Bronze", "Aluminum", "Ceramic"],
+        correct: 3
+    },
+    {
+        question: "Which of the following engines uses an external combustion process?",
+        answers: ["Diesel engine", "Steam engine", "Electric engine", "Internal combustion engine"],
+        correct: 1
+    },{
+        question: "Which type of stress is caused by forces acting perpendicular to the surface?",
+        answers: ["Shear stress", "Compressive stress", "Tensile stress", "Bending stress"],
+        correct: 0
+    },
+    {
+        question: "What type of pump is used in a hydraulic system to move fluids?",
+        answers: ["Gear pump", "Centrifugal pump", "Reciprocating pump", "Diaphragm pump"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the main function of a governor in an engine?",
+        answers: ["To regulate the engine speed", "To ignite the fuel", "To control exhaust gases", "To compress the air-fuel mixture"],
+        correct: 0
+    },
+    {
+        question: "Which of the following metals is commonly used for casting due to its good fluidity?",
+        answers: ["Aluminum", "Iron", "Copper", "Steel"],
+        correct: 0
+    },
+    {
+        question: "Which is the primary purpose of a condenser in a refrigeration cycle?",
+        answers: ["To absorb heat from the refrigerant", "To increase refrigerant pressure", "To remove moisture from the refrigerant", "To release heat to the surroundings"],
+        correct: 3
+    },
+    {
+        question: "What is the unit of power in the International System of Units?",
+        answers: ["Joule", "Newton", "Watt", "Volt"],
+        correct: 2
+    },
+    {
+        question: "What is the main difference between a gear and a pulley?",
+        answers: ["Gears mesh with teeth, pulleys use belts", "Gears are larger", "Pulleys are used for power transmission", "Gears are used for vertical movement"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is used in the construction of engine cylinder heads?",
+        answers: ["Aluminum", "Steel", "Copper", "Brass"],
+        correct: 0
+    },
+    {
+        question: "What type of force is exerted on a material during tensile testing?",
+        answers: ["Shear force", "Axial force", "Bending force", "Tensile force"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of an expansion valve in refrigeration?",
+        answers: ["To increase the refrigerant pressure", "To decrease the refrigerant pressure", "To regulate the airflow", "To cool the refrigerant"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the best method for measuring the hardness of a material?",
+        answers: ["Tensile testing", "Brinell hardness test", "Charpy impact test", "Fatigue test"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to reduce the vibration in an internal combustion engine?",
+        answers: ["Balancer shaft", "Piston", "Flywheel", "Turbocharger"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'specific heat' refer to in thermodynamics?",
+        answers: ["The heat required to raise the temperature of a unit mass by one degree", "The heat required to change the state of a substance", "The total energy of a substance", "The energy required to compress a gas"],
+        correct: 0
+    },
+    {
+        question: "Which material is used for making the engine block?",
+        answers: ["Aluminum", "Copper", "Cast iron", "Steel"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a major disadvantage of using a diesel engine?",
+        answers: ["High fuel consumption", "Low efficiency", "High maintenance cost", "Higher emissions"],
+        correct: 3
+    },
+    {
+        question: "What type of motion is associated with a crankshaft in an internal combustion engine?",
+        answers: ["Rotational motion", "Linear motion", "Oscillatory motion", "Translational motion"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the primary material used for the construction of turbine blades?",
+        answers: ["Aluminum", "Steel", "Copper", "Nickel alloys"],
+        correct: 3
+    },
+    {
+        question: "What does the term 'reynolds number' represent in fluid mechanics?",
+        answers: ["The ratio of inertial forces to viscous forces", "The ratio of velocity to pressure", "The rate of heat transfer in a fluid", "The density of a fluid"],
+        correct: 0
+    },
+    {
+        question: "Which of the following components is used to regulate the fuel mixture in a carburetor?",
+        answers: ["Throttle valve", "Fuel injector", "Venturi", "Spark plug"],
+        correct: 2
+    },
+    {
+        question: "Which type of valve is typically used in internal combustion engines to control exhaust gases?",
+        answers: ["Intake valve", "Exhaust valve", "Control valve", "Relief valve"],
+        correct: 1
+    },
+    {
+        question: "What type of mechanical power transmission system uses a belt to transmit motion?",
+        answers: ["Chain drive", "Pulley system", "Gear drive", "Shaft system"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to measure the rotational speed of an engine?",
+        answers: ["Manometer", "Tachometer", "Voltmeter", "Ammeter"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of a spark plug in an internal combustion engine?",
+        answers: ["To ignite the fuel-air mixture", "To cool the engine", "To regulate exhaust gases", "To increase air intake"],
+        correct: 0
+    },
+    {
+        question: "What is the term used to describe the amount of heat required to raise the temperature of a unit mass of a substance by one degree Celsius?",
+        answers: ["Specific heat", "Latent heat", "Heat capacity", "Thermal conductivity"],
+        correct: 0
+    },
+    {
+        question: "What is the most commonly used fuel in internal combustion engines?",
+        answers: ["Gasoline", "Diesel", "Ethanol", "Hydrogen"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the primary function of a heat exchanger?",
+        answers: ["To increase the temperature of fluids", "To transfer heat between two fluids", "To compress fluids", "To cool gases"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of a camshaft in an internal combustion engine?",
+        answers: ["To control the opening and closing of valves", "To ignite the fuel", "To compress the air-fuel mixture", "To reduce vibrations"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the unit of pressure?",
+        answers: ["Newton", "Joule", "Pascal", "Watt"],
+        correct: 2
+    },
+    {
+        question: "What is the process of increasing the hardness of a material by heating and cooling it called?",
+        answers: ["Tempering", "Quenching", "Annealing", "Hardening"],
+        correct: 1
+    },
+    {
+        question: "What is the term used for the process of shaping a material by removing unwanted material using cutting tools?",
+        answers: ["Casting", "Milling", "Forging", "Welding"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of the cooling system in an engine?",
+        answers: ["To increase the engine temperature", "To regulate exhaust gases", "To prevent overheating", "To increase fuel efficiency"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the most commonly used bearing type?",
+        answers: ["Ball bearing", "Roller bearing", "Needle bearing", "Magnetic bearing"],
+        correct: 0
+    },
+    {
+        question: "Which of the following systems is used to convert mechanical energy into electrical energy?",
+        answers: ["Engine", "Generator", "Compressor", "Condenser"],
+        correct: 1
+    },
+    {
+        question: "What is the unit of torque?",
+        answers: ["Newton", "Joule", "Watt", "Newton-meter"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is used to increase the air intake in an internal combustion engine?",
+        answers: ["Turbocharger", "Exhaust valve", "Flywheel", "Compressor"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a timing belt in an engine?",
+        answers: ["To drive the camshaft and synchronize the timing of the valves", "To ignite the fuel", "To compress the air-fuel mixture", "To reduce engine vibrations"],
+        correct: 0
+    },
+    {
+        question: "Which of the following methods is used to reduce wear and friction in machinery?",
+        answers: ["Lubrication", "Cooling", "Vibration", "Exhaust"],
+        correct: 0
+    },
+    {
+        question: "What is the main component of a combustion chamber in an engine?",
+        answers: ["Cylinder", "Piston", "Crankshaft", "Exhaust valve"],
+        correct: 0
+    }, {
+        question: "Which of the following is the primary function of a flywheel in an engine?",
+        answers: ["To store rotational energy", "To regulate engine temperature", "To cool the engine", "To filter exhaust gases"],
+        correct: 0
+    },
+    {
+        question: "Which law states that the pressure of a gas is inversely proportional to its volume at constant temperature?",
+        answers: ["Boyle's law", "Charles' law", "Gay-Lussac's law", "Avogadro's law"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a torque converter in a vehicle?",
+        answers: ["To convert rotational power from the engine to hydraulic energy", "To increase the engine speed", "To reduce fuel consumption", "To regulate exhaust gases"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is used for making the pistons in an engine?",
+        answers: ["Aluminum", "Steel", "Copper", "Brass"],
+        correct: 0
+    },
+    {
+        question: "What is the term used to describe the rate at which work is done?",
+        answers: ["Power", "Energy", "Force", "Momentum"],
+        correct: 0
+    },
+    {
+        question: "Which of the following methods is used for welding metal parts?",
+        answers: ["Casting", "Milling", "Arc welding", "Forging"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the correct unit for measuring work done in a system?",
+        answers: ["Newton", "Joule", "Watt", "Pascal"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'brake horsepower' refer to?",
+        answers: ["The power output of an engine measured at the crankshaft", "The power required to run an engine", "The energy used to compress air", "The power required to turn a turbine"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to decrease the pressure in a refrigeration cycle?",
+        answers: ["Expansion valve", "Compressor", "Condenser", "Evaporator"],
+        correct: 0
+    },
+    {
+        question: "Which of the following types of stress is experienced by a body when it is stretched or compressed along its length?",
+        answers: ["Tensile stress", "Compressive stress", "Shear stress", "Bending stress"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a camshaft in an internal combustion engine?",
+        answers: ["To control the timing of the intake and exhaust valves", "To ignite the fuel mixture", "To regulate fuel flow", "To increase engine torque"],
+        correct: 0
+    },
+    {
+        question: "What is the effect of an increase in temperature on the viscosity of a fluid?",
+        answers: ["Viscosity decreases", "Viscosity increases", "Viscosity remains constant", "Viscosity fluctuates"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a condenser in a refrigeration system?",
+        answers: ["To absorb heat from the refrigerant", "To remove moisture from the refrigerant", "To release heat from the refrigerant", "To compress the refrigerant"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a common material used for making gears?",
+        answers: ["Aluminum", "Steel", "Copper", "Plastic"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'brinell hardness' refer to?",
+        answers: ["The ability of a material to resist deformation", "The ability of a material to resist corrosion", "The resistance to impact forces", "The ability of a material to conduct heat"],
+        correct: 0
+    },
+    {
+        question: "Which of the following machines is used for shaping metal by removing material?",
+        answers: ["Lathe", "Milling machine", "Drill press", "Welding machine"],
+        correct: 1
+    },
+    {
+        question: "Which of the following components is used in a car engine to store and release energy?",
+        answers: ["Flywheel", "Piston", "Crankshaft", "Camshaft"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of the exhaust system in an internal combustion engine?",
+        answers: ["To expel the burnt gases", "To regulate engine speed", "To cool the engine", "To increase fuel efficiency"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main function of a radiator in an engine?",
+        answers: ["To absorb heat", "To store energy", "To dissipate heat", "To increase fuel efficiency"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a type of power transmission used in mechanical systems?",
+        answers: ["Hydraulic transmission", "Electric transmission", "Mechanical transmission", "Magnetic transmission"],
+        correct: 2
+    },
+    {
+        question: "Which type of fluid is commonly used in hydraulic systems?",
+        answers: ["Water", "Oil", "Gas", "Alcohol"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the function of the turbocharger in an engine?",
+        answers: ["To increase the amount of air entering the engine", "To regulate fuel flow", "To cool the engine", "To reduce emissions"],
+        correct: 0
+    },
+    {
+        question: "What does the term 'cutting speed' refer to in machining?",
+        answers: ["The speed at which the tool moves across the workpiece", "The speed at which the tool cuts the material", "The speed at which the material is fed into the machine", "The speed at which the workpiece is rotated"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a common material used in the construction of bearings?",
+        answers: ["Steel", "Brass", "Copper", "Aluminum"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a method used for joining two metal pieces?",
+        answers: ["Welding", "Milling", "Casting", "Boring"],
+        correct: 0
+    },
+    {
+        question: "Which of the following types of stresses is associated with the twisting of a material?",
+        answers: ["Shear stress", "Tensile stress", "Compressive stress", "Torsional stress"],
+        correct: 3
+    },
+    {
+        question: "What is the main purpose of a compressor in a refrigeration system?",
+        answers: ["To compress the refrigerant", "To release heat", "To remove moisture", "To increase the cooling effect"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of heat treatment used to increase the hardness of a material?",
+        answers: ["Annealing", "Tempering", "Quenching", "Carburizing"],
+        correct: 2
+    },
+    {
+        question: "What is the function of the intake valve in an engine?",
+        answers: ["To allow the fuel-air mixture to enter the combustion chamber", "To exhaust the burnt gases", "To regulate engine speed", "To cool the engine"],
+        correct: 0
+    },{
+        question: "Which of the following is the main component of a four-stroke internal combustion engine?",
+        answers: ["Cylinder", "Crankshaft", "Piston", "Flywheel"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of a non-ferrous material?",
+        answers: ["Steel", "Cast iron", "Aluminum", "Brass"],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of a governor in an engine?",
+        answers: ["To regulate the fuel flow", "To control the engine speed", "To increase engine torque", "To reduce emissions"],
+        correct: 1
+    },
+    {
+        question: "What does the term 'specific heat capacity' refer to?",
+        answers: ["The amount of heat required to raise the temperature of a substance", "The ability of a material to resist heat flow", "The rate at which a substance absorbs heat", "The total heat energy stored in a substance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is used for making the cylinder heads of internal combustion engines?",
+        answers: ["Steel", "Cast iron", "Aluminum", "Copper"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the basic unit of force in the SI system?",
+        answers: ["Joule", "Newton", "Watt", "Pascal"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a method used to increase the hardness of steel?",
+        answers: ["Annealing", "Tempering", "Quenching", "Casting"],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of a hydraulic press?",
+        answers: ["To increase the force applied", "To decrease the pressure", "To regulate the fluid flow", "To increase the speed of operations"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main purpose of a carburetor in an engine?",
+        answers: ["To mix fuel and air in the correct ratio", "To ignite the fuel-air mixture", "To filter exhaust gases", "To control the engine temperature"],
+        correct: 0
+    },
+    {
+        question: "What is the typical function of a camshaft in an engine?",
+        answers: ["To control the opening and closing of engine valves", "To increase the engine power", "To regulate fuel intake", "To cool the engine"],
+        correct: 0
+    },
+    {
+        question: "What type of stress occurs when two forces act in opposite directions along the same axis?",
+        answers: ["Shear stress", "Tensile stress", "Compressive stress", "Bending stress"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a function of a heat exchanger?",
+        answers: ["To exchange heat between fluids", "To increase fluid pressure", "To filter fluids", "To regulate fluid temperature"],
+        correct: 0
+    },
+    {
+        question: "What is the function of the radiator in a car engine?",
+        answers: ["To release heat from the coolant", "To increase engine temperature", "To regulate fuel flow", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of mechanical advantage used in a lever?",
+        answers: ["Force advantage", "Speed advantage", "Distance advantage", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a thermodynamic process in which the system’s temperature remains constant?",
+        answers: ["Isobaric", "Isochoric", "Isothermal", "Adiabatic"],
+        correct: 2
+    },
+    {
+        question: "What does the term 'fluid dynamics' refer to?",
+        answers: ["The study of the motion of fluids", "The study of the motion of gases", "The study of heat transfer in fluids", "The study of fluid pressure"],
+        correct: 0
+    },
+    {
+        question: "What type of bearing is used to reduce friction in a machine?",
+        answers: ["Ball bearing", "Roller bearing", "Needle bearing", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a common method of preventing corrosion in metals?",
+        answers: ["Painting", "Galvanizing", "Plating", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the main function of a piston in an engine?",
+        answers: ["To convert fuel energy into mechanical energy", "To cool the engine", "To regulate exhaust gases", "To control the fuel flow"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common application of a centrifugal pump?",
+        answers: ["Water pumping", "Air conditioning", "Vacuum cleaning", "Oil extraction"],
+        correct: 0
+    },
+    {
+        question: "What is the primary purpose of using a differential gear in an automobile?",
+        answers: ["To change the gear ratio", "To allow wheels to rotate at different speeds", "To increase the engine speed", "To reduce engine torque"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a factor that affects the efficiency of an engine?",
+        answers: ["Fuel type", "Engine design", "Operating temperature", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the principle behind the operation of a steam turbine?",
+        answers: ["Conversion of thermal energy into mechanical energy", "Conversion of mechanical energy into electrical energy", "Conversion of kinetic energy into potential energy", "Conversion of electrical energy into mechanical energy"],
+        correct: 0
+    },{
+        question: "Which of the following is used to measure the flow of liquid in a pipe?",
+        answers: ["Flowmeter", "Manometer", "Thermometer", "Altimeter"],
+        correct: 0
+    },
+    {
+        question: "What is the principle of operation of a jet engine?",
+        answers: ["Newton’s third law of motion", "Bernoulli's principle", "Law of conservation of energy", "Pascal's law"],
+        correct: 0
+    },
+    {
+        question: "What type of stress is produced when an object is subjected to forces that cause a material to twist?",
+        answers: ["Tensile stress", "Compressive stress", "Shear stress", "Torsional stress"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is a major component of a heat pump?",
+        answers: ["Condenser", "Compressor", "Expansion valve", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the function of the clutch in a car?",
+        answers: ["To connect the engine to the transmission", "To regulate engine temperature", "To increase engine speed", "To control fuel intake"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main purpose of a mechanical filter in an engine?",
+        answers: ["To remove contaminants from the fuel", "To increase fuel efficiency", "To filter exhaust gases", "To cool the engine"],
+        correct: 0
+    },
+    {
+        question: "In a refrigeration cycle, which of the following is the refrigerant used to absorb heat from the surroundings?",
+        answers: ["Water", "Air", "Freon", "Ammonia"],
+        correct: 2
+    },
+    {
+        question: "Which of the following processes is used to reduce the hardness of steel?",
+        answers: ["Quenching", "Tempering", "Hardening", "Annealing"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of an air filter in an internal combustion engine?",
+        answers: ["To regulate the fuel supply", "To clean the air entering the engine", "To reduce exhaust emissions", "To increase engine speed"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to store energy in a suspension system of a vehicle?",
+        answers: ["Leaf spring", "Coil spring", "Shock absorber", "All of the above"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an essential component in a hydraulic system?",
+        answers: ["Pump", "Cylinder", "Fluid", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the effect of increasing the temperature on the viscosity of a fluid?",
+        answers: ["Viscosity increases", "Viscosity decreases", "Viscosity remains unchanged", "Viscosity is inversely proportional to temperature"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of the exhaust system in an automobile?",
+        answers: ["To circulate fuel", "To reduce engine noise", "To control the speed", "To expel exhaust gases safely"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is the most common material used for making turbine blades?",
+        answers: ["Aluminum", "Steel", "Nickel-based alloys", "Copper"],
+        correct: 2
+    },
+    {
+        question: "Which of the following thermodynamic processes occurs without heat transfer?",
+        answers: ["Isobaric", "Isochoric", "Adiabatic", "Isothermal"],
+        correct: 2
+    },
+    {
+        question: "What is the main function of the timing belt in an internal combustion engine?",
+        answers: ["To regulate engine speed", "To synchronize the movement of the crankshaft and camshaft", "To control exhaust gases", "To increase engine torque"],
+        correct: 1
+    },
+    {
+        question: "What type of engine uses a spark plug to ignite the fuel-air mixture?",
+        answers: ["Diesel engine", "Petrol engine", "Gas turbine", "Steam engine"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of a turbocharger in an engine?",
+        answers: ["To increase engine torque", "To reduce fuel consumption", "To increase engine power", "To filter exhaust gases"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a type of mechanical drive system that transfers motion from one part of a machine to another?",
+        answers: ["Gearbox", "Pulley", "Belt", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is an example of a non-contact type sensor used in an engine?",
+        answers: ["Thermocouple", "Optical sensor", "Strain gauge", "Pressure sensor"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of a supercharger in an internal combustion engine?",
+        answers: ["To increase air intake", "To reduce engine temperature", "To increase exhaust emissions", "To improve fuel efficiency"],
+        correct: 0
+    }, {
+        question: "What is the function of a flywheel in an engine?",
+        answers: ["To store rotational energy", "To reduce engine noise", "To regulate exhaust gases", "To increase engine power"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a characteristic of a material that is brittle?",
+        answers: ["It deforms easily", "It breaks without significant deformation", "It is highly ductile", "It absorbs a lot of heat"],
+        correct: 1
+    },
+    {
+        question: "What is the main purpose of a gearbox in a vehicle?",
+        answers: ["To increase engine power", "To transfer power from the engine to the wheels", "To reduce fuel consumption", "To regulate exhaust gases"],
+        correct: 1
+    },
+    {
+        question: "What is the main function of a bearing in a mechanical system?",
+        answers: ["To reduce friction between moving parts", "To increase power output", "To regulate fluid flow", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the temperature of a fluid in an engine?",
+        answers: ["Thermometer", "Manometer", "Flowmeter", "Barometer"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the primary purpose of lubrication in a machine?",
+        answers: ["To reduce friction", "To cool the engine", "To increase power output", "To regulate fluid flow"],
+        correct: 0
+    },
+    {
+        question: "What is the function of a carburetor in an internal combustion engine?",
+        answers: ["To mix fuel with air in the correct ratio", "To regulate the engine speed", "To ignite the fuel-air mixture", "To reduce exhaust emissions"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of welding process?",
+        answers: ["Arc welding", "Casting", "Molding", "Fusing"],
+        correct: 0
+    },
+    {
+        question: "What is the term used to describe the amount of heat required to change the temperature of a substance?",
+        answers: ["Specific heat capacity", "Thermal conductivity", "Latent heat", "Thermal resistance"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is most commonly used for the construction of heat exchangers?",
+        answers: ["Aluminum", "Steel", "Copper", "Iron"],
+        correct: 2
+    },
+    {
+        question: "What is the purpose of a shock absorber in a vehicle?",
+        answers: ["To reduce vibrations", "To increase speed", "To reduce fuel consumption", "To control the engine temperature"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of mechanical advantage?",
+        answers: ["Lever", "Pulley", "Inclined plane", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the main purpose of a timing belt in an engine?",
+        answers: ["To synchronize the camshaft and crankshaft", "To regulate the exhaust gases", "To increase fuel efficiency", "To reduce engine noise"],
+        correct: 0
+    },
+    {
+        question: "What is the unit of pressure in the SI system?",
+        answers: ["Pascal", "Newton", "Joule", "Watt"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of fluid used in a hydraulic system?",
+        answers: ["Water", "Oil", "Air", "Steam"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to increase the fuel efficiency of an engine?",
+        answers: ["Turbocharger", "Supercharger", "Exhaust gas recirculation", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of the following is the primary purpose of a differential in a car?",
+        answers: ["To reduce fuel consumption", "To distribute power to the wheels", "To increase speed", "To control exhaust emissions"],
+        correct: 1
+    },
+    {
+        question: "What is the primary function of an air conditioning system in a car?",
+        answers: ["To cool the cabin", "To increase engine power", "To filter exhaust gases", "To reduce engine noise"],
+        correct: 0
+    },
+    {
+        question: "What is the effect of decreasing the temperature of a fluid on its viscosity?",
+        answers: ["Viscosity increases", "Viscosity decreases", "Viscosity remains constant", "Viscosity becomes unstable"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is most commonly used for making turbine blades?",
+        answers: ["Copper", "Steel", "Nickel-based alloys", "Aluminum"],
+        correct: 2
+    },
+    {
+        question: "What is the function of a valve in an internal combustion engine?",
+        answers: ["To control the flow of gases into and out of the cylinders", "To regulate fuel flow", "To increase engine speed", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a camshaft in an engine?",
+        answers: ["To open and close the engine valves", "To regulate fuel flow", "To ignite the fuel-air mixture", "To reduce exhaust emissions"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the rotational speed of a machine?",
+        answers: ["Tachometer", "Thermometer", "Manometer", "Flowmeter"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of the alternator in a vehicle?",
+        answers: ["To charge the battery", "To control the fuel intake", "To regulate engine speed", "To filter exhaust gases"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of a supercharger in an engine?",
+        answers: ["To increase air intake", "To increase engine power", "To reduce exhaust gases", "To cool the engine"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a type of heat transfer?",
+        answers: ["Conduction", "Convection", "Radiation", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the purpose of a condenser in a refrigeration cycle?",
+        answers: ["To release heat from the refrigerant", "To absorb heat from the environment", "To regulate the refrigerant flow", "To store refrigerant"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is the main function of the engine coolant in a car?",
+        answers: ["To increase engine power", "To regulate engine temperature", "To clean the exhaust gases", "To filter the air intake"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a major component of an internal combustion engine?",
+        answers: ["Cylinder", "Camshaft", "Piston", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What type of energy is converted into mechanical energy in a steam turbine?",
+        answers: ["Electrical energy", "Thermal energy", "Kinetic energy", "Potential energy"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is used to measure the pressure of a fluid in a pipe?",
+        answers: ["Barometer", "Manometer", "Thermometer", "Flowmeter"],
+        correct: 1
+    },
+    {
+        question: "What is the effect of increasing the temperature of a gas on its volume, according to Boyle's law?",
+        answers: ["Volume increases", "Volume decreases", "Volume remains constant", "Volume fluctuates"],
+        correct: 0
+    },
+    {
+        question: "What is the principle of operation of a jet engine?",
+        answers: ["Conservation of mass", "Conservation of energy", "Newton's third law of motion", "Bernoulli's principle"],
+        correct: 2
+    },
+    {
+        question: "What is the primary purpose of a timing chain in an engine?",
+        answers: ["To increase engine speed", "To synchronize the camshaft and crankshaft", "To filter exhaust gases", "To regulate fuel flow"],
+        correct: 1
+    },
+    {
+        question: "What is the term used to describe the rate at which work is done?",
+        answers: ["Power", "Energy", "Force", "Work"],
+        correct: 0
+    },{
+        question: "What is the primary function of a piston in an internal combustion engine?",
+        answers: ["To compress the fuel-air mixture", "To regulate the exhaust gases", "To ignite the fuel", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to measure the speed of a fluid?",
+        answers: ["Manometer", "Thermometer", "Pitot tube", "Barometer"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is the unit of work in the SI system?",
+        answers: ["Joule", "Newton", "Watt", "Pascal"],
+        correct: 0
+    },
+    {
+        question: "Which of the following materials is commonly used for making gears?",
+        answers: ["Steel", "Copper", "Aluminum", "Plastic"],
+        correct: 0
+    },
+    {
+        question: "What is the principle of operation of a hydraulic lift?",
+        answers: ["Pascal's law", "Boyle's law", "Bernoulli's principle", "Newton's second law"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common method for controlling the speed of an electric motor?",
+        answers: ["Changing the supply voltage", "Increasing the current", "Using a variable resistor", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which type of stress is a result of forces acting perpendicular to the surface?",
+        answers: ["Tensile stress", "Shear stress", "Compressive stress", "Bending stress"],
+        correct: 1
+    },
+    {
+        question: "What is the term used to describe the amount of deformation of a material due to an applied load?",
+        answers: ["Stress", "Strain", "Elasticity", "Viscosity"],
+        correct: 1
+    },
+    {
+        question: "What is the purpose of a radiator in a car engine?",
+        answers: ["To cool the engine", "To increase the engine speed", "To filter exhaust gases", "To store fuel"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a common material used for manufacturing turbine blades in gas turbines?",
+        answers: ["Copper", "Nickel-based alloys", "Aluminum", "Cast iron"],
+        correct: 1
+    },
+    {
+        question: "Which of the following processes is used to join two pieces of metal?",
+        answers: ["Welding", "Casting", "Molding", "Forging"],
+        correct: 0
+    },
+    {
+        question: "What is the term used to describe the ratio of the output force to the input force in a machine?",
+        answers: ["Mechanical advantage", "Efficiency", "Power", "Work"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a muffler in an internal combustion engine?",
+        answers: ["To reduce noise", "To filter exhaust gases", "To increase engine power", "To regulate fuel flow"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a measure of a material's ability to resist deformation?",
+        answers: ["Hardness", "Strength", "Toughness", "Elasticity"],
+        correct: 1
+    },
+    {
+        question: "What is the function of a clutch in a vehicle?",
+        answers: ["To connect and disconnect the engine from the transmission", "To increase engine power", "To regulate exhaust gases", "To control the fuel flow"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a type of mechanical wave?",
+        answers: ["Sound wave", "Light wave", "Radio wave", "All of the above"],
+        correct: 0
+    },
+    {
+        question: "Which law explains the relationship between the force applied to a fluid and the pressure exerted by that fluid?",
+        answers: ["Pascal's law", "Boyle's law", "Hooke's law", "Archimedes' principle"],
+        correct: 0
+    },
+    {
+        question: "What is the primary purpose of a thermostat in an engine?",
+        answers: ["To regulate engine temperature", "To filter exhaust gases", "To increase engine power", "To control fuel flow"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a method of measuring temperature in a machine?",
+        answers: ["Thermocouple", "Manometer", "Tachometer", "Flowmeter"],
+        correct: 0
+    },
+    {
+        question: "What is the main function of a crankshaft in an internal combustion engine?",
+        answers: ["To convert the up-and-down motion of the pistons into rotary motion", "To ignite the fuel", "To regulate the exhaust gases", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "What is the unit of power in the SI system?",
+        answers: ["Watt", "Joule", "Pascal", "Newton"],
+        correct: 0
+    },
+    {
+        question: "Which of the following processes is used to reduce the size of metal pieces?",
+        answers: ["Milling", "Casting", "Grinding", "Forging"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is used to measure the speed of a rotating object?",
+        answers: ["Tachometer", "Manometer", "Thermometer", "Flowmeter"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is used to reduce the amount of friction in a machine?",
+        answers: ["Lubrication", "Heating", "Cooling", "Vibration"],
+        correct: 0
+    },
+    {
+        question: "What is the purpose of a governor in an engine?",
+        answers: ["To regulate engine speed", "To reduce exhaust gases", "To filter fuel", "To cool the engine"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a simple machine?",
+        answers: ["Lever", "Pulley", "Inclined plane", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the main function of a valve in an engine?",
+        answers: ["To control the flow of gases into and out of the cylinders", "To regulate fuel flow", "To increase engine power", "To store energy"],
+        correct: 0
+    },
+    {
+        question: "What is the main purpose of a fuel injector in an engine?",
+        answers: ["To inject fuel into the combustion chamber", "To regulate exhaust gases", "To increase engine power", "To filter air intake"],
+        correct: 0
+    }
+
+
+  
+];
+
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 

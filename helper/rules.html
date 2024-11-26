@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In / Sign Up</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .header h2 {
+      color: #333;
+    }
+
+    .header p {
+      color: #777;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #ff7e5f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #feb47b;
+    }
+
+    .toggle-btn {
+      background: transparent;
+      color: #333;
+      text-decoration: underline;
+      cursor: pointer;
+      border: none;
+      margin-top: 10px;
+    }
+
+    .social-btn {
+      background: #4267b2;
+      color: white;
+    }
+
+    #googleLogin {
+      background: #db4a39;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <div class="header">
+        <h2 id="formHeader">Welcome!</h2>
+        <p id="formDescription">Sign in or create a new account.</p>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="signInForm">
+        <input type="email" id="signInEmail" placeholder="Enter Email" required>
+        <input type="password" id="signInPassword" placeholder="Enter Password" required>
+        <button type="submit">Sign In</button>
+        <p>OR</p>
+        <button id="googleLogin" class="social-btn">Sign in with Google</button>
+        <button id="facebookLogin" class="social-btn">Sign in with Facebook</button>
+        <button class="toggle-btn" type="button" onclick="toggleForm()">Don't have an account? Sign Up</button>
+      </form>
+
+      <!-- Sign Up Form -->
+      <form id="signUpForm" class="hidden">
+        <input type="text" id="signUpName" placeholder="Enter Name" required>
+        <input type="number" id="signUpAge" placeholder="Enter Age" required>
+        <input type="file" id="signUpImage" accept="image/*">
+        <input type="number" id="signUpNumber" placeholder="Enter Phone Number" required>
+        <input type="email" id="signUpEmail" placeholder="Enter Email" required>
+        <input type="password" id="signUpPassword" placeholder="Enter Password" required>
+        <button type="submit">Sign Up</button>
+        <button class="toggle-btn" type="button" onclick="toggleForm()">Already have an account? Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const signInForm = document.getElementById('signInForm');
+    const signUpForm = document.getElementById('signUpForm');
+    const formHeader = document.getElementById('formHeader');
+    const formDescription = document.getElementById('formDescription');
+
+    // Toggle between Sign In and Sign Up forms
+    function toggleForm() {
+      if (signInForm.classList.contains('hidden')) {
+        signInForm.classList.remove('hidden');
+        signUpForm.classList.add('hidden');
+        formHeader.textContent = 'Welcome!';
+        formDescription.textContent = 'Sign in or create a new account.';
+      } else {
+        signUpForm.classList.remove('hidden');
+        signInForm.classList.add('hidden');
+        formHeader.textContent = 'Create an Account!';
+        formDescription.textContent = 'Sign up to get started.';
+      }
+    }
+
+    // Simulate Sign In
+    signInForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('signInEmail').value;
+      const password = document.getElementById('signInPassword').value;
+      alert(`Signed in as ${email}`);
+    });
+
+    // Simulate Sign Up
+    signUpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signUpName').value;
+      const age = document.getElementById('signUpAge').value;
+      const email = document.getElementById('signUpEmail').value;
+      const password = document.getElementById('signUpPassword').value;
+      const number = document.getElementById('signUpNumber').value;
+      alert(`Account created for ${name} (${email})`);
+    });
+  </script>
+</body>
+</html>

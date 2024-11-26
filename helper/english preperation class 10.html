@@ -1,0 +1,1142 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            text-align: center;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .answer-btn {
+            padding: 15px;
+            background-color: rgba(59, 47, 47, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            background-color: rgba(255, 165, 0, 1); /* Vibrant orange */
+            
+        }
+
+        .feedback-frame {
+            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 5px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .correct {
+            border: 3px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .incorrect {
+            border: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 1.5em;
+            color: #007bff;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            border-radius: 10px;
+            animation: countdown 10s linear forwards;
+        }
+
+        @keyframes countdown {
+            0% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                background-color: red;
+            }
+        }
+
+        .navigation-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            display: none;
+            margin-top: 20px;
+        }
+
+        p{
+            color:ye
+        }
+        .result-header {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        canvas {
+            max-width: 300px;
+            max-height: 300px;
+        }
+
+        .btn-result {
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-result:hover {
+            background-color: #218838;
+        }
+
+        /* Stop button */
+        .btn-stop {
+            padding: 15px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-stop:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive Design for small screens */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+                width: 95%;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .answer-btn {
+                font-size: 1em;
+                padding: 10px;
+            }
+
+            .feedback-frame {
+                font-size: 1em;
+            }
+
+            .timer {
+                font-size: 1.2em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .chart-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Display Question Number -->
+        
+        <div class="question-number" id="question-number">Question 1 of 6</div>
+
+        <div class="timer">
+           
+            
+        </div>
+
+        <div class="question-container">
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="answers">
+                <button class="answer-btn" id="btn1" onclick="checkAnswer(0)">Option 1</button>
+                <button class="answer-btn" id="btn2" onclick="checkAnswer(1)">Option 2</button>
+                <button class="answer-btn" id="btn3" onclick="checkAnswer(2)">Option 3</button>
+                <button class="answer-btn" id="btn4" onclick="checkAnswer(3)">Option 4</button>
+            </div>
+            <div class="feedback-frame" id="feedback"></div>
+            <div class="navigation-buttons">
+                <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">Previous</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">Next</button>
+            </div>
+            <button class="btn-result" id="viewResultBtn" onclick="showResults()" style="display:none;">View Result</button>
+            <button class="btn-stop" id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+        </div>
+
+        <div class="result">
+            <div class="result-header">Quiz Results</div>
+            <div id="finalScore">Score: 0</div>
+            <div id="percentage">Percentage: 0%</div>
+            <div class="chart-container">
+                <canvas id="pieChart"></canvas>
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+     <script>
+    const questions=
+    [
+    {
+        question: "Which of the following is a synonym for 'happy'?",
+        answers: ["Sad", "Angry", "Joyful", "Bored"],
+        correct: 2
+    },
+    {
+        question: "What is the past tense of 'run'?",
+        answers: ["Ran", "Runned", "Running", "Runs"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adjective?",
+        answers: ["Quickly", "Jump", "Happiness", "Smart"],
+        correct: 3
+    },
+    {
+        question: "What does the word 'diligent' mean?",
+        answers: ["Lazy", "Hardworking", "Smart", "Uninterested"],
+        correct: 1
+    },
+    {
+        question: "Which of these sentences is grammatically correct?",
+        answers: ["She don't like pizza", "He do like to swim", "I am going to school", "They was playing football"],
+        correct: 2
+    },
+    {
+        question: "What is the opposite of 'strong'?",
+        answers: ["Weak", "Tough", "Brave", "Powerful"],
+        correct: 0
+    },
+    {
+        question: "Which is a preposition?",
+        answers: ["Quick", "Under", "Beautiful", "Blue"],
+        correct: 1
+    },
+    {
+        question: "What is the correct form of the word: 'She has __ a book.'",
+        answers: ["Read", "Reading", "Reads", "Readed"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a noun?",
+        answers: ["Walk", "Beautiful", "Car", "Jumping"],
+        correct: 2
+    },
+    {
+        question: "What type of word is 'but'?",
+        answers: ["Noun", "Verb", "Conjunction", "Adjective"],
+        correct: 2
+    },
+    {
+        question: "Which sentence is in the future tense?",
+        answers: ["I go to school.", "I am going to school.", "I will go to school.", "I went to school."],
+        correct: 2
+    },
+    {
+        question: "What is the plural of 'child'?",
+        answers: ["Children", "Childs", "Childes", "Childern"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adverb?",
+        answers: ["Quick", "Quickly", "Quickness", "Quicker"],
+        correct: 1
+    },
+    {
+        question: "What is the correct form of the word: 'They __ the books every week.'",
+        answers: ["Read", "Reads", "Reading", "Readed"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences contains a simile?",
+        answers: ["He is as brave as a lion.", "He is brave.", "He is a lion.", "He is strong."],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a complete sentence?",
+        answers: ["Running in the park.", "She enjoys reading.", "Jumping over the wall.", "After school."],
+        correct: 1
+    },
+    {
+        question: "Which is the correct possessive form of 'child'?",
+        answers: ["Child's", "Children's", "Childes'", "Childs'"],
+        correct: 0
+    },
+    {
+        question: "What is the antonym of 'brave'?",
+        answers: ["Cowardly", "Fearful", "Shy", "Bold"],
+        correct: 0
+    },
+    {
+        question: "Which sentence is in passive voice?",
+        answers: ["The cake was eaten by her.", "She eats the cake.", "She is eating the cake.", "They eat the cake."],
+        correct: 0
+    },
+    {
+        question: "Which of these words is a conjunction?",
+        answers: ["Run", "And", "Dog", "Sleep"],
+        correct: 1
+    },
+    {
+        question: "Which is the correct form of the word: 'He __ the car every day.'",
+        answers: ["Drive", "Drives", "Driving", "Drove"],
+        correct: 1
+    },
+    {
+        question: "What does the word 'elated' mean?",
+        answers: ["Sad", "Excited", "Angry", "Confused"],
+        correct: 1
+    },  {
+        question: "What is the past tense of 'go'?",
+        answers: ["Gone", "Went", "Going", "Goes"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a synonym for 'bright'?",
+        answers: ["Dark", "Dim", "Shiny", "Quiet"],
+        correct: 2
+    },
+    {
+        question: "What is the antonym of 'happy'?",
+        answers: ["Sad", "Joyful", "Glad", "Excited"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a correct sentence?",
+        answers: ["He play football.", "He plays football.", "He playing football.", "He played footballs."],
+        correct: 1
+    },
+    {
+        question: "What is the plural of 'woman'?",
+        answers: ["Women", "Womans", "Womene", "Womenes"],
+        correct: 0
+    },
+    {
+        question: "Which word is an adjective?",
+        answers: ["Quickly", "Swim", "Blue", "Jump"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is an article?",
+        answers: ["An", "A", "The", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What type of word is 'happy'?",
+        answers: ["Noun", "Adjective", "Verb", "Adverb"],
+        correct: 1
+    },
+    {
+        question: "Which of these is a preposition?",
+        answers: ["Under", "Beautiful", "Jump", "Happiness"],
+        correct: 0
+    },
+    {
+        question: "Which sentence uses a conjunction correctly?",
+        answers: ["I like tea and coffee.", "I like tea coffee.", "I like and tea coffee.", "I like coffee, but tea."],
+        correct: 0
+    },
+    {
+        question: "Which of these words is a verb?",
+        answers: ["Sing", "Sung", "Sings", "Singing"],
+        correct: 0
+    },
+    {
+        question: "What is the antonym of 'begin'?",
+        answers: ["End", "Start", "Finish", "Continue"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences is in future tense?",
+        answers: ["I will read a book.", "I read a book.", "I am reading a book.", "I readed a book."],
+        correct: 0
+    },
+    {
+        question: "What does the word 'abundant' mean?",
+        answers: ["Scarce", "Plenty", "Rare", "Excessive"],
+        correct: 1
+    },
+    {
+        question: "Which is the correct form of the word: 'They __ to school every day.'",
+        answers: ["Go", "Goes", "Going", "Gone"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is a noun?",
+        answers: ["Running", "Jump", "Book", "Fast"],
+        correct: 2
+    },
+    {
+        question: "What is the opposite of 'rich'?",
+        answers: ["Poor", "Wealthy", "Affluent", "Comfortable"],
+        correct: 0
+    },
+    {
+        question: "Which word is an adverb?",
+        answers: ["Beautiful", "Quickly", "Fast", "Swim"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a question word?",
+        answers: ["Happy", "Why", "Beautiful", "Sing"],
+        correct: 1
+    },
+    {
+        question: "What is the correct form of the word: 'He __ a new car.'",
+        answers: ["Bought", "Buy", "Buying", "Buys"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences is correct?",
+        answers: ["The dog barks loudly.", "The dog bark loudly.", "The dog barked loudly.", "Barks the dog loudly."],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'clean'?",
+        answers: ["Dirty", "Neat", "Cleaned", "Wiped"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adjective?",
+        answers: ["Quick", "Quickly", "Jump", "Swim"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a correct sentence?",
+        answers: ["She can sings well.", "She sing well.", "She sings well.", "She singing well."],
+        correct: 2
+    },
+    {
+        question: "Which of these words is a conjunction?",
+        answers: ["On", "And", "Jump", "Fast"],
+        correct: 1
+    },
+    {
+        question: "Which of these sentences is in passive voice?",
+        answers: ["The book is being read by her.", "She is reading the book.", "She reads the book.", "She is a book reader."],
+        correct: 0
+    },
+    {
+        question: "What is the plural form of 'child'?",
+        answers: ["Children", "Childs", "Childes", "Childeren"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences uses a gerund?",
+        answers: ["I like swimming.", "I like to swim.", "I swim.", "I will swim."],
+        correct: 0
+    },
+    {
+        question: "Which is a correct sentence?",
+        answers: ["He can to swim.", "He can swim.", "He swim can.", "He swim."],
+        correct: 1
+    },
+    {
+        question: "Which of these is a correct preposition?",
+        answers: ["On", "At", "In", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of these is the correct form of the word 'dance'?",
+        answers: ["Danced", "Dances", "Dancing", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the synonym of 'hard'?",
+        answers: ["Difficult", "Soft", "Easy", "Quick"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'early'?",
+        answers: ["Late", "Quick", "Fast", "Slow"],
+        correct: 0
+    },
+    {
+        question: "What is the past tense of 'eat'?",
+        answers: ["Ate", "Eats", "Eating", "Eaten"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a possessive noun?",
+        answers: ["Girl", "Girls", "Girl's", "Girls'"],
+        correct: 2
+    },
+    {
+        question: "Which word is an adjective?",
+        answers: ["She runs fast.", "He is a tall boy.", "They walked quickly.", "They are running."],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the correct form of 'sing' in past tense?",
+        answers: ["Sang", "Singed", "Sings", "Sung"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an interjection?",
+        answers: ["Wow!", "Book", "Quickly", "Under"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a simple sentence?",
+        answers: ["I like reading books.", "Although I like reading, I do not have time.", "She was singing while running.", "None of the above."],
+        correct: 0
+    },
+    {
+        question: "What is the comparative form of 'good'?",
+        answers: ["Gooder", "More good", "Better", "Best"],
+        correct: 2
+    },
+    {
+        question: "Which of these words is a pronoun?",
+        answers: ["She", "Run", "Book", "Beautiful"],
+        correct: 0
+    },
+    {
+        question: "What does the word 'comprehensive' mean?",
+        answers: ["Limited", "Extensive", "Partial", "Inadequate"],
+        correct: 1
+    },
+    {
+        question: "What is the past tense of 'go'?",
+        answers: ["Went", "Gone", "Going", "Goes"],
+        correct: 0
+    }, {
+        question: "Which of the following is a compound sentence?",
+        answers: ["I like tea.", "I like tea and I like coffee.", "I like tea or I like coffee.", "None of the above."],
+        correct: 1
+    },
+    {
+        question: "What is the plural form of 'fox'?",
+        answers: ["Foxes", "Foxs", "Foxies", "Foxen"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a noun?",
+        answers: ["Fast", "Swim", "Happiness", "Quickly"],
+        correct: 2
+    },
+    {
+        question: "What is the comparative form of 'bad'?",
+        answers: ["Badder", "Worse", "Worst", "More bad"],
+        correct: 1
+    },
+    {
+        question: "Which of these sentences is in past continuous tense?",
+        answers: ["I am reading a book.", "I read a book.", "I was reading a book.", "I will read a book."],
+        correct: 2
+    },
+    {
+        question: "Which word is the subject in the sentence 'The cat sat on the mat'?",
+        answers: ["The", "Sat", "Cat", "Mat"],
+        correct: 2
+    },
+    {
+        question: "Which sentence is in the present perfect tense?",
+        answers: ["I read the book.", "I have read the book.", "I am reading the book.", "I will read the book."],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a synonym for 'big'?",
+        answers: ["Large", "Small", "Tiny", "Little"],
+        correct: 0
+    },
+    {
+        question: "Which sentence uses a reflexive pronoun?",
+        answers: ["I did it myself.", "I did it.", "I do it.", "I have done it."],
+        correct: 0
+    },
+    {
+        question: "What is the antonym of 'empty'?",
+        answers: ["Full", "Large", "Big", "Tiny"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences is a correct question?",
+        answers: ["Is you coming?", "Do you coming?", "Are you coming?", "You are coming?"],
+        correct: 2
+    },
+    {
+        question: "Which of the following is a correct use of an apostrophe?",
+        answers: ["The books cover", "The book's cover", "The books' cover", "The book cover's"],
+        correct: 1
+    },
+    {
+        question: "Which word is a preposition?",
+        answers: ["On", "Fast", "Run", "Quickly"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'fast'?",
+        answers: ["Slow", "Quick", "Speedy", "Rapid"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a present perfect continuous tense?",
+        answers: ["I have been reading a book.", "I have read a book.", "I am reading a book.", "I read a book."],
+        correct: 0
+    },
+    {
+        question: "Which sentence is in past perfect tense?",
+        answers: ["I had gone to the market.", "I go to the market.", "I am going to the market.", "I will go to the market."],
+        correct: 0
+    },
+    {
+        question: "Which is a synonym for 'happy'?",
+        answers: ["Sad", "Joyful", "Angry", "Bored"],
+        correct: 1
+    },
+    {
+        question: "Which sentence is in future tense?",
+        answers: ["I will eat an apple.", "I am eating an apple.", "I ate an apple.", "I eat an apple."],
+        correct: 0
+    },
+    {
+        question: "What is the past tense of 'sleep'?",
+        answers: ["Slept", "Sleeps", "Sleeping", "Sleeped"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adverb?",
+        answers: ["Quick", "Quickly", "Quickness", "Quickest"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is the correct plural form of 'child'?",
+        answers: ["Children", "Childs", "Childeren", "Childes"],
+        correct: 0
+    },
+    {
+        question: "Which is a correct question word?",
+        answers: ["When", "Where", "Why", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of these is an example of a conjunction?",
+        answers: ["But", "Because", "So", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "Which of these is a correct possessive form?",
+        answers: ["The dog bone's", "The dog's bone", "The dogs bone", "The dog bone"],
+        correct: 1
+    },
+    {
+        question: "What is the opposite of 'hard'?",
+        answers: ["Soft", "Tough", "Strong", "Solid"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences uses a conditional?",
+        answers: ["If I study, I will pass the exam.", "I study every day.", "I studied yesterday.", "I am studying now."],
+        correct: 0
+    },
+    {
+        question: "Which of these is a gerund?",
+        answers: ["Swimming", "Swim", "Swam", "Swimmer"],
+        correct: 0
+    },
+    {
+        question: "What is the plural of 'knife'?",
+        answers: ["Knifes", "Knifeses", "Knives", "Kni-ves"],
+        correct: 2
+    },
+    {
+        question: "Which word is a verb?",
+        answers: ["Run", "Fast", "Swim", "Quickly"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a correct use of 'there'?",
+        answers: ["There is a book.", "Their is a book.", "They're is a book.", "They is a book."],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences contains an infinitive?",
+        answers: ["I like to read.", "I am reading.", "I read the book.", "I will read the book."],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences uses an interjection?",
+        answers: ["Wow! That was amazing.", "I am excited to see you.", "She is running fast.", "He is happy."],
+        correct: 0
+    },
+    {
+        question: "What is the antonym of 'love'?",
+        answers: ["Hate", "Like", "Enjoy", "Adore"],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences is correct?",
+        answers: ["She can sings well.", "She can swim well.", "She swim can well.", "She can to swim well."],
+        correct: 1
+    },
+    {
+        question: "What is the opposite of 'heavy'?",
+        answers: ["Light", "Big", "Large", "Small"],
+        correct: 0
+    },
+    {
+        question: "What is the past tense of 'buy'?",
+        answers: ["Bought", "Buys", "Buying", "Buyed"],
+        correct: 0
+    },
+    {
+        question: "Which of these words is a noun?",
+        answers: ["Jump", "Big", "Cat", "Quickly"],
+        correct: 2
+    },
+    {
+        question: "Which sentence uses a direct object?",
+        answers: ["I saw the movie.", "I ran quickly.", "I slept peacefully.", "I smiled."],
+        correct: 0
+    },
+    {
+        question: "Which of these sentences is in active voice?",
+        answers: ["The cat was fed by the dog.", "The dog fed the cat.", "The dog was fed by the cat.", "The cat has been fed by the dog."],
+        correct: 1
+    },
+    {
+        question: "Which of these words is a possessive pronoun?",
+        answers: ["His", "He", "She", "They"],
+        correct: 0
+    },
+    {
+        question: "What is the comparative form of 'easy'?",
+        answers: ["Easier", "More easy", "Easyer", "Most easy"],
+        correct: 0
+    },
+    {
+        question: "Which of these is a correct use of 'too'?",
+        answers: ["I am too tired.", "I am tired too.", "I too am tired.", "All of the above"],
+        correct: 3
+    },
+    {
+        question: "What is the plural of 'mouse'?",
+        answers: ["Mouses", "Mice", "Mices", "Mousees"],
+        correct: 1
+    },
+    {
+        question: "Which word is a conjunction?",
+        answers: ["Although", "Quickly", "Run", "Cat"],
+        correct: 0
+    }, {
+        question: "Which of the following sentences is in future continuous tense?",
+        answers: ["I will be eating lunch.", "I eat lunch.", "I will eat lunch.", "I ate lunch."],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a synonym of 'begin'?",
+        answers: ["Start", "End", "Finish", "Pause"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'short'?",
+        answers: ["Tall", "Long", "Big", "Large"],
+        correct: 1
+    },
+    {
+        question: "Which of the following is an example of an imperative sentence?",
+        answers: ["Sit down.", "He sits down.", "She will sit down.", "I sat down."],
+        correct: 0
+    },
+    {
+        question: "Which of these words is an adjective?",
+        answers: ["Beautiful", "Quick", "Run", "Carefully"],
+        correct: 0
+    },
+    {
+        question: "What is the superlative form of 'happy'?",
+        answers: ["Happiest", "More happy", "Happier", "Happyer"],
+        correct: 0
+    },
+    {
+        question: "What is the plural of 'leaf'?",
+        answers: ["Leaves", "Leafs", "Leavs", "Leves"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a simple sentence?",
+        answers: ["I like tea and I like coffee.", "I like tea because it's refreshing.", "I like tea.", "Although I like tea, I prefer coffee."],
+        correct: 2
+    },
+    {
+        question: "Which of these sentences uses a conditional?",
+        answers: ["If it rains, I will bring an umbrella.", "I will bring an umbrella.", "It is raining now.", "I bring an umbrella."],
+        correct: 0
+    },
+    {
+        question: "What is the past form of 'go'?",
+        answers: ["Goes", "Gone", "Went", "Going"],
+        correct: 2
+    },
+    {
+        question: "Which of these is a question?",
+        answers: ["I am going to the store.", "Where are you going?", "I will go to the store.", "I went to the store."],
+        correct: 1
+    },
+    {
+        question: "Which sentence is in passive voice?",
+        answers: ["The book was read by him.", "He reads the book.", "He will read the book.", "He is reading the book."],
+        correct: 0
+    },
+    {
+        question: "Which of these is a possessive form?",
+        answers: ["The dog's bone", "The dog bone", "Dog's bone", "The bone of the dog"],
+        correct: 0
+    },
+    {
+        question: "What is the correct plural form of 'child'?",
+        answers: ["Children", "Childs", "Childeren", "Childes"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'strong'?",
+        answers: ["Weak", "Tall", "Short", "Big"],
+        correct: 0
+    },
+    {
+        question: "Which sentence is in the future tense?",
+        answers: ["I will study tomorrow.", "I studied yesterday.", "I am studying now.", "I study every day."],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a compound word?",
+        answers: ["Sunflower", "Beautiful", "Quickly", "Faster"],
+        correct: 0
+    },
+    {
+        question: "Which is an example of a direct object?",
+        answers: ["I saw the movie.", "I ran quickly.", "She sleeps.", "He is tall."],
+        correct: 0
+    },
+    {
+        question: "Which of these is an example of a reflexive pronoun?",
+        answers: ["Myself", "I", "He", "They"],
+        correct: 0
+    },
+    {
+        question: "Which sentence is in present continuous tense?",
+        answers: ["She is eating lunch.", "She eats lunch.", "She ate lunch.", "She will eat lunch."],
+        correct: 0
+    },
+    {
+        question: "What is the past tense of 'write'?",
+        answers: ["Wrote", "Writes", "Writing", "Written"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a preposition?",
+        answers: ["Under", "Quickly", "Beautiful", "Run"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'hard'?",
+        answers: ["Soft", "Tough", "Strong", "Heavy"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is a sentence fragment?",
+        answers: ["While walking to school.", "I am walking to school.", "She is running.", "He has left."],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an example of a simile?",
+        answers: ["She is as brave as a lion.", "She is brave like a lion.", "She is a brave lion.", "She is brave."],
+        correct: 0
+    },
+    {
+        question: "Which sentence is in past perfect tense?",
+        answers: ["I had eaten lunch.", "I ate lunch.", "I am eating lunch.", "I will eat lunch."],
+        correct: 0
+    },
+    {
+        question: "Which word is a conjunction?",
+        answers: ["And", "Quickly", "Sing", "Beautiful"],
+        correct: 0
+    },
+    {
+        question: "Which of the following is an adjective?",
+        answers: ["Happy", "Happily", "Happiness", "Happier"],
+        correct: 0
+    },
+    {
+        question: "What is the opposite of 'light'?",
+        answers: ["Heavy", "Bright", "Dark", "Fast"],
+        correct: 2
+    },
+    {
+        question: "Which of the following sentences is correct?",
+        answers: ["She runs fast than him.", "She runs faster than him.", "She run faster than him.", "She faster than him runs."],
+        correct: 1
+    },
+    {
+        question: "Which of the following is a plural pronoun?",
+        answers: ["We", "He", "She", "It"],
+        correct: 0
+    },
+    {
+        question: "Which of these is an imperative sentence?",
+        answers: ["Please, sit down.", "I will sit down.", "I am sitting down.", "I sat down."],
+        correct: 0
+    }
+
+
+]
+
+
+  
+
+
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    
+    const questionText = document.getElementById('question-text');
+    const answerBtns = document.querySelectorAll('.answer-btn');
+    const feedback = document.getElementById('feedback');
+    const questionNumber = document.getElementById('question-number');
+    const finalScore = document.getElementById('finalScore');
+    const percentage = document.getElementById('percentage');
+    const resultContainer = document.querySelector('.result');
+    const viewResultBtn = document.getElementById('viewResultBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    
+    
+    
+    function displayQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        questionText.textContent = currentQuestion.question;
+        for (let i = 0; i < currentQuestion.answers.length; i++) {
+            answerBtns[i].textContent = currentQuestion.answers[i];
+        }
+        questionNumber.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        feedback.textContent = "";
+        startTimer();
+    }
+    
+    function checkAnswer(selectedIndex) {
+        const currentQuestion = questions[currentQuestionIndex];
+        clearTimeout(timer);
+        if (selectedIndex === currentQuestion.correct) {
+            score++;
+            feedback.textContent = "Correct!";
+            feedback.className = "feedback-frame correct";
+        } else {
+            feedback.textContent = "Incorrect!";
+            feedback.className = "feedback-frame incorrect";
+        }
+        setTimeout(() => {
+            nextQuestion();
+        }, 1500);
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length - 1) {
+            currentQuestionIndex++;
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            displayQuestion();
+        }
+    }
+    
+    function showResults() {
+        const percentageScore = (score / questions.length) * 100;
+        finalScore.textContent = `Score: ${score} / ${questions.length}`;
+        percentage.textContent = `Percentage: ${percentageScore.toFixed(2)}%`;
+        
+        // Display the result section and hide the quiz
+        resultContainer.style.display = 'block';
+        document.querySelector('.question-container').style.display = 'none';
+        
+        // Chart.js for visual representation (pie and bar charts)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Correct', 'Incorrect'],
+                datasets: [{
+                    data: [score, questions.length - score],
+                    backgroundColor: ['#28a745', '#dc3545']
+                }]
+            }
+        });
+
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Score'],
+                datasets: [{
+                    label: 'Your Score',
+                    data: [score],
+                    backgroundColor: '#28a745'
+                }]
+            }
+        });
+
+        viewResultBtn.style.display = 'none';
+    }
+
+    function stopQuiz() {
+        
+       
+        showResults();
+    }
+    
+    // Initialize the quiz
+    displayQuestion();
+    function checkAnswer(selectedIndex) {
+    const currentQuestion = questions[currentQuestionIndex];
+    clearInterval(timer);
+
+    // Check if the selected answer is correct
+    if (selectedIndex === currentQuestion.correct) {
+        score++;
+        feedback.textContent = "Correct!";
+        feedback.className = "feedback-frame correct";
+    } else {
+        feedback.textContent = `Incorrect! The correct answer is:   ${currentQuestion.answers[currentQuestion.correct]}`;
+        feedback.className = "feedback-frame incorrect";
+    }
+
+    setTimeout(() => {
+        nextQuestion();
+    }, 1500);
+}
+
+</script>
+
+
+
+  
+
+</body>
+</html> 
